@@ -1,0 +1,11 @@
+export { default as MailBulkIcon } from './MailBulkIcon';
+export { default as ChevronDownIcon } from './ChevronDownIcon';
+export { default as HamburgerIcon } from './HamburgerIcon';
+export { default as CloseIcon } from './CloseIcon';
+export { default as ArrowRightIcon } from './ArrowRightIcon';
+export { default as MailIcon } from './MailIcon';
+export { default as WhatsappIcon } from './WhatsappIcon';
+export { default as SkypeIcon } from './SkypeIcon';
+export { default as TelegramIcon } from './TelegramIcon';
+export { default as FacebookIcon } from './FacebookIcon';
+export { default as AddressIcon } from './AddressIcon';
