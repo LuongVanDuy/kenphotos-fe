@@ -1,3 +1,4 @@
+import FreeTestFiles from '@/components/Home/FreeTestFiles'
 import Footer from '@/components/Layout/Footer'
 import Navbar from '@/components/Layout/Navbar'
 import LayoutProvider from '@/components/Layout/Provider'
@@ -130,6 +131,7 @@ const BlogPage = () => {
         </div>
       </div>
 
+      <FreeTestFiles />
       <Footer />
     </LayoutProvider>
   )
