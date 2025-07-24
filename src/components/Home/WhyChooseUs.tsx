@@ -104,7 +104,7 @@ const WhyChooseUs: React.FC = () => {
                   priority
                 />
               </div>
-              <h3 className='text-[17px] md:text-[28px] font-bold text-text-blue mb-2'>
+              <h3 className='text-[17px] md:text-[28px] font-semibold text-text-blue mb-2'>
                 {benefit.title}
               </h3>
               <p className='text-sm text-text-gray-dark leading-relaxed'>{benefit.description}</p>
