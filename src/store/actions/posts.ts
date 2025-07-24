@@ -1,23 +1,30 @@
-import { fetchWithToken } from "@/app/api";
+import { postApi } from "@/services/api";
 import { AppDispatch } from "../store";
 import { FETCH_POSTS, FETCH_POSTS_FAILURE, FETCH_POSTS_SUCCESS } from "../actionTypes";
-import posts from "../endpoint/posts";
 
-export const fetchPosts = (accessToken: any, option: any) => {
-  return (dispatch: AppDispatch) => {
+export const fetchPosts = (option: any) => {
+  return async (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_POSTS });
-    fetchWithToken(posts.fetchPosts(option), accessToken)
-      .then((response) => {
+
+    try {
+      const response = await postApi.getPosts(option);
+
+      if (response.success) {
         dispatch({
           type: FETCH_POSTS_SUCCESS,
-          payload: { data: response },
+          payload: { data: response.data },
         });
-      })
-      .catch((error) => {
+      } else {
         dispatch({
           type: FETCH_POSTS_FAILURE,
-          payload: { error: error.message },
+          payload: { error: response.error },
         });
+      }
+    } catch (error) {
+      dispatch({
+        type: FETCH_POSTS_FAILURE,
+        payload: { error: error instanceof Error ? error.message : 'Unknown error' },
       });
+    }
   };
 };

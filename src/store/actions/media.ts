@@ -1,23 +1,30 @@
-import { fetchWithToken } from "@/app/api";
+import { mediaApi } from "@/services/api";
 import { AppDispatch } from "../store";
 import { FETCH_MEDIA, FETCH_MEDIA_FAILURE, FETCH_MEDIA_SUCCESS } from "../actionTypes";
-import media from "../endpoint/media";
 
-export const fetchMedia = (accessToken: any, option: any) => {
-  return (dispatch: AppDispatch) => {
+export const fetchMedia = (option: any) => {
+  return async (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_MEDIA });
-    fetchWithToken(media.fetchMedia(option), accessToken)
-      .then((response) => {
+
+    try {
+      const response = await mediaApi.getMedia(option);
+
+      if (response.success) {
         dispatch({
           type: FETCH_MEDIA_SUCCESS,
-          payload: { data: response },
+          payload: { data: response.data },
         });
-      })
-      .catch((error) => {
+      } else {
         dispatch({
           type: FETCH_MEDIA_FAILURE,
-          payload: { error: error.message },
+          payload: { error: response.error },
         });
+      }
+    } catch (error) {
+      dispatch({
+        type: FETCH_MEDIA_FAILURE,
+        payload: { error: error instanceof Error ? error.message : 'Unknown error' },
       });
+    }
   };
 };

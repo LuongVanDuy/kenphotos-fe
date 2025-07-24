@@ -9,6 +9,9 @@ const poppins = Poppins({
   variable: '--font-poppins',
 })
 
+import StyledComponentsRegistry from '@/lib/StyledComponentsRegistry'
+import '../../public/css/globals.css'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -17,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang='en' className={poppins.variable}>
       <body>
-        <LayoutProvider>{children}</LayoutProvider>
+        <StyledComponentsRegistry>
+          <LayoutProvider>{children}</LayoutProvider>
+        </StyledComponentsRegistry>
       </body>
     </html>
   )
