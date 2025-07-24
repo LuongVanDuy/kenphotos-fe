@@ -4,6 +4,7 @@ import React from "react";
 import { Layout, Menu, Typography } from "antd";
 import { AdminMenuHelper, adminMenuConfig } from "@/config/adminMenu";
 import { designTokens } from "../UI/theme";
+import Link from "next/link";
 
 const { Sider } = Layout;
 const { Text } = Typography;
@@ -101,7 +102,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 />
               </div>
             ) : (
-              <div className="space-y-2">
+              <Link href='/' className="space-y-2">
                 <div className="flex items-center justify-center space-x-3">
                   <div>
                     <div className="text-xl font-bold text-white">KenPhotos</div>
@@ -117,7 +118,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 >
                   Admin Dashboard
                 </Text>
-              </div>
+              </Link>
             )}
           </div>
         </div>

@@ -111,14 +111,7 @@ export const AdminThemeProvider: React.FC<AdminThemeProviderProps> = ({
     return { ...defaultThemeConfig, ...defaultConfig };
   });
 
-  // Save to localStorage whenever config changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('admin-theme-config', JSON.stringify(config));
-    }
-  }, [config]);
 
-  // Apply CSS custom properties for theme
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const root = document.documentElement;

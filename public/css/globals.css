@@ -790,3 +790,18 @@ body {
     }
   }
 }
+
+
+
+.ant-message-notice-content {
+  padding: 0 !important;
+  border-radius: 999px !important;
+}
+
+.ant-message-custom-content {
+  padding: 9px 12px !important;
+}
+
+.ant-message-undefined {
+  padding: 0 !important;
+}

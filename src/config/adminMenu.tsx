@@ -261,7 +261,7 @@ export class AdminMenuHelper {
   // Convert config thành Ant Design menu items
   static convertToAntdMenuItems(
     items: MenuItemConfig[], 
-    handleNavigation: (path: string) => void
+    handleNavigation: (path: any) => void
   ): any[] {
     return items.map(item => ({
       key: item.key,

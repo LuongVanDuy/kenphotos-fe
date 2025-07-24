@@ -1,4 +1,5 @@
 import LayoutProvider from "@/components/Layout/Provider";
+import StyledComponentsRegistry from "@/lib/StyledComponentsRegistry";
 import "../../public/css/globals.css";
 
 export default function RootLayout({
@@ -9,7 +10,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <LayoutProvider>{children}</LayoutProvider>
+        <StyledComponentsRegistry>
+          <LayoutProvider>{children}</LayoutProvider>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );
