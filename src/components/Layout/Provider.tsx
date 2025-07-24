@@ -35,9 +35,7 @@ export default function LayoutProvider({ children }: { children: React.ReactNode
       <SessionProvider>
         <AntdRegistry>
           <ConfigProvider locale={viVN}>
-            <Provider store={store}>
-              {children}
-            </Provider>
+            <Provider store={store}>{children}</Provider>
           </ConfigProvider>
         </AntdRegistry>
       </SessionProvider>
@@ -50,9 +48,7 @@ export default function LayoutProvider({ children }: { children: React.ReactNode
         {isAdminRoute ? (
           // Use advanced theme provider for admin routes
           <AdminThemeProvider>
-            <Provider store={store}>
-              {children}
-            </Provider>
+            <Provider store={store}>{children}</Provider>
           </AdminThemeProvider>
         ) : (
           // Use basic config for public routes
