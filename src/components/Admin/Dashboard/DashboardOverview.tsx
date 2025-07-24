@@ -29,8 +29,9 @@ import {
   TeamOutlined,
 } from "@ant-design/icons";
 import { DashboardStats, User, Post, Media } from "@/types";
-import { AdminCard, AdminButton, StatusBadge } from "../UI/StyledComponents";
-import { designTokens } from "../UI/theme";
+import { AdminCard } from "@/components/UI/AdminCard";
+import { AdminButton } from "@/components/UI/AdminButton";
+import { StatusBadge } from "@/components/UI/StatusBadge";
 
 const { Title, Text } = Typography;
 
@@ -111,8 +112,8 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       title: "Total Users",
       value: currentStats.totalUsers,
       icon: <TeamOutlined />,
-      color: designTokens.colors.primary[500],
-      bgColor: designTokens.colors.primary[50],
+      color: "#1677ff",
+      bgColor: "#e6f7ff",
       trend: { value: 12, isPositive: true },
       description: "Active users this month",
     },
@@ -120,8 +121,8 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       title: "Total Posts",
       value: currentStats.totalPosts,
       icon: <FileTextOutlined />,
-      color: designTokens.colors.success[500],
-      bgColor: designTokens.colors.success[50],
+      color: "#52c41a",
+      bgColor: "#f6ffed",
       trend: { value: 8, isPositive: true },
       description: "Published content",
     },
@@ -129,8 +130,8 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       title: "Media Files",
       value: currentStats.totalMedia,
       icon: <PictureOutlined />,
-      color: designTokens.colors.warning[500],
-      bgColor: designTokens.colors.warning[50],
+      color: "#faad14",
+      bgColor: "#fffbe6",
       trend: { value: 3, isPositive: false },
       description: "Images and videos",
     },
@@ -138,8 +139,8 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       title: "Total Views",
       value: currentStats.totalViews,
       icon: <EyeOutlined />,
-      color: designTokens.colors.info[500],
-      bgColor: designTokens.colors.info[50],
+      color: "#2f54eb",
+      bgColor: "#f0f5ff",
       trend: { value: 15, isPositive: true },
       description: "Page views today",
     },
@@ -168,7 +169,15 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
-        <Tag color={status === "published" ? "green" : status === "draft" ? "orange" : "red"}>
+        <Tag
+          color={
+            status === "published"
+              ? "green"
+              : status === "draft"
+              ? "orange"
+              : "red"
+          }
+        >
           {status.toUpperCase()}
         </Tag>
       ),
@@ -191,19 +200,19 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               level={1}
               style={{
                 margin: 0,
-                fontSize: 'clamp(24px, 5vw, 32px)',
+                fontSize: "clamp(24px, 5vw, 32px)",
                 fontWeight: 700,
-                color: designTokens.colors.neutral[900],
+                color: "#595959",
               }}
             >
               Dashboard Overview
             </Title>
             <Text
               style={{
-                fontSize: 'clamp(14px, 3vw, 16px)',
-                color: designTokens.colors.neutral[600],
-                marginTop: '8px',
-                display: 'block',
+                fontSize: "clamp(14px, 3vw, 16px)",
+                color: "#595959",
+                marginTop: "8px",
+                display: "block",
               }}
             >
               Welcome back! Here's what's happening with your site today.
@@ -213,9 +222,9 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
             <Button
               icon={<CalendarOutlined />}
               style={{
-                borderRadius: designTokens.borderRadius.lg,
-                height: '40px',
-                border: `1px solid ${designTokens.colors.neutral[300]}`,
+                borderRadius: 12,
+                height: "40px",
+                border: `1px solid #d9d9d9`,
               }}
               className="admin-touch-target"
             >
@@ -226,7 +235,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               type="primary"
               icon={<EyeOutlined />}
               colorScheme="primary"
-              style={{ height: '40px' }}
+              style={{ height: "40px" }}
               className="admin-touch-target"
             >
               <span className="hidden sm:inline">View Analytics</span>
@@ -245,25 +254,25 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               style={{
                 background: `linear-gradient(135deg, ${card.bgColor}, ${card.bgColor}90)`,
                 border: `1px solid ${card.color}20`,
-                position: 'relative',
-                overflow: 'hidden',
+                position: "relative",
+                overflow: "hidden",
               }}
             >
               {/* Background Pattern */}
               <div
                 style={{
-                  position: 'absolute',
-                  top: '-20px',
-                  right: '-20px',
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '50%',
+                  position: "absolute",
+                  top: "-20px",
+                  right: "-20px",
+                  width: "80px",
+                  height: "80px",
+                  borderRadius: "50%",
                   background: `${card.color}10`,
                   zIndex: 0,
                 }}
               />
 
-              <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ position: "relative", zIndex: 1 }}>
                 <div className="flex items-start justify-between mb-4">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -273,19 +282,23 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                     }}
                   >
                     {React.cloneElement(card.icon, {
-                      style: { fontSize: '20px', color: '#ffffff' }
+                      style: { fontSize: "20px", color: "#ffffff" },
                     })}
                   </div>
                   <div className="flex items-center">
                     {card.trend.isPositive ? (
-                      <ArrowUpOutlined style={{ color: designTokens.colors.success[500], fontSize: '14px' }} />
+                      <ArrowUpOutlined
+                        style={{ color: "#52c41a", fontSize: "14px" }}
+                      />
                     ) : (
-                      <ArrowDownOutlined style={{ color: designTokens.colors.error[500], fontSize: '14px' }} />
+                      <ArrowDownOutlined
+                        style={{ color: "#ff4d4f", fontSize: "14px" }}
+                      />
                     )}
                     <span
                       className="text-sm font-medium ml-1"
                       style={{
-                        color: card.trend.isPositive ? designTokens.colors.success[500] : designTokens.colors.error[500]
+                        color: card.trend.isPositive ? "#52c41a" : "#ff4d4f",
                       }}
                     >
                       {card.trend.value}%
@@ -296,20 +309,17 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                 <div>
                   <div
                     className="text-3xl font-bold mb-1"
-                    style={{ color: designTokens.colors.neutral[900] }}
+                    style={{ color: "#595959" }}
                   >
                     {card.value.toLocaleString()}
                   </div>
                   <div
                     className="text-sm font-medium mb-1"
-                    style={{ color: designTokens.colors.neutral[700] }}
+                    style={{ color: "#595959" }}
                   >
                     {card.title}
                   </div>
-                  <div
-                    className="text-xs"
-                    style={{ color: designTokens.colors.neutral[500] }}
-                  >
+                  <div className="text-xs" style={{ color: "#595959" }}>
                     {card.description}
                   </div>
                 </div>
@@ -329,19 +339,19 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                 <div>
                   <Text
                     style={{
-                      fontSize: '18px',
+                      fontSize: "18px",
                       fontWeight: 600,
-                      color: designTokens.colors.neutral[800],
+                      color: "#595959",
                     }}
                   >
                     Recent Posts
                   </Text>
                   <Text
                     style={{
-                      fontSize: '14px',
-                      color: designTokens.colors.neutral[500],
-                      display: 'block',
-                      marginTop: '4px',
+                      fontSize: "14px",
+                      color: "#595959",
+                      display: "block",
+                      marginTop: "4px",
                     }}
                   >
                     Latest published content
@@ -357,7 +367,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                 </AdminButton>
               </div>
             }
-            style={{ height: 'fit-content' }}
+            style={{ height: "fit-content" }}
           >
             <Table
               dataSource={currentStats.recentPosts}
@@ -366,7 +376,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               size="middle"
               rowKey="id"
               style={{
-                borderRadius: designTokens.borderRadius.lg,
+                borderRadius: 12,
               }}
             />
           </AdminCard>
@@ -380,22 +390,26 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               title={
                 <Text
                   style={{
-                    fontSize: '18px',
+                    fontSize: "18px",
                     fontWeight: 600,
-                    color: designTokens.colors.neutral[800],
+                    color: "#595959",
                   }}
                 >
                   Quick Actions
                 </Text>
               }
             >
-              <Space direction="vertical" style={{ width: "100%" }} size="middle">
+              <Space
+                direction="vertical"
+                style={{ width: "100%" }}
+                size="middle"
+              >
                 <AdminButton
                   type="primary"
                   block
                   icon={<PlusOutlined />}
                   colorScheme="primary"
-                  style={{ height: '48px' }}
+                  style={{ height: "48px" }}
                 >
                   Create New Post
                 </AdminButton>
@@ -403,7 +417,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                   block
                   icon={<PlusOutlined />}
                   colorScheme="neutral"
-                  style={{ height: '48px' }}
+                  style={{ height: "48px" }}
                 >
                   Upload Media
                 </AdminButton>
@@ -411,7 +425,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                   block
                   icon={<UserOutlined />}
                   colorScheme="neutral"
-                  style={{ height: '48px' }}
+                  style={{ height: "48px" }}
                 >
                   Add User
                 </AdminButton>
@@ -423,9 +437,9 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               title={
                 <Text
                   style={{
-                    fontSize: '18px',
+                    fontSize: "18px",
                     fontWeight: 600,
-                    color: designTokens.colors.neutral[800],
+                    color: "#595959",
                   }}
                 >
                   Recent Users
@@ -435,28 +449,26 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               <List
                 dataSource={currentStats.recentUsers}
                 renderItem={(user) => (
-                  <List.Item style={{ padding: '12px 0' }}>
+                  <List.Item style={{ padding: "12px 0" }}>
                     <List.Item.Meta
                       avatar={
                         <Avatar
                           icon={<UserOutlined />}
                           style={{
-                            background: `linear-gradient(135deg, ${designTokens.colors.primary[500]}, ${designTokens.colors.primary[600]})`,
+                            background: `linear-gradient(135deg, #1677ff, #4096ff)`,
                           }}
                         />
                       }
                       title={
-                        <Text style={{ fontWeight: 500, color: designTokens.colors.neutral[800] }}>
+                        <Text style={{ fontWeight: 500, color: "#595959" }}>
                           {user.name}
                         </Text>
                       }
                       description={
-                        <Text style={{ color: designTokens.colors.neutral[500] }}>
-                          {user.email}
-                        </Text>
+                        <Text style={{ color: "#595959" }}>{user.email}</Text>
                       }
                     />
-                    <StatusBadge status={user.status as any} size="small" />
+                    <StatusBadge status={user.status as any} />
                   </List.Item>
                 )}
               />
@@ -467,9 +479,9 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               title={
                 <Text
                   style={{
-                    fontSize: '18px',
+                    fontSize: "18px",
                     fontWeight: 600,
-                    color: designTokens.colors.neutral[800],
+                    color: "#595959",
                   }}
                 >
                   Storage Usage
@@ -479,34 +491,30 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-2">
-                    <Text style={{ fontWeight: 500, color: designTokens.colors.neutral[700] }}>
+                    <Text style={{ fontWeight: 500, color: "#595959" }}>
                       Media Files
                     </Text>
-                    <Text style={{ color: designTokens.colors.neutral[600] }}>
-                      2.4 GB / 10 GB
-                    </Text>
+                    <Text style={{ color: "#595959" }}>2.4 GB / 10 GB</Text>
                   </div>
                   <Progress
                     percent={24}
                     size="small"
-                    strokeColor={designTokens.colors.primary[500]}
-                    trailColor={designTokens.colors.neutral[200]}
+                    strokeColor="#1677ff"
+                    trailColor="#d9d9d9"
                   />
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
-                    <Text style={{ fontWeight: 500, color: designTokens.colors.neutral[700] }}>
+                    <Text style={{ fontWeight: 500, color: "#595959" }}>
                       Database
                     </Text>
-                    <Text style={{ color: designTokens.colors.neutral[600] }}>
-                      156 MB / 1 GB
-                    </Text>
+                    <Text style={{ color: "#595959" }}>156 MB / 1 GB</Text>
                   </div>
                   <Progress
                     percent={15}
                     size="small"
-                    strokeColor={designTokens.colors.success[500]}
-                    trailColor={designTokens.colors.neutral[200]}
+                    strokeColor="#52c41a"
+                    trailColor="#d9d9d9"
                   />
                 </div>
               </div>

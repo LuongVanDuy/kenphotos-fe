@@ -4,8 +4,7 @@ import cx from "classnames";
 import Image from "next/image";
 import { type ReactNode, useEffect, useRef, useState, forwardRef } from "react";
 
-import MinusIcon from "@/assets/minusIcon.svg";
-import PlusIcon from "@/assets/plusRedIcon.svg";
+import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 
 import { InputStyled } from "./styled";
 
@@ -56,7 +55,7 @@ export const CustomInput = forwardRef<
       allowDecimal = false,
       ...rest
     },
-    ref,
+    ref
   ) => {
     const [label, setLabel] = useState<string>();
 
@@ -119,9 +118,7 @@ export const CustomInput = forwardRef<
       <InputStyled className={`${wrapClassName} flex items-center gap-x-2`}>
         {hasMinus && (
           <div className="flex items-center">
-            <Image
-              src={MinusIcon}
-              alt=""
+            <MinusOutlined
               className="w-4 cursor-pointer"
               onClick={() => {
                 if (onMinus) {
@@ -144,7 +141,7 @@ export const CustomInput = forwardRef<
                 !bordered,
               "hide-arrow": hideArrow,
             },
-            prefixIcon ? "pl-10" : "",
+            prefixIcon ? "pl-10" : ""
           )}
           type={type === "number" ? "text" : type}
           placeholder={placeholder}
@@ -158,9 +155,7 @@ export const CustomInput = forwardRef<
         />
         {hasPlus && (
           <div className="flex items-center">
-            <Image
-              src={PlusIcon}
-              alt=""
+            <PlusOutlined
               className="w-4 cursor-pointer"
               onClick={() => {
                 if (onPlus) {
@@ -175,7 +170,7 @@ export const CustomInput = forwardRef<
         )}
       </InputStyled>
     );
-  },
+  }
 );
 
 // Ensure that forwardRef name is set for debugging
@@ -190,7 +185,7 @@ export function CustomTextarea(props: TextAreaProps & { rows?: number }) {
     <TextArea
       className={cx(
         "rounded p-3 border-[#D3D5D7] placeholder-[#999999]",
-        className,
+        className
       )}
       rows={rows}
       {...rest}

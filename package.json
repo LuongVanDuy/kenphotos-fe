@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
     "@ant-design/nextjs-registry": "^1.0.2",
+    "@hookform/resolvers": "^5.1.1",
     "@reduxjs/toolkit": "^2.8.2",
     "antd": "^5.26.5",
     "aos": "^2.3.4",
@@ -19,14 +20,17 @@
     "next": "^14.2.30",
     "next-auth": "^4.24.11",
     "quill": "^2.0.3",
+    "quill-better-table": "^1.2.10",
     "react": "^18",
     "react-compare-slider": "^3.1.0",
     "react-dom": "^18",
     "react-fast-marquee": "^1.6.5",
+    "react-hook-form": "^7.61.1",
     "react-redux": "^9.2.0",
     "redux-thunk": "^3.1.0",
     "styled-components": "^6.1.19",
-    "swiper": "^11.2.10"
+    "swiper": "^11.2.10",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@types/aos": "^3.0.7",

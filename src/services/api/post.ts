@@ -9,7 +9,7 @@ import {
 } from './types';
 
 class PostApiService {
-  private readonly basePath = '/v1/posts';
+  private readonly basePath = '/posts';
 
   /**
    * Get all posts with pagination and filters

@@ -61,3 +61,33 @@ export function CustomModal({
     </StyledModal>
   );
 }
+
+export function CustomShowConfirmModal({
+  title,
+  content,
+  onConfirm,
+  onCancel,
+  okText = "OK",
+  cancelText = "Cancel",
+  type = "info",
+}: {
+  title: string;
+  content: string;
+  onConfirm: () => void;
+  onCancel?: () => void;
+  okText?: string;
+  cancelText?: string;
+  type?: "info" | "warning" | "error" | "success" | "confirm";
+}) {
+  Modal.confirm({
+    title,
+    content,
+    onOk: onConfirm,
+    onCancel,
+    okText,
+    cancelText,
+    centered: true,
+    icon: null,
+    className: "custom-modal-confirm",
+  });
+}

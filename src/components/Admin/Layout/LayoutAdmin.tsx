@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Layout } from "antd";
 import { usePathname, useRouter } from "next/navigation";
 import { AdminMenuHelper } from "@/config/adminMenu";
-import { designTokens } from "../UI/theme";
 import AdminSidebar from "./AdminSidebar";
 import AdminHeader from "./AdminHeader";
 
@@ -35,7 +34,7 @@ const AdminLayout = ({ children }: Props) => {
         setCollapsed(true);
       } else {
         // Auto-expand on desktop if user hasn't manually collapsed
-        const userCollapsed = localStorage.getItem('admin-sidebar-collapsed');
+        const userCollapsed = localStorage.getItem("admin-sidebar-collapsed");
         if (userCollapsed === null) {
           setCollapsed(false);
         }
@@ -43,8 +42,8 @@ const AdminLayout = ({ children }: Props) => {
     };
 
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Update openKeys when pathname changes
@@ -55,7 +54,7 @@ const AdminLayout = ({ children }: Props) => {
   // Save user's collapse preference
   const handleCollapse = (collapsed: boolean) => {
     setCollapsed(collapsed);
-    localStorage.setItem('admin-sidebar-collapsed', collapsed.toString());
+    localStorage.setItem("admin-sidebar-collapsed", collapsed.toString());
   };
 
   // Helper function to handle navigation and close mobile sidebar
@@ -68,19 +67,24 @@ const AdminLayout = ({ children }: Props) => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", background: designTokens.colors.neutral[50] }}>
+    <Layout
+      style={{
+        minHeight: "100vh",
+        background: "#f5f5f5",
+      }}
+    >
       {/* Mobile Overlay - Click outside to close sidebar */}
       {isMobile && !collapsed && (
         <div
           style={{
-            position: 'fixed',
+            position: "fixed",
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
+            background: "rgba(0, 0, 0, 0.5)",
             zIndex: 99,
-            backdropFilter: 'blur(4px)',
+            backdropFilter: "blur(4px)",
           }}
           onClick={() => setCollapsed(true)}
         />
@@ -100,9 +104,9 @@ const AdminLayout = ({ children }: Props) => {
       {/* Main content layout */}
       <Layout
         style={{
-          marginLeft: isMobile ? 0 : (collapsed ? 80 : 280),
-          transition: 'margin-left 0.2s ease-in-out',
-          background: designTokens.colors.neutral[50],
+          marginLeft: isMobile ? 0 : collapsed ? 80 : 280,
+          transition: "margin-left 0.2s ease-in-out",
+          background: "#f5f5f5",
         }}
         className="admin-main-layout"
       >
@@ -120,20 +124,16 @@ const AdminLayout = ({ children }: Props) => {
         {/* Content Area */}
         <Content
           style={{
-            margin: isMobile ? '16px' : '32px',
-            minHeight: 'calc(100vh - 136px)',
-            background: 'transparent',
+            margin: isMobile ? "16px" : "32px",
+            minHeight: "calc(100vh - 136px)",
           }}
         >
           <div
-            className="admin-content-container fade-in"
+            className=" fade-in"
             style={{
-              padding: isMobile ? '16px' : '32px',
-              background: '#ffffff',
-              borderRadius: designTokens.borderRadius.xl,
-              boxShadow: designTokens.boxShadow.md,
-              border: `1px solid ${designTokens.colors.neutral[200]}`,
-              minHeight: 'calc(100vh - 200px)',
+              padding: isMobile ? "16px" : "32px",
+              background: "#ffffff",
+              minHeight: "calc(100vh - 200px)",
             }}
           >
             {children}

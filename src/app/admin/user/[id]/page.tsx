@@ -1,30 +1,30 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Card, 
-  Tabs, 
-  Button, 
-  Avatar, 
-  Tag, 
-  Descriptions, 
-  Space, 
-  Divider, 
+import {
+  Card,
+  Tabs,
+  Button,
+  Avatar,
+  Tag,
+  Descriptions,
+  Space,
+  Divider,
   Table,
   message,
   Skeleton,
 } from "antd";
-import { 
-  UserOutlined, 
-  EditOutlined, 
-  DeleteOutlined, 
+import {
+  UserOutlined,
+  EditOutlined,
+  DeleteOutlined,
   ArrowLeftOutlined,
   LockOutlined,
   HistoryOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { showConfirmModal } from "@/components/Admin/UI";
+import { CustomShowConfirmModal } from "@/components/UI/CustomModal";
 import { User } from "@/types";
 
 interface UserDetailsProps {
@@ -46,8 +46,8 @@ const UserDetailsPage: React.FC<UserDetailsProps> = ({ params }) => {
     setLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Mock user data
       const mockUser: User = {
         id: params.id,
@@ -58,7 +58,7 @@ const UserDetailsPage: React.FC<UserDetailsProps> = ({ params }) => {
         createdAt: "2024-01-15",
         lastLogin: "2024-01-20",
       };
-      
+
       setUser(mockUser);
     } catch (error) {
       message.error("Failed to load user details");
@@ -72,13 +72,14 @@ const UserDetailsPage: React.FC<UserDetailsProps> = ({ params }) => {
   };
 
   const handleDelete = () => {
-    showConfirmModal({
+    CustomShowConfirmModal({
       title: "Delete User",
-      content: "Are you sure you want to delete this user? This action cannot be undone.",
+      content:
+        "Are you sure you want to delete this user? This action cannot be undone.",
       onConfirm: async () => {
         try {
           // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
           message.success("User deleted successfully");
           router.push("/admin/user/list");
         } catch (error) {
@@ -92,13 +93,14 @@ const UserDetailsPage: React.FC<UserDetailsProps> = ({ params }) => {
   };
 
   const handleResetPassword = () => {
-    showConfirmModal({
+    CustomShowConfirmModal({
       title: "Reset Password",
-      content: "Are you sure you want to reset this user's password? They will receive an email with instructions.",
+      content:
+        "Are you sure you want to reset this user's password? They will receive an email with instructions.",
       onConfirm: async () => {
         try {
           // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
           message.success("Password reset email sent");
         } catch (error) {
           message.error("Failed to reset password");
@@ -169,21 +171,43 @@ const UserDetailsPage: React.FC<UserDetailsProps> = ({ params }) => {
             <Skeleton active avatar paragraph={{ rows: 6 }} />
           ) : user ? (
             <Descriptions bordered column={{ xs: 1, sm: 2, md: 2 }}>
-              <Descriptions.Item label="Full Name">{user.name}</Descriptions.Item>
+              <Descriptions.Item label="Full Name">
+                {user.name}
+              </Descriptions.Item>
               <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
               <Descriptions.Item label="Role">
-                <Tag color={user.role === "admin" ? "red" : user.role === "editor" ? "blue" : "default"}>
+                <Tag
+                  color={
+                    user.role === "admin"
+                      ? "red"
+                      : user.role === "editor"
+                      ? "blue"
+                      : "default"
+                  }
+                >
                   {user.role.toUpperCase()}
                 </Tag>
               </Descriptions.Item>
               <Descriptions.Item label="Status">
-                <Tag color={user.status === "active" ? "green" : user.status === "inactive" ? "red" : "orange"}>
+                <Tag
+                  color={
+                    user.status === "active"
+                      ? "green"
+                      : user.status === "inactive"
+                      ? "red"
+                      : "orange"
+                  }
+                >
                   {user.status.toUpperCase()}
                 </Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="Created">{new Date(user.createdAt).toLocaleDateString()}</Descriptions.Item>
+              <Descriptions.Item label="Created">
+                {new Date(user.createdAt).toLocaleDateString()}
+              </Descriptions.Item>
               <Descriptions.Item label="Last Login">
-                {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "Never"}
+                {user.lastLogin
+                  ? new Date(user.lastLogin).toLocaleString()
+                  : "Never"}
               </Descriptions.Item>
             </Descriptions>
           ) : (
@@ -214,18 +238,29 @@ const UserDetailsPage: React.FC<UserDetailsProps> = ({ params }) => {
           <div>
             <h3 className="text-lg font-medium mb-2">Account Settings</h3>
             <div className="space-y-2">
-              <Button type="primary" onClick={handleResetPassword} icon={<LockOutlined />}>
+              <Button
+                type="primary"
+                onClick={handleResetPassword}
+                icon={<LockOutlined />}
+              >
                 Reset Password
               </Button>
             </div>
           </div>
-          
+
           <Divider />
-          
+
           <div>
-            <h3 className="text-lg font-medium mb-2 text-red-500">Danger Zone</h3>
+            <h3 className="text-lg font-medium mb-2 text-red-500">
+              Danger Zone
+            </h3>
             <div className="space-y-2">
-              <Button danger type="primary" onClick={handleDelete} icon={<DeleteOutlined />}>
+              <Button
+                danger
+                type="primary"
+                onClick={handleDelete}
+                icon={<DeleteOutlined />}
+              >
                 Delete User
               </Button>
             </div>
@@ -237,9 +272,9 @@ const UserDetailsPage: React.FC<UserDetailsProps> = ({ params }) => {
 
   return (
     <div>
-      <Button 
-        type="text" 
-        icon={<ArrowLeftOutlined />} 
+      <Button
+        type="text"
+        icon={<ArrowLeftOutlined />}
         onClick={() => router.push("/admin/user/list")}
         className="mb-4"
       >
@@ -256,7 +291,11 @@ const UserDetailsPage: React.FC<UserDetailsProps> = ({ params }) => {
             )}
             <div className="ml-4">
               {loading ? (
-                <Skeleton active paragraph={{ rows: 1 }} title={{ width: 150 }} />
+                <Skeleton
+                  active
+                  paragraph={{ rows: 1 }}
+                  title={{ width: 150 }}
+                />
               ) : (
                 <>
                   <h1 className="text-2xl font-bold">{user?.name}</h1>
@@ -265,12 +304,12 @@ const UserDetailsPage: React.FC<UserDetailsProps> = ({ params }) => {
               )}
             </div>
           </div>
-          
+
           {!loading && (
             <Space>
-              <Button 
-                type="primary" 
-                icon={<EditOutlined />} 
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
                 onClick={handleEdit}
               >
                 Edit

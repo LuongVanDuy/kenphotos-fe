@@ -2,11 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import { Button, Tag, Avatar, Space, message } from "antd";
-import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { DataTable, showConfirmModal, AdminButton, StatusBadge, RoleBadge } from "@/components/Admin/UI";
+import CustomTable from "@/components/UI/CustomTable";
+import { CustomShowConfirmModal } from "@/components/UI/CustomModal";
+import { RoleBadge } from "@/components/UI/RoleBadge";
+import { StatusBadge } from "@/components/UI/StatusBadge";
+import { AdminButton } from "@/components/UI/AdminButton";
+
 import { User } from "@/types";
-import { designTokens } from "@/components/Admin/UI/theme";
 
 const UserListPage: React.FC = () => {
   const router = useRouter();
@@ -60,7 +69,7 @@ const UserListPage: React.FC = () => {
     setLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setUsers(mockUsers);
     } catch (error) {
       message.error("Failed to load users");
@@ -74,14 +83,14 @@ const UserListPage: React.FC = () => {
   };
 
   const handleDelete = (user: User) => {
-    showConfirmModal({
+    CustomShowConfirmModal({
       title: "Delete User",
       content: `Are you sure you want to delete user "${user.name}"? This action cannot be undone.`,
       onConfirm: async () => {
         try {
           // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
-          setUsers(users.filter(u => u.id !== user.id));
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          setUsers(users.filter((u) => u.id !== user.id));
           message.success("User deleted successfully");
         } catch (error) {
           message.error("Failed to delete user");
@@ -103,11 +112,7 @@ const UserListPage: React.FC = () => {
       key: "user",
       render: (_: any, record: User) => (
         <Space>
-          <Avatar 
-            size="small" 
-            icon={<UserOutlined />} 
-            src={record.avatar}
-          />
+          <Avatar size="small" icon={<UserOutlined />} src={record.avatar} />
           <div>
             <div className="font-medium">{record.name}</div>
             <div className="text-sm text-gray-500">{record.email}</div>
@@ -119,17 +124,13 @@ const UserListPage: React.FC = () => {
       title: "Role",
       dataIndex: "role",
       key: "role",
-      render: (role: string) => (
-        <RoleBadge role={role as any} size="small" />
-      ),
+      render: (role: string) => <RoleBadge role={role as any} />,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => (
-        <StatusBadge status={status as any} size="small" />
-      ),
+      render: (status: string) => <StatusBadge status={status as any} />,
     },
     {
       title: "Created",
@@ -141,7 +142,7 @@ const UserListPage: React.FC = () => {
       title: "Last Login",
       dataIndex: "lastLogin",
       key: "lastLogin",
-      render: (date?: string) => 
+      render: (date?: string) =>
         date ? new Date(date).toLocaleDateString() : "Never",
     },
   ];
@@ -150,16 +151,10 @@ const UserListPage: React.FC = () => {
     <div className="fade-in">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1
-            className="text-3xl font-bold mb-2"
-            style={{ color: designTokens.colors.neutral[900] }}
-          >
+          <h1 className="text-3xl font-bold mb-2" style={{ color: "#1F2937" }}>
             Users
           </h1>
-          <p
-            className="text-lg"
-            style={{ color: designTokens.colors.neutral[600] }}
-          >
+          <p className="text-lg" style={{ color: "#4B5563" }}>
             Manage user accounts and permissions
           </p>
         </div>
@@ -168,13 +163,13 @@ const UserListPage: React.FC = () => {
           icon={<PlusOutlined />}
           onClick={() => router.push("/admin/user/create")}
           colorScheme="primary"
-          style={{ height: '48px', fontSize: '16px' }}
+          style={{ height: "48px", fontSize: "16px" }}
         >
           Add User
         </AdminButton>
       </div>
 
-      <DataTable
+      <CustomTable
         columns={columns}
         data={users}
         loading={loading}

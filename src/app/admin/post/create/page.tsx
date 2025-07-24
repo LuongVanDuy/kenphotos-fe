@@ -22,58 +22,74 @@ import {
   SendOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import {
-  TextField,
-  TextAreaField,
-  SelectField,
-  SwitchField,
-  FormActions,
-  UploadField,
-} from "@/components/Admin/UI";
+import { CustomInput, CustomTextarea } from "@/components/UI/CustomInput";
+import { CustomSelect } from "@/components/UI/CustomSelect";
+import { CustomSwitch } from "@/components/UI/CustomSwitch";
+import FormActions from "@/components/UI/FormActions";
+import UploadField from "@/components/UI/UploadField";
+import CustomQuill from "@/components/UI/CustomQuill";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  title: yup.string().required("Please enter the title"),
+  slug: yup.string().required("Please enter the slug"),
+  excerpt: yup.string().required("Please enter the excerpt"),
+  content: yup.string().required("Please enter the content"),
+  status: yup.number().required("Please select status"),
+  password: yup.string(),
+  thumbnail: yup.mixed().nullable().required("Please upload a thumbnail"),
+  categoryIds: yup.array().of(yup.number()).min(1, "Please select categories"),
+});
+
+const defaultValues = {
+  title: "",
+  slug: "",
+  excerpt: "",
+  content: "",
+  status: 0,
+  password: "",
+  thumbnail: "",
+  categoryIds: [],
+};
 
 const CreatePostPage: React.FC = () => {
   const router = useRouter();
-  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [previewMode, setPreviewMode] = useState(false);
-  const [formData, setFormData] = useState<any>({});
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues,
+    resolver: yupResolver(schema),
+    mode: "onTouched",
+  });
 
   const statusOptions = [
-    { value: "draft", label: "Draft" },
-    { value: "published", label: "Published" },
-    { value: "archived", label: "Archived" },
+    { value: 0, label: "Draft" },
+    { value: 1, label: "Published" },
+    { value: 2, label: "Archived" },
   ];
 
   const categoryOptions = [
-    { value: "web-development", label: "Web Development" },
-    { value: "tutorial", label: "Tutorial" },
-    { value: "programming", label: "Programming" },
-    { value: "typescript", label: "TypeScript" },
-    { value: "ui-ux", label: "UI/UX" },
-    { value: "design", label: "Design" },
-    { value: "state-management", label: "State Management" },
+    { value: 1, label: "Web Development" },
+    { value: 2, label: "Tutorial" },
+    { value: 3, label: "Programming" },
+    { value: 4, label: "TypeScript" },
+    { value: 5, label: "UI/UX" },
+    { value: 6, label: "Design" },
+    { value: 7, label: "State Management" },
   ];
 
-  const tagOptions = [
-    { value: "nextjs", label: "Next.js" },
-    { value: "react", label: "React" },
-    { value: "typescript", label: "TypeScript" },
-    { value: "antd", label: "Ant Design" },
-    { value: "redux", label: "Redux" },
-    { value: "tutorial", label: "Tutorial" },
-    { value: "advanced", label: "Advanced" },
-    { value: "patterns", label: "Patterns" },
-    { value: "ui", label: "UI" },
-    { value: "responsive", label: "Responsive" },
-  ];
-
-  const handleSubmit = async (values: any) => {
+  const onSubmit = async (values: any) => {
     setLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      console.log("Creating post:", values);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       message.success("Post created successfully!");
       router.push("/admin/post/list");
     } catch (error) {
@@ -82,99 +98,6 @@ const CreatePostPage: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const handleSaveDraft = async () => {
-    const values = await form.validateFields();
-    values.status = "draft";
-    handleSubmit(values);
-  };
-
-  const handlePublish = async () => {
-    const values = await form.validateFields();
-    values.status = "published";
-    handleSubmit(values);
-  };
-
-  const handlePreview = () => {
-    form.validateFields().then(values => {
-      setFormData(values);
-      setPreviewMode(true);
-    });
-  };
-
-  const handleCancel = () => {
-    router.push("/admin/post/list");
-  };
-
-  if (previewMode) {
-    return (
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <Button
-            type="text"
-            icon={<ArrowLeftOutlined />}
-            onClick={() => setPreviewMode(false)}
-          >
-            Back to Editor
-          </Button>
-          <Space>
-            <Button onClick={handleSaveDraft} icon={<SaveOutlined />}>
-              Save Draft
-            </Button>
-            <Button type="primary" onClick={handlePublish} icon={<SendOutlined />}>
-              Publish
-            </Button>
-          </Space>
-        </div>
-
-        <Card>
-          <article className="prose max-w-none">
-            {formData.featuredImage && (
-              <div className="mb-6">
-                <Image
-                  src={formData.featuredImage}
-                  alt={formData.title}
-                  className="w-full h-64 object-cover rounded"
-                />
-              </div>
-            )}
-
-            <h1 className="text-3xl font-bold mb-4">{formData.title}</h1>
-
-            {formData.excerpt && (
-              <p className="text-lg text-gray-600 mb-6 italic">
-                {formData.excerpt}
-              </p>
-            )}
-
-            <div className="mb-6">
-              {formData.categories?.map((category: string) => (
-                <Tag key={category} color="blue" className="mb-2">
-                  {categoryOptions.find(opt => opt.value === category)?.label || category}
-                </Tag>
-              ))}
-            </div>
-
-            <div className="prose prose-lg">
-              {formData.content?.split('\n').map((paragraph: string, index: number) => (
-                <p key={index}>{paragraph}</p>
-              ))}
-            </div>
-
-            <Divider />
-
-            <div className="flex flex-wrap gap-2">
-              {formData.tags?.map((tag: string) => (
-                <Tag key={tag}>
-                  {tagOptions.find(opt => opt.value === tag)?.label || tag}
-                </Tag>
-              ))}
-            </div>
-          </article>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -186,170 +109,209 @@ const CreatePostPage: React.FC = () => {
       >
         Back to Posts
       </Button>
-
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Create New Post</h1>
-          <p className="text-gray-600">Write and publish a new blog post</p>
-        </div>
-        <Space>
-          <Button onClick={handlePreview} icon={<EyeOutlined />}>
-            Preview
-          </Button>
-          <Button onClick={handleSaveDraft} icon={<SaveOutlined />}>
-            Save Draft
-          </Button>
-          <Button type="primary" onClick={handlePublish} icon={<SendOutlined />}>
-            Publish
-          </Button>
-        </Space>
+      <div className="text-start mb-5">
+        <h1 className="text-3xl font-bold">Create New Post</h1>
       </div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex-1 min-w-0">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+              {/* Title */}
+              <div className="mb-8">
+                <label className="font-semibold block mb-2">Title</label>
+                <Controller
+                  name="title"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomInput
+                      {...field}
+                      placeholder="Title"
+                      maxLength={300}
+                    />
+                  )}
+                />
+                {errors.title && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {errors.title.message}
+                  </div>
+                )}
+              </div>
+              {/* Content */}
+              <div className="mb-10">
+                <Controller
+                  name="content"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomQuill
+                      {...field}
+                      placeholder="Write your post content here..."
+                      style={{ height: "500px" }}
+                      className="quill-editor"
+                    />
+                  )}
+                />
+                {errors.content && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {errors.content.message}
+                  </div>
+                )}
+              </div>
+              {/* Excerpt */}
+              <div className="mb-0">
+                <label className="font-semibold block mb-1">Excerpt</label>
+                <Controller
+                  name="excerpt"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomInput
+                      {...field}
+                      placeholder="Brief description of the post"
+                      maxLength={300}
+                    />
+                  )}
+                />
+                {errors.excerpt && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {errors.excerpt.message}
+                  </div>
+                )}
+              </div>
+              {/* Slug */}
+              <div className="mt-6">
+                <label className="font-semibold block mb-1">URL Slug</label>
+                <Controller
+                  name="slug"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomInput {...field} placeholder="post-url-slug" />
+                  )}
+                />
+                {errors.slug && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {errors.slug.message}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        initialValues={{
-          status: "draft",
-          allowComments: true,
-          featured: false,
-        }}
-      >
-        <Row gutter={24}>
-          {/* Main Content */}
-          <Col xs={24} lg={16}>
-            <Card title="Post Content" className="mb-6">
-              <TextField
-                name="title"
-                label="Title"
-                placeholder="Enter post title"
-                required
-                description="The main title of your post"
-                maxLength={100}
-              />
-
-              <TextField
-                name="slug"
-                label="URL Slug"
-                placeholder="post-url-slug"
-                description="URL-friendly version of the title (auto-generated if empty)"
-              />
-
-              <TextAreaField
-                name="excerpt"
-                label="Excerpt"
-                placeholder="Brief description of the post"
-                rows={3}
-                maxLength={300}
-                description="Short summary that appears in post previews"
-              />
-
-              <TextAreaField
-                name="content"
-                label="Content"
-                placeholder="Write your post content here..."
-                rows={20}
-                required
-                description="The main content of your post (supports Markdown)"
-              />
-            </Card>
-          </Col>
-
-          {/* Sidebar */}
-          <Col xs={24} lg={8}>
-            <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-              {/* Publish Settings */}
-              <Card title="Publish Settings" size="small">
-                <SelectField
+          <div className="w-full lg:w-80 flex-shrink-0">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+              <div className="mb-6">
+                <label className="font-semibold block mb-2">Status</label>
+                <Controller
                   name="status"
-                  label="Status"
-                  options={statusOptions}
-                  required
-                  description="Current status of the post"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomSelect
+                      {...field}
+                      options={statusOptions}
+                      style={{ width: "100%" }}
+                      value={field.value}
+                      onChange={(val) => field.onChange(val)}
+                    />
+                  )}
                 />
-
-                <SwitchField
-                  name="featured"
-                  label="Featured Post"
-                  description="Mark this post as featured"
-                />
-
-                <SwitchField
-                  name="allowComments"
-                  label="Allow Comments"
-                  description="Enable comments for this post"
-                />
-              </Card>
-
-              {/* Featured Image */}
-              <Card title="Featured Image" size="small">
-                <UploadField
-                  name="featuredImage"
-                  label="Upload Image"
-                  description="Main image for the post"
-                  accept="image/*"
-                  listType="picture-card"
-                  maxCount={1}
-                />
-              </Card>
-
+                {errors.status && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {errors.status.message}
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-2 mb-8">
+                <Button
+                  type="default"
+                  onClick={handleSubmit((data) =>
+                    onSubmit({ ...data, status: 0 })
+                  )}
+                  className="flex-1"
+                  disabled={loading}
+                >
+                  Save Draft
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  className="flex-1 font-semibold"
+                >
+                  Publish
+                </Button>
+              </div>
               {/* Categories */}
-              <Card title="Categories" size="small">
-                <SelectField
-                  name="categories"
-                  label="Categories"
-                  placeholder="Select categories"
-                  options={categoryOptions}
-                  mode="multiple"
-                  description="Organize your post into categories"
+              <div className="mb-6">
+                <label className="font-semibold block mb-2">Categories</label>
+                <Controller
+                  name="categoryIds"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomSelect
+                      {...field}
+                      options={categoryOptions}
+                      mode="multiple"
+                      style={{ width: "100%" }}
+                      value={field.value}
+                      onChange={(val) => field.onChange(val)}
+                    />
+                  )}
                 />
-              </Card>
-
-              {/* Tags */}
-              <Card title="Tags" size="small">
-                <SelectField
-                  name="tags"
-                  label="Tags"
-                  placeholder="Select or add tags"
-                  options={tagOptions}
-                  mode="tags"
-                  description="Add relevant tags for better discoverability"
+                {errors.categoryIds && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {errors.categoryIds.message}
+                  </div>
+                )}
+              </div>
+              {/* Thumbnail */}
+              <div className="mb-6">
+                <label className="font-semibold block mb-2">Thumbnail</label>
+                <Controller
+                  name="thumbnail"
+                  control={control}
+                  render={({ field }) => (
+                    <UploadField
+                      {...field}
+                      name="thumbnail"
+                      label="Upload Image"
+                      description="Main image for the post"
+                      accept="image/*"
+                      listType="picture-card"
+                      maxCount={1}
+                      onChange={(file) => field.onChange(file)}
+                    />
+                  )}
                 />
-              </Card>
-
-              {/* SEO Settings */}
-              <Card title="SEO Settings" size="small">
-                <TextField
-                  name="metaTitle"
-                  label="Meta Title"
-                  placeholder="SEO title"
-                  maxLength={60}
-                  description="Title for search engines (60 chars max)"
+                {errors.thumbnail && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {errors.thumbnail.message}
+                  </div>
+                )}
+              </div>
+              {/* Password */}
+              <div className="mb-0">
+                <label className="font-semibold block mb-2">
+                  Password (optional)
+                </label>
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomInput
+                      {...field}
+                      placeholder="Password to protect post"
+                      type="password"
+                    />
+                  )}
                 />
-
-                <TextAreaField
-                  name="metaDescription"
-                  label="Meta Description"
-                  placeholder="SEO description"
-                  rows={3}
-                  maxLength={160}
-                  description="Description for search engines (160 chars max)"
-                />
-              </Card>
-            </Space>
-          </Col>
-        </Row>
-
-        <div className="mt-8 pt-6 border-t">
-          <FormActions
-            loading={loading}
-            onCancel={handleCancel}
-            submitText="Save Post"
-            cancelText="Cancel"
-            showCancel={false}
-          />
+                {errors.password && (
+                  <div className="text-red-500 text-xs mt-1">
+                    {errors.password.message}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-      </Form>
+      </form>
     </div>
   );
 };

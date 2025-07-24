@@ -9,7 +9,7 @@ import {
 } from './types';
 
 class UserApiService {
-  private readonly basePath = '/v1/users';
+  private readonly basePath = '/users';
 
   /**
    * Get all users with pagination and filters

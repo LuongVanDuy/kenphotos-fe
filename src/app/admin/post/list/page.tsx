@@ -11,8 +11,8 @@ import {
   FileTextOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { DataTable, showConfirmModal } from "@/components/Admin/UI";
 import { Post } from "@/types";
+import CustomTable from "@/components/UI/CustomTable";
 
 const { Option } = Select;
 
@@ -20,15 +20,17 @@ const PostListPage: React.FC = () => {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Mock data for demonstration
   const mockPosts: Post[] = [
     {
       id: "1",
       title: "Getting Started with Next.js 14",
-      content: "This is a comprehensive guide to getting started with Next.js 14...",
-      excerpt: "Learn the basics of Next.js 14 and how to build modern web applications.",
+      content:
+        "This is a comprehensive guide to getting started with Next.js 14...",
+      excerpt:
+        "Learn the basics of Next.js 14 and how to build modern web applications.",
       status: "published",
       author: {
         id: "1",
@@ -49,7 +51,8 @@ const PostListPage: React.FC = () => {
       id: "2",
       title: "Advanced TypeScript Patterns",
       content: "Explore advanced TypeScript patterns and techniques...",
-      excerpt: "Deep dive into advanced TypeScript patterns for better code organization.",
+      excerpt:
+        "Deep dive into advanced TypeScript patterns for better code organization.",
       status: "draft",
       author: {
         id: "2",
@@ -67,8 +70,10 @@ const PostListPage: React.FC = () => {
     {
       id: "3",
       title: "Building Responsive UIs with Ant Design",
-      content: "Learn how to create beautiful and responsive user interfaces...",
-      excerpt: "Master the art of building responsive UIs using Ant Design components.",
+      content:
+        "Learn how to create beautiful and responsive user interfaces...",
+      excerpt:
+        "Master the art of building responsive UIs using Ant Design components.",
       status: "published",
       author: {
         id: "1",
@@ -89,7 +94,8 @@ const PostListPage: React.FC = () => {
       id: "4",
       title: "State Management with Redux Toolkit",
       content: "Modern state management patterns using Redux Toolkit...",
-      excerpt: "Simplify your state management with Redux Toolkit's modern approach.",
+      excerpt:
+        "Simplify your state management with Redux Toolkit's modern approach.",
       status: "archived",
       author: {
         id: "2",
@@ -115,11 +121,13 @@ const PostListPage: React.FC = () => {
     setLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       let filteredPosts = mockPosts;
-      if (statusFilter !== 'all') {
-        filteredPosts = mockPosts.filter(post => post.status === statusFilter);
+      if (statusFilter !== "all") {
+        filteredPosts = mockPosts.filter(
+          (post) => post.status === statusFilter
+        );
       }
 
       setPosts(filteredPosts);
@@ -134,25 +142,7 @@ const PostListPage: React.FC = () => {
     router.push(`/admin/post/edit/${post.id}`);
   };
 
-  const handleDelete = (post: Post) => {
-    showConfirmModal({
-      title: "Delete Post",
-      content: `Are you sure you want to delete "${post.title}"? This action cannot be undone.`,
-      onConfirm: async () => {
-        try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
-          setPosts(posts.filter(p => p.id !== post.id));
-          message.success("Post deleted successfully");
-        } catch (error) {
-          message.error("Failed to delete post");
-        }
-      },
-      type: "error",
-      okText: "Delete",
-      cancelText: "Cancel",
-    });
-  };
+  const handleDelete = (post: Post) => {};
 
   const handleView = (post: Post) => {
     router.push(`/admin/post/${post.id}`);
@@ -161,10 +151,12 @@ const PostListPage: React.FC = () => {
   const handleStatusChange = async (post: Post, newStatus: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setPosts(posts.map(p =>
-        p.id === post.id ? { ...p, status: newStatus as any } : p
-      ));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setPosts(
+        posts.map((p) =>
+          p.id === post.id ? { ...p, status: newStatus as any } : p
+        )
+      );
       message.success(`Post status updated to ${newStatus}`);
     } catch (error) {
       message.error("Failed to update post status");
@@ -193,12 +185,14 @@ const PostListPage: React.FC = () => {
             )}
             <div className="flex flex-wrap gap-1">
               {record.tags.slice(0, 3).map((tag) => (
-                <Tag key={tag} size="small" color="blue">
+                <Tag key={tag} className="text-xs px-2 py-0.5" color="blue">
                   {tag}
                 </Tag>
               ))}
               {record.tags.length > 3 && (
-                <Tag size="small">+{record.tags.length - 3}</Tag>
+                <Tag className="text-xs px-2 py-0.5">
+                  +{record.tags.length - 3}
+                </Tag>
               )}
             </div>
           </div>
@@ -223,22 +217,9 @@ const PostListPage: React.FC = () => {
       dataIndex: "status",
       key: "status",
       render: (status: string, record: Post) => (
-        <Select
-          value={status}
-          size="small"
-          style={{ width: 100 }}
-          onChange={(value) => handleStatusChange(record, value)}
-        >
-          <Option value="draft">
-            <Tag color="orange">Draft</Tag>
-          </Option>
-          <Option value="published">
-            <Tag color="green">Published</Tag>
-          </Option>
-          <Option value="archived">
-            <Tag color="red">Archived</Tag>
-          </Option>
-        </Select>
+        <Tag color={status === "published" ? "green" : "orange"}>
+          {status}
+        </Tag>
       ),
     },
     {
@@ -248,7 +229,7 @@ const PostListPage: React.FC = () => {
       render: (categories: string[]) => (
         <div className="space-y-1">
           {categories.map((category) => (
-            <Tag key={category} size="small">
+            <Tag key={category} className="text-xs px-2 py-0.5">
               {category}
             </Tag>
           ))}
@@ -283,7 +264,6 @@ const PostListPage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Posts</h1>
-          <p className="text-gray-600">Manage your blog posts and articles</p>
         </div>
         <Button
           type="primary"
@@ -294,29 +274,7 @@ const PostListPage: React.FC = () => {
         </Button>
       </div>
 
-      <Card className="mb-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <span className="text-sm font-medium">Filter by status:</span>
-            <Select
-              value={statusFilter}
-              onChange={setStatusFilter}
-              style={{ width: 120 }}
-            >
-              <Option value="all">All Posts</Option>
-              <Option value="published">Published</Option>
-              <Option value="draft">Draft</Option>
-              <Option value="archived">Archived</Option>
-            </Select>
-          </div>
-
-          <div className="text-sm text-gray-500">
-            Total: {posts.length} posts
-          </div>
-        </div>
-      </Card>
-
-      <DataTable
+      <CustomTable
         columns={columns}
         data={posts}
         loading={loading}
@@ -326,7 +284,6 @@ const PostListPage: React.FC = () => {
         onView={handleView}
         searchable
         exportable
-        title="All Posts"
       />
     </div>
   );

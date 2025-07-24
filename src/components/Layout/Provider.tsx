@@ -9,7 +9,6 @@ import { Provider } from 'react-redux'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import FloatingContacts from './FloatingContacts'
-import { AdminThemeProvider } from '@/components/Admin/UI/ThemeProvider'
 import authService from '@/services/authService'
 
 export default function LayoutProvider({ children }: { children: React.ReactNode }) {
@@ -46,12 +45,8 @@ export default function LayoutProvider({ children }: { children: React.ReactNode
     <SessionProvider>
       <AntdRegistry>
         {isAdminRoute ? (
-          // Use advanced theme provider for admin routes
-          <AdminThemeProvider>
-            <Provider store={store}>{children}</Provider>
-          </AdminThemeProvider>
+          <Provider store={store}>{children}</Provider>
         ) : (
-          // Use basic config for public routes
           <ConfigProvider locale={viVN}>
             <Provider store={store}>
               {children}

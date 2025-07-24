@@ -8,7 +8,7 @@ import {
 } from './types';
 
 class AuthApiService {
-  private readonly basePath = '/v1/auth';
+  private readonly basePath = '/auth';
 
   /**
    * Login user

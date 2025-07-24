@@ -1,33 +1,30 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Card, 
-  Tabs, 
-  Form, 
-  message, 
-  Divider, 
+import {
+  Card,
+  Tabs,
+  Form,
+  message,
+  Divider,
   Typography,
   Space,
   Button,
   Alert,
 } from "antd";
-import { 
-  SaveOutlined, 
-  SettingOutlined, 
-  GlobalOutlined, 
+import {
+  SaveOutlined,
+  SettingOutlined,
+  GlobalOutlined,
   MailOutlined,
   SecurityScanOutlined,
   DatabaseOutlined,
 } from "@ant-design/icons";
-import {
-  TextField,
-  TextAreaField,
-  SelectField,
-  SwitchField,
-  FormActions,
-  UploadField,
-} from "@/components/Admin/UI";
+import { CustomInput, CustomTextarea } from "@/components/UI/CustomInput";
+import { CustomSelect } from "@/components/UI/CustomSelect";
+import { CustomSwitch } from "@/components/UI/CustomSwitch";
+import FormActions from "@/components/UI/FormActions";
+import UploadField from "@/components/UI/UploadField";
 
 const { Title, Text } = Typography;
 
@@ -36,7 +33,7 @@ const SettingsPage: React.FC = () => {
   const [emailForm] = Form.useForm();
   const [securityForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState("general");
 
   const timezoneOptions = [
     { value: "UTC", label: "UTC" },
@@ -63,8 +60,8 @@ const SettingsPage: React.FC = () => {
     setLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       console.log(`Saving ${formType} settings:`, values);
       message.success(`${formType} settings saved successfully!`);
     } catch (error) {
@@ -79,7 +76,7 @@ const SettingsPage: React.FC = () => {
       <Form
         form={generalForm}
         layout="vertical"
-        onFinish={(values) => handleSaveSettings(values, 'general')}
+        onFinish={(values) => handleSaveSettings(values, "general")}
         initialValues={{
           siteName: "My Admin Panel",
           siteDescription: "A comprehensive admin dashboard",
@@ -90,35 +87,31 @@ const SettingsPage: React.FC = () => {
         }}
       >
         <Title level={4}>Site Information</Title>
-        
-        <TextField
-          name="siteName"
-          label="Site Name"
-          placeholder="Enter site name"
-          required
-          description="The name of your website"
-        />
 
-        <TextAreaField
-          name="siteDescription"
-          label="Site Description"
-          placeholder="Enter site description"
-          rows={3}
-          description="Brief description of your website"
-        />
-
-        <TextField
-          name="siteUrl"
-          label="Site URL"
-          placeholder="https://example.com"
-          type="url"
-          description="The main URL of your website"
-        />
-
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="siteName" style={{ fontWeight: 500 }}>
+            Site Name
+          </label>
+          <CustomInput id="siteName" placeholder="Enter site name" />
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="siteDescription" style={{ fontWeight: 500 }}>
+            Site Description
+          </label>
+          <CustomTextarea
+            id="siteDescription"
+            placeholder="Enter site description"
+            rows={3}
+          />
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="siteUrl" style={{ fontWeight: 500 }}>
+            Site URL
+          </label>
+          <CustomInput id="siteUrl" placeholder="https://example.com" />
+        </div>
         <UploadField
           name="siteLogo"
-          label="Site Logo"
-          description="Upload your site logo"
           accept="image/*"
           listType="picture-card"
           maxCount={1}
@@ -128,37 +121,31 @@ const SettingsPage: React.FC = () => {
 
         <Title level={4}>Localization</Title>
 
-        <SelectField
-          name="timezone"
-          label="Timezone"
-          options={timezoneOptions}
-          required
-          description="Default timezone for the site"
-        />
-
-        <SelectField
-          name="language"
-          label="Default Language"
-          options={languageOptions}
-          required
-          description="Default language for the interface"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="timezone" style={{ fontWeight: 500 }}>
+            Timezone
+          </label>
+          <CustomSelect options={timezoneOptions} style={{ width: "100%" }} />
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="language" style={{ fontWeight: 500 }}>
+            Language
+          </label>
+          <CustomSelect options={languageOptions} style={{ width: "100%" }} />
+        </div>
 
         <Divider />
 
         <Title level={4}>Site Settings</Title>
 
-        <SwitchField
-          name="maintenanceMode"
-          label="Maintenance Mode"
-          description="Enable maintenance mode to temporarily disable the site"
-        />
-
-        <SwitchField
-          name="allowRegistration"
-          label="Allow User Registration"
-          description="Allow new users to register accounts"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <CustomSwitch />
+          <span style={{ marginLeft: 8 }}>Maintenance Mode</span>
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <CustomSwitch />
+          <span style={{ marginLeft: 8 }}>Allow Registration</span>
+        </div>
 
         <FormActions
           loading={loading}
@@ -174,7 +161,7 @@ const SettingsPage: React.FC = () => {
       <Form
         form={emailForm}
         layout="vertical"
-        onFinish={(values) => handleSaveSettings(values, 'email')}
+        onFinish={(values) => handleSaveSettings(values, "email")}
         initialValues={{
           smtpHost: "",
           smtpPort: 587,
@@ -193,84 +180,81 @@ const SettingsPage: React.FC = () => {
 
         <Title level={4}>SMTP Configuration</Title>
 
-        <TextField
-          name="smtpHost"
-          label="SMTP Host"
-          placeholder="smtp.gmail.com"
-          required
-          description="SMTP server hostname"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="smtpHost" style={{ fontWeight: 500 }}>
+            SMTP Host
+          </label>
+          <CustomInput id="smtpHost" placeholder="smtp.gmail.com" />
+        </div>
 
-        <TextField
-          name="smtpPort"
-          label="SMTP Port"
-          placeholder="587"
-          required
-          description="SMTP server port (usually 587 for TLS or 465 for SSL)"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="smtpPort" style={{ fontWeight: 500 }}>
+            SMTP Port
+          </label>
+          <CustomInput id="smtpPort" placeholder="587" />
+        </div>
 
-        <SelectField
-          name="smtpSecurity"
-          label="Security"
-          options={[
-            { value: "none", label: "None" },
-            { value: "tls", label: "TLS" },
-            { value: "ssl", label: "SSL" },
-          ]}
-          required
-          description="Email encryption method"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="smtpSecurity" style={{ fontWeight: 500 }}>
+            Security
+          </label>
+          <CustomSelect
+            options={[
+              { value: "none", label: "None" },
+              { value: "tls", label: "TLS" },
+              { value: "ssl", label: "SSL" },
+            ]}
+            style={{ width: "100%" }}
+          />
+        </div>
 
-        <TextField
-          name="smtpUsername"
-          label="SMTP Username"
-          placeholder="your-email@gmail.com"
-          required
-          description="SMTP authentication username"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="smtpUsername" style={{ fontWeight: 500 }}>
+            SMTP Username
+          </label>
+          <CustomInput id="smtpUsername" placeholder="your-email@gmail.com" />
+        </div>
 
-        <TextField
-          name="smtpPassword"
-          label="SMTP Password"
-          placeholder="Enter password"
-          type="password"
-          required
-          description="SMTP authentication password"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="smtpPassword" style={{ fontWeight: 500 }}>
+            SMTP Password
+          </label>
+          <CustomInput
+            id="smtpPassword"
+            placeholder="Enter password"
+            type="password"
+          />
+        </div>
 
         <Divider />
 
         <Title level={4}>Email Settings</Title>
 
-        <TextField
-          name="adminEmail"
-          label="Admin Email"
-          placeholder="admin@example.com"
-          type="email"
-          required
-          description="Primary admin email address"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="adminEmail" style={{ fontWeight: 500 }}>
+            Admin Email
+          </label>
+          <CustomInput id="adminEmail" placeholder="admin@example.com" />
+        </div>
 
-        <TextField
-          name="fromEmail"
-          label="From Email"
-          placeholder="noreply@example.com"
-          type="email"
-          description="Default 'from' email address for outgoing emails"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="fromEmail" style={{ fontWeight: 500 }}>
+            From Email
+          </label>
+          <CustomInput id="fromEmail" placeholder="noreply@example.com" />
+        </div>
 
-        <TextField
-          name="fromName"
-          label="From Name"
-          placeholder="Your Site Name"
-          description="Default 'from' name for outgoing emails"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="fromName" style={{ fontWeight: 500 }}>
+            From Name
+          </label>
+          <CustomInput id="fromName" placeholder="Your Site Name" />
+        </div>
 
-        <SwitchField
-          name="emailNotifications"
-          label="Enable Email Notifications"
-          description="Send email notifications for various events"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <CustomSwitch />
+          <span style={{ marginLeft: 8 }}>Enable Email Notifications</span>
+        </div>
 
         <FormActions
           loading={loading}
@@ -286,7 +270,7 @@ const SettingsPage: React.FC = () => {
       <Form
         form={securityForm}
         layout="vertical"
-        onFinish={(values) => handleSaveSettings(values, 'security')}
+        onFinish={(values) => handleSaveSettings(values, "security")}
         initialValues={{
           sessionTimeout: 24,
           maxLoginAttempts: 5,
@@ -305,51 +289,49 @@ const SettingsPage: React.FC = () => {
 
         <Title level={4}>Authentication</Title>
 
-        <TextField
-          name="sessionTimeout"
-          label="Session Timeout (hours)"
-          placeholder="24"
-          required
-          description="How long user sessions remain active"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="sessionTimeout" style={{ fontWeight: 500 }}>
+            Session Timeout (hours)
+          </label>
+          <CustomInput id="sessionTimeout" placeholder="24" />
+        </div>
 
-        <TextField
-          name="maxLoginAttempts"
-          label="Max Login Attempts"
-          placeholder="5"
-          required
-          description="Maximum failed login attempts before account lockout"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="maxLoginAttempts" style={{ fontWeight: 500 }}>
+            Max Login Attempts
+          </label>
+          <CustomInput id="maxLoginAttempts" placeholder="5" />
+        </div>
 
-        <SwitchField
-          name="requireStrongPasswords"
-          label="Require Strong Passwords"
-          description="Enforce strong password requirements"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <CustomSwitch />
+          <span style={{ marginLeft: 8 }}>Require Strong Passwords</span>
+        </div>
 
-        <SwitchField
-          name="twoFactorAuth"
-          label="Two-Factor Authentication"
-          description="Enable 2FA for enhanced security"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <CustomSwitch />
+          <span style={{ marginLeft: 8 }}>Two-Factor Authentication</span>
+        </div>
 
         <Divider />
 
         <Title level={4}>Access Control</Title>
 
-        <SwitchField
-          name="ipWhitelist"
-          label="IP Whitelist"
-          description="Restrict access to specific IP addresses"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <CustomSwitch />
+          <span style={{ marginLeft: 8 }}>IP Whitelist</span>
+        </div>
 
-        <TextAreaField
-          name="allowedIps"
-          label="Allowed IP Addresses"
-          placeholder="192.168.1.1&#10;10.0.0.1"
-          rows={4}
-          description="One IP address per line (only if IP whitelist is enabled)"
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="allowedIps" style={{ fontWeight: 500 }}>
+            Allowed IP Addresses
+          </label>
+          <CustomTextarea
+            id="allowedIps"
+            placeholder="192.168.1.1&#10;10.0.0.1"
+            rows={4}
+          />
+        </div>
 
         <FormActions
           loading={loading}
@@ -363,7 +345,7 @@ const SettingsPage: React.FC = () => {
   const systemInfo = (
     <Card>
       <Title level={4}>System Information</Title>
-      
+
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card size="small">
@@ -372,21 +354,21 @@ const SettingsPage: React.FC = () => {
               <div className="text-sm text-gray-500">Application Version</div>
             </div>
           </Card>
-          
+
           <Card size="small">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">Online</div>
               <div className="text-sm text-gray-500">System Status</div>
             </div>
           </Card>
-          
+
           <Card size="small">
             <div className="text-center">
               <div className="text-2xl font-bold text-orange-600">2.4 GB</div>
               <div className="text-sm text-gray-500">Storage Used</div>
             </div>
           </Card>
-          
+
           <Card size="small">
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">1,234</div>
@@ -400,11 +382,21 @@ const SettingsPage: React.FC = () => {
         <div>
           <Title level={5}>Environment Information</Title>
           <div className="space-y-2 text-sm">
-            <div><strong>Node.js:</strong> v18.17.0</div>
-            <div><strong>Next.js:</strong> v14.2.30</div>
-            <div><strong>React:</strong> v18.0.0</div>
-            <div><strong>Database:</strong> PostgreSQL 15.0</div>
-            <div><strong>Server:</strong> Vercel</div>
+            <div>
+              <strong>Node.js:</strong> v18.17.0
+            </div>
+            <div>
+              <strong>Next.js:</strong> v14.2.30
+            </div>
+            <div>
+              <strong>React:</strong> v18.0.0
+            </div>
+            <div>
+              <strong>Database:</strong> PostgreSQL 15.0
+            </div>
+            <div>
+              <strong>Server:</strong> Vercel
+            </div>
           </div>
         </div>
 
@@ -414,9 +406,7 @@ const SettingsPage: React.FC = () => {
           <Button type="primary" icon={<DatabaseOutlined />}>
             Backup Database
           </Button>
-          <Button icon={<SettingOutlined />}>
-            Clear Cache
-          </Button>
+          <Button icon={<SettingOutlined />}>Clear Cache</Button>
         </Space>
       </div>
     </Card>
@@ -424,26 +414,26 @@ const SettingsPage: React.FC = () => {
 
   const tabItems = [
     {
-      key: 'general',
-      label: 'General',
+      key: "general",
+      label: "General",
       icon: <GlobalOutlined />,
       children: generalSettings,
     },
     {
-      key: 'email',
-      label: 'Email',
+      key: "email",
+      label: "Email",
       icon: <MailOutlined />,
       children: emailSettings,
     },
     {
-      key: 'security',
-      label: 'Security',
+      key: "security",
+      label: "Security",
       icon: <SecurityScanOutlined />,
       children: securitySettings,
     },
     {
-      key: 'system',
-      label: 'System',
+      key: "system",
+      label: "System",
       icon: <DatabaseOutlined />,
       children: systemInfo,
     },

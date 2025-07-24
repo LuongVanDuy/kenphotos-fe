@@ -9,7 +9,7 @@ import {
 } from './types';
 
 class CategoryApiService {
-  private readonly basePath = '/v1/tour/categories';
+  private readonly basePath = '/tour/categories';
 
   /**
    * Get all categories with pagination and filters

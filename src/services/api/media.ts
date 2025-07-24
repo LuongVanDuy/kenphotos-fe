@@ -9,7 +9,7 @@ import {
 } from './types';
 
 class MediaApiService {
-  private readonly basePath = '/v1/media';
+  private readonly basePath = '/media';
 
   /**
    * Get all media files with pagination and filters

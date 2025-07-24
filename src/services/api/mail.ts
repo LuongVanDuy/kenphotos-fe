@@ -5,7 +5,7 @@ import {
 } from './types';
 
 class MailApiService {
-  private readonly basePath = '/v1/mail';
+  private readonly basePath = '/mail';
 
   /**
    * Test mail functionality

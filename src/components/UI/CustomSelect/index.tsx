@@ -2,8 +2,8 @@ import { Select } from "antd";
 import cx from "classnames";
 import Image from "next/image";
 import React, { useRef, type ReactNode } from "react";
-import SortingIcon from "@/assets/column-sorting.svg";
 import { ComponentStyled } from "./styled";
+import { SortAscendingOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -53,15 +53,6 @@ export function CustomSelect({
   //   return option?.label?.toLowerCase()?.indexOf(input.toLowerCase()) >= 0;
   // };
 
-  const filterOption = (input, option) => {
-    const value = option?.value?.toString();
-    return value && value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-  };
-
-  const filterSort = (input, option) => {
-    const name = option?.name?.toLowerCase();
-    return name && name.indexOf(input.toLowerCase()) >= 0;
-  };
 
   const [open, setOpen] = React.useState(false);
 
@@ -102,7 +93,7 @@ export function CustomSelect({
         suffixIcon={
           <div className="flex items-center gap-[5px] cursor-pointer">
             <div onClick={handleSuffixClick}>
-              <Image src={SortingIcon} alt="" />
+              <SortAscendingOutlined />
             </div>
             {suffixIcon}
           </div>

@@ -13,7 +13,6 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { AdminMenuHelper, userMenuConfig } from "@/config/adminMenu";
-import { designTokens } from "../UI/theme";
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -60,8 +59,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        boxShadow: designTokens.boxShadow.md,
-        borderBottom: `1px solid ${designTokens.colors.neutral[200]}`,
+        boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.1)",
+        borderBottom: `1px solid #e0e0e0`,
         height: '72px',
       }}
     >
@@ -75,8 +74,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             fontSize: '16px',
             width: 48,
             height: 48,
-            borderRadius: designTokens.borderRadius.lg,
-            color: designTokens.colors.neutral[600],
+            borderRadius: "8px",
+            color: "#666",
           }}
           className="admin-focus admin-touch-target"
         />
@@ -89,7 +88,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
               fontSize: '14px',
             }}
             separator={
-              <span style={{ color: designTokens.colors.neutral[400] }}>
+              <span style={{ color: "#888" }}>
                 /
               </span>
             }
@@ -101,8 +100,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                     onClick={() => onNavigation(item.path!)}
                     style={{
                       color: index === breadcrumbs.length - 1
-                        ? designTokens.colors.neutral[800]
-                        : designTokens.colors.neutral[500],
+                        ? "#333"
+                        : "#666",
                       fontWeight: index === breadcrumbs.length - 1 ? 500 : 400,
                       textDecoration: 'none',
                     }}
@@ -112,7 +111,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                   </a>
                 ) : (
                   <span style={{
-                    color: designTokens.colors.neutral[800],
+                    color: "#333",
                     fontWeight: 500,
                   }}>
                     {item.title}
@@ -126,76 +125,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
 
       {/* Right Section - Responsive */}
       <Space size={isMobile ? "small" : "middle"}>
-        {/* Search Button - Hidden on mobile */}
-        {!isMobile && (
-          <Button
-            type="text"
-            icon={<SearchOutlined />}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: designTokens.borderRadius.lg,
-              color: designTokens.colors.neutral[600],
-            }}
-            className="admin-focus admin-touch-target"
-          />
-        )}
-
-        {/* Theme Toggle - Hidden on mobile */}
-        {!isMobile && (
-          <Button
-            type="text"
-            icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
-            onClick={onDarkModeToggle}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: designTokens.borderRadius.lg,
-              color: designTokens.colors.neutral[600],
-            }}
-            className="admin-focus admin-touch-target"
-          />
-        )}
-
-        {/* Help Button - Hidden on mobile */}
-        {!isMobile && (
-          <Button
-            type="text"
-            icon={<QuestionCircleOutlined />}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: designTokens.borderRadius.lg,
-              color: designTokens.colors.neutral[600],
-            }}
-            className="admin-focus admin-touch-target"
-          />
-        )}
-
-        {/* Notifications */}
-        <Badge
-          count={5}
-          size="small"
-          style={{
-            backgroundColor: designTokens.colors.error[500],
-          }}
-        >
-          <Button
-            type="text"
-            icon={<BellOutlined />}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: designTokens.borderRadius.lg,
-              color: designTokens.colors.neutral[600],
-            }}
-            className="admin-focus admin-touch-target"
-          />
-        </Badge>
-
-        {!isMobile && (
-          <Divider type="vertical" style={{ height: '32px', margin: '0 8px' }} />
-        )}
 
         {/* User Profile Dropdown */}
         <Dropdown
@@ -207,13 +136,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             className="flex items-center cursor-pointer rounded-lg transition-colors admin-focus admin-touch-target"
             style={{
               background: 'transparent',
-              border: `1px solid ${designTokens.colors.neutral[200]}`,
-              borderRadius: designTokens.borderRadius.lg,
               padding: isMobile ? '8px' : '12px',
               minHeight: '44px',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = designTokens.colors.neutral[50];
+              e.currentTarget.style.background = "#f5f5f5";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'transparent';
@@ -223,7 +150,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
               size={32}
               icon={<UserOutlined />}
               style={{
-                background: `linear-gradient(135deg, ${designTokens.colors.primary[500]}, ${designTokens.colors.primary[600]})`,
+                background: `linear-gradient(135deg, #4caf50, #388e3c)`,
               }}
             />
             <div className="ml-3 text-left hidden sm:block">
@@ -231,7 +158,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                 style={{
                   fontSize: '14px',
                   fontWeight: 500,
-                  color: designTokens.colors.neutral[800],
+                  color: "#333",
                   display: 'block',
                   lineHeight: '1.2',
                 }}
@@ -241,7 +168,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
               <Text
                 style={{
                   fontSize: '12px',
-                  color: designTokens.colors.neutral[500],
+                  color: "#666",
                   display: 'block',
                   lineHeight: '1.2',
                 }}

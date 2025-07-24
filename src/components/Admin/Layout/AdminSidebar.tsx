@@ -3,7 +3,6 @@
 import React from "react";
 import { Layout, Menu, Typography } from "antd";
 import { AdminMenuHelper, adminMenuConfig } from "@/config/adminMenu";
-import { designTokens } from "../UI/theme";
 import Link from "next/link";
 
 const { Sider } = Layout;
@@ -29,7 +28,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onNavigation,
 }) => {
   const selectedKeys = AdminMenuHelper.getSelectedKeys(pathname);
-  const menuItems = AdminMenuHelper.convertToAntdMenuItems(adminMenuConfig, onNavigation);
+  const menuItems = AdminMenuHelper.convertToAntdMenuItems(
+    adminMenuConfig,
+    onNavigation
+  );
 
   return (
     <Sider
@@ -40,80 +42,49 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       collapsedWidth={isMobile ? 0 : 80}
       breakpoint="lg"
       style={{
-        overflow: 'hidden',
-        position: 'fixed',
+        overflow: "hidden",
+        position: "fixed",
         left: 0,
         top: 0,
         bottom: 0,
         zIndex: 101,
-        background: designTokens.colors.neutral[900],
-        borderRight: `1px solid ${designTokens.colors.neutral[800]}`,
-        boxShadow: designTokens.boxShadow.xl,
+        background: "#fff",
+        borderRight: `1px solid #e5e7eb`, // xám nhạt
+        boxShadow: "0 1px 8px 0 rgba(0,0,0,0.04)",
       }}
-      theme="dark"
+      theme="light"
     >
       {/* Logo Section */}
       <div
         className="relative overflow-hidden"
         style={{
-          borderBottom: `1px solid ${designTokens.colors.neutral[800]}`,
-          background: `linear-gradient(135deg, ${designTokens.colors.primary[600]} 0%, ${designTokens.colors.primary[700]} 50%, ${designTokens.colors.primary[800]} 100%)`,
-          minHeight: '88px',
-          position: 'relative',
+          borderBottom: `1px solid #e5e7eb`,
+          minHeight: "72px",
+          position: "relative",
+          background: "#f9fafb",
         }}
       >
-        {/* Background Pattern */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                             radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%)`,
-            zIndex: 1,
-          }}
-        />
-
-        <div className="relative z-10 flex items-center justify-center py-6 px-4">
-          <div className="text-white text-center">
+        <div className="relative z-10 flex items-center justify-center py-4 px-4">
+          <div className="text-center">
             {collapsed ? (
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center relative"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                }}
-              >
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '-2px',
-                    right: '-2px',
-                    width: '8px',
-                    height: '8px',
-                    background: designTokens.colors.success[400],
-                    borderRadius: '50%',
-                    border: '2px solid white',
-                  }}
-                />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-200">
+                <span className="text-lg font-bold text-gray-700">K</span>
               </div>
             ) : (
-              <Link href='/' className="space-y-2">
-                <div className="flex items-center justify-center space-x-3">
+              <Link href="/" className="space-y-1">
+                <div className="flex items-center justify-center space-x-2">
                   <div>
-                    <div className="text-xl font-bold text-white">KenPhotos</div>
+                    <div className="text-lg font-bold text-gray-900">
+                      KenPhotos
+                    </div>
                   </div>
                 </div>
                 <Text
                   style={{
-                    color: 'rgba(255, 255, 255, 0.8)',
-                    fontSize: '13px',
+                    color: "#6b7280",
+                    fontSize: "13px",
                     fontWeight: 400,
-                    letterSpacing: '0.5px',
+                    letterSpacing: "0.5px",
                   }}
                 >
                   Admin Dashboard
@@ -125,24 +96,25 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </div>
 
       {/* Navigation Menu */}
-      <div 
-        className="admin-scrollbar" 
-        style={{ 
-          height: 'calc(100vh - 88px)', 
-          overflowY: 'auto', 
-          padding: '20px 0' 
+      <div
+        className="admin-scrollbar"
+        style={{
+          height: "calc(100vh - 72px)",
+          overflowY: "auto",
+          padding: "20px 0",
+          background: "#fff",
         }}
       >
         {/* Navigation Section Label */}
         {!collapsed && (
-          <div style={{ padding: '0 20px 16px 20px' }}>
+          <div style={{ padding: "0 20px 12px 20px" }}>
             <Text
               style={{
-                color: designTokens.colors.neutral[400],
-                fontSize: '11px',
+                color: "#9ca3af",
+                fontSize: "11px",
                 fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
+                textTransform: "uppercase",
+                letterSpacing: "1px",
               }}
             >
               Navigation
@@ -151,8 +123,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         )}
 
         <Menu
-          key={pathname} // Force re-render when pathname changes
-          theme="dark"
+          key={pathname}
+          theme="light"
           mode="inline"
           items={menuItems}
           selectedKeys={selectedKeys}
@@ -160,8 +132,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           onOpenChange={onOpenChange}
           style={{
             borderRight: 0,
-            background: 'transparent',
-            padding: '0 12px',
+            background: "transparent",
+            padding: "0 12px",
           }}
           className="admin-sidebar-menu"
           forceSubMenuRender
