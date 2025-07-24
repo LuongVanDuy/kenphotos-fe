@@ -61,7 +61,7 @@ const FloatingContacts = () => {
   ]
 
   return (
-    <div className='fixed bottom-8 right-8 flex flex-col gap-4 z-50'>
+    <div className='fixed bottom-0 left-0 w-full px-4 py-2 flex flex-row justify-evenly bg-white md:bg-transparent items-center gap-4 z-50 md:bottom-8 md:right-8 md:left-auto md:w-auto md:flex-col'>
       {contacts.map((contact, index) => (
         <a
           key={index}
