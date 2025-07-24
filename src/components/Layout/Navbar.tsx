@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ChevronDownIcon, HamburgerIcon, CloseIcon, ArrowRightIcon } from '@/components/Icons'
 import { usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 export interface MenuGroup {
   title: string
   items: { label: string; href: string }[]
@@ -84,14 +85,14 @@ const menuItems: MenuItem[] = [
   { label: 'BLOG', href: '/blog/' },
 ]
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<{ onSendFreeTest?: () => void }> = ({ onSendFreeTest }) => {
   const pathname = usePathname()
+  const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [openMobileGroups, setOpenMobileGroups] = useState<{ [key: string]: boolean }>({})
   const [isClosing, setIsClosing] = useState(false)
   const [isOpening, setIsOpening] = useState(false)
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<number | null>(null)
-  console.log('pathName:', pathname)
 
   return (
     <>
@@ -211,14 +212,14 @@ const Navbar: React.FC = () => {
             ))}
           </ul>
           {/* CTA Button Desktop */}
-          <Link
-            href='/send-free-test'
+          <button
+            onClick={onSendFreeTest}
             className='hidden md:flex ml-6 bg-[#51C6FF] text-black px-[30px] py-[15px] text-[16px] font-medium items-center gap-2 shadow hover:bg-[#000] hover:text-[#fff] transition-colors'
             role='button'
             title='Send Free Test'
           >
             Send Free Test <ArrowRightIcon />
-          </Link>
+          </button>
 
           {/* Hamburger icon for mobile */}
           <button
@@ -366,18 +367,20 @@ const Navbar: React.FC = () => {
                   </li>
                 ))}
                 <li className='mt-6'>
-                  <Link
-                    href='/send-free-test'
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false)
+                      setOpenMobileGroups({})
+                      setTimeout(() => {
+                        onSendFreeTest?.()
+                      }, 300)
+                    }}
                     className='block w-full bg-[#29b6f6] text-black px-6 py-3 rounded text-base font-medium text-center shadow hover:bg-[#03a9f4] transition-colors'
                     role='button'
                     title='Send Free Test'
-                    onClick={() => {
-                      setIsMobileMenuOpen(false)
-                      setOpenMobileGroups({}) // Reset all mobile groups
-                    }}
                   >
                     Send Free Test <ArrowRightIcon />
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>
