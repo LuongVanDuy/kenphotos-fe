@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ChevronDownIcon, HamburgerIcon, CloseIcon, ArrowRightIcon } from '@/components/Icons'
+import { usePathname } from 'next/navigation'
 export interface MenuGroup {
   title: string
   items: { label: string; href: string }[]
@@ -77,18 +78,20 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
-  { label: 'PRICE LIST', href: '/price-list' },
-  { label: 'CONTACT', href: '/contact' },
-  { label: 'ABOUT US', href: '/about-us' },
-  { label: 'BLOG', href: '/blog' },
+  { label: 'PRICE LIST', href: '/price-list/' },
+  { label: 'CONTACT', href: '/contact/' },
+  { label: 'ABOUT US', href: '/about-us/' },
+  { label: 'BLOG', href: '/blog/' },
 ]
 
 const Navbar: React.FC = () => {
+  const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [openMobileGroups, setOpenMobileGroups] = useState<{ [key: string]: boolean }>({})
   const [isClosing, setIsClosing] = useState(false)
   const [isOpening, setIsOpening] = useState(false)
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<number | null>(null)
+  console.log('pathName:', pathname)
 
   return (
     <>
@@ -189,8 +192,8 @@ const Navbar: React.FC = () => {
                   <Link
                     href={item.href!}
                     className={
-                      item.active
-                        ? 'text-[#00A1F8] font-[600] p-[10px] mx-[5px] text-[16px]'
+                      pathname === item.href
+                        ? 'text-[#2196f3] font-[600] p-[10px] mx-[5px] text-[16px]'
                         : 'hover:text-[#2196f3] font-[600] p-[10px] mx-[5px] text-[16px]'
                     }
                     role='menuitem'

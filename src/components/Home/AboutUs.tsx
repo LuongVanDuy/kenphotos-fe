@@ -16,8 +16,8 @@ const media = [
 
 const AboutUs: React.FC = () => {
   return (
-    <section className='bg-[#D4EFFF] overflow-hidden'>
-      <div className='max-w-content mx-auto px-4 py-8 md:py-[50px] text-center'>
+    <section className='bg-[#D4EFFF] overflow-hidden py-8 md:py-16'>
+      <div className='max-w-content mx-auto px-4  text-center'>
         <h2 className='text-[20px] md:text-[45px] font-semibold text-[#1C244B] mb-4 md:mb-12'>
           The media talks about us
         </h2>

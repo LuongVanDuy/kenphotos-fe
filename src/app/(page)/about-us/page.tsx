@@ -133,47 +133,51 @@ const AboutPage = () => {
           </div>
         </div>
       </div>
-
       <div className='bg-[#D4EFFF] py-16 md:py-20'>
         <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-10'>
           <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-bold mb-2'>10+</h3>
+            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
+              10+
+            </h3>
             <p className='text-sm sm:text-base text-gray-600'>Experience</p>
           </div>
 
           <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-bold mb-2'>15</h3>
+            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
+              15
+            </h3>
             <p className='text-sm sm:text-base text-gray-600'>Countries</p>
           </div>
 
           <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-bold mb-2'>
+            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
               1,000+
             </h3>
             <p className='text-sm sm:text-base text-gray-600'>Clients</p>
           </div>
 
           <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-bold mb-2'>
+            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
               4,500+
             </h3>
             <p className='text-sm sm:text-base text-gray-600'>Houses/Month</p>
           </div>
 
           <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-bold mb-2'>
+            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
               5,000
             </h3>
             <p className='text-sm sm:text-base text-gray-600'>Est. Hours Saved</p>
           </div>
 
           <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-bold mb-2'>2M+</h3>
+            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
+              2M+
+            </h3>
             <p className='text-sm sm:text-base text-gray-600'>Photos</p>
           </div>
         </div>
       </div>
-
       <div className='py-16 md:py-20'>
         <div className='max-w-content mx-auto px-4'>
           <h2 className='text-center text-3xl md:text-[54px] text-gray-800 font-semibold mb-12 md:mb-16'>

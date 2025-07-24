@@ -302,7 +302,7 @@ const Footer: React.FC = () => {
           </ul>
         </nav>
       </div>
-      <div className='flex flex-col md:flex-row justify-between items-center border-t md:border-none gap-4 p-[20px]  border-gray-700 mt-3 text-white'>
+      <div className='flex flex-col md:flex-row justify-between items-center border-t md:border-none gap-4 p-[20px] mb-[65px] md:mb-0 border-gray-700 mt-3 text-white'>
         <div className='text-[15px] md:text-[22px] font-bold flex items-center gap-2 flex-1 text-center justify-center'>
           ©Copyright 2015 By True Color. All rights reserved
         </div>
