@@ -1,6 +1,7 @@
 import Clients from '@/components/Home/Clients'
 import Following from '@/components/Home/Following'
 import FreeTestFiles from '@/components/Home/FreeTestFiles'
+import BaseLayout from '@/components/Layout/BaseLayout'
 import Footer from '@/components/Layout/Footer'
 import Navbar from '@/components/Layout/Navbar'
 import LayoutProvider from '@/components/Layout/Provider'
@@ -35,8 +36,7 @@ const storyData: StoryItem[] = [
 
 const AboutPage = () => {
   return (
-    <LayoutProvider>
-      <Navbar />
+    <>
       <div className='min-h-[350px] bg-black'>
         <div className='max-w-content mx-auto'>
           <div className='p-4 md:p-[35px] text-center h-full'>
@@ -231,9 +231,7 @@ const AboutPage = () => {
 
       <Following />
       <Clients />
-      <FreeTestFiles />
-      <Footer />
-    </LayoutProvider>
+    </>
   )
 }
 
