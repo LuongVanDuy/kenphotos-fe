@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { Typography } from "antd";
-import LayoutAdmin from "@/components/Admin/Layout/LayoutAdmin";
+import React from "react";
+import DashboardOverview from "@/components/Admin/Dashboard/DashboardOverview";
 
-const { Title } = Typography;
-
-const Dashboard = (props: any) => {
-  return <h1>Dashboard</h1>;
+const Dashboard = () => {
+  return (
+    <div className="fade-in">
+      <DashboardOverview />
+    </div>
+  );
 };
 
 export default Dashboard;
