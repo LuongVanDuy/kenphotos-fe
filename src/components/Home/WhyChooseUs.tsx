@@ -15,7 +15,7 @@ interface BenefitItem {
 const WhyChooseUs: React.FC = () => {
   useEffect(() => {
     AOS.init({
-      duration: 1000,
+      duration: 300,
       once: true,
       easing: 'ease-out-cubic',
     })
@@ -86,13 +86,13 @@ const WhyChooseUs: React.FC = () => {
           role='list'
           aria-label='Benefits of choosing our services'
         >
-          {benefits.map((benefit) => (
+          {benefits.map((benefit, index) => (
             <article
               key={benefit.id}
               className='text-center'
               role='listitem'
               data-aos='zoom-in'
-              data-aos-delay={200 + parseInt(benefit.id.split('-')[0]) * 100}
+              data-aos-delay={(index + 1) * 100}
             >
               <div className='mb-4 flex justify-center' aria-hidden='true'>
                 <Image

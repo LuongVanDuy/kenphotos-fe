@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
+import { CompareSlider } from './CompareSlider'
 
 const Services: React.FC = () => {
   const services = [
@@ -100,57 +100,53 @@ const Services: React.FC = () => {
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12'>
-          {services.map((service) => (
-            <div key={service.id} className=' overflow-hidden'>
-              {/* Image Comparison */}
-              <div className='relative h-64 bg-gray-200'>
-                <ReactCompareSlider
-                  itemOne={
-                    <ReactCompareSliderImage
-                      src={service.beforeImage}
-                      alt='Before Image'
-                      className='object-cover w-full h-64'
-                    />
-                  }
-                  itemTwo={
-                    <ReactCompareSliderImage
-                      src={service.afterImage}
-                      alt='After Image'
-                      className='object-cover w-full h-64'
-                    />
-                  }
-                  position={50}
-                  className='h-full'
-                  style={{ height: '100%' }}
-                />
-              </div>
-
-              {/* Content */}
-              <div className='p-6 text-center'>
-                {/* Title */}
-                <h3 className='text-xl font-bold text-[#1C244B] mb-3'>{service.title}</h3>
-
-                {/* Pricing */}
-                <div className='flex items-center justify-center gap-2 mb-3 text-center'>
-                  <span className='text-red-500 font-bold'>{service.discount}</span>
-                  <span className='text-gray-400 line-through'>{service.originalPrice}</span>
-                  <span className='text-green-600 font-bold text-lg'>{service.newPrice}</span>
+          {services.map((service) => {
+            return (
+              <div
+                key={service.id}
+                className='overflow-hidden bg-white rounded-[12px] shadow-lg transition-transform transform hover:bg-gray-100'
+              >
+                {/* Image Comparison */}
+                <div className='relative h-80 bg-gray-200'>
+                  <CompareSlider
+                    beforeImage={service.beforeImage}
+                    afterImage={service.afterImage}
+                  />
                 </div>
 
-                {/* Description */}
-                <p className='text-gray-600 text-sm leading-relaxed mb-4'>{service.description}</p>
+                {/* Content */}
+                <div className='p-6 text-start'>
+                  {/* Title */}
+                  <h3 className='text-xl font-bold text-[#1C244B] mb-3 cursor-pointer'>
+                    {service.title}
+                  </h3>
 
-                {/* Rating */}
-                <div className='flex items-center gap-2 justify-center'>
-                  <div className='flex items-center'>
-                    <span className='text-yellow-400 text-lg'>★</span>
-                    <span className='font-semibold ml-1'>{service.rating}</span>
+                  {/* Description */}
+                  <p className='text-gray-600 text-sm leading-relaxed mb-4'>
+                    {service.description}
+                  </p>
+
+                  <div className='flex justify-between items-center'>
+                    {/* Rating */}
+                    <div className='flex items-center gap-2 justify-center'>
+                      <div className='flex items-center'>
+                        <span className='text-yellow-400 text-lg'>★</span>
+                        <span className='font-semibold ml-1'>{service.rating}</span>
+                      </div>
+                      <span className='text-gray-500 text-sm'>({service.orders} orders)</span>
+                    </div>
+
+                    {/* Pricing */}
+                    <div className='flex items-center justify-center gap-2  text-center'>
+                      <span className='text-red-500 font-bold'>{service.discount}</span>
+                      <span className='text-gray-400 line-through'>{service.originalPrice}</span>
+                      <span className='text-green-600 font-bold text-lg'>{service.newPrice}</span>
+                    </div>
                   </div>
-                  <span className='text-gray-500 text-sm'>({service.orders} orders)</span>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>

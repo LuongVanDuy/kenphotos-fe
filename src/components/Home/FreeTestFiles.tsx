@@ -33,7 +33,7 @@ const FreeTestFiles: React.FC = () => {
           </div>
 
           {/* Right Section  */}
-          <div className='bg-white rounded-lg shadow-lg p-2 py-4 md:p-8'>
+          <div className='bg-white rounded-lg shadow-[12px] p-2 py-4 md:p-8'>
             <form className='space-y-6' aria-label='Free photo editing test form'>
               {/* Row 1 */}
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -43,7 +43,7 @@ const FreeTestFiles: React.FC = () => {
                     id='name'
                     name='name'
                     required
-                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
                     placeholder='Your name'
                   />
                 </div>
@@ -53,7 +53,7 @@ const FreeTestFiles: React.FC = () => {
                     id='email'
                     name='email'
                     required
-                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md  focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
                     placeholder='Your email'
                   />
                 </div>
@@ -66,7 +66,7 @@ const FreeTestFiles: React.FC = () => {
                     type='tel'
                     id='phone'
                     name='phone'
-                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md  focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
                     placeholder='Your number'
                   />
                 </div>
@@ -75,7 +75,7 @@ const FreeTestFiles: React.FC = () => {
                     type='text'
                     id='city'
                     name='city'
-                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md  focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
                     placeholder='Your city'
                   />
                 </div>
@@ -88,7 +88,7 @@ const FreeTestFiles: React.FC = () => {
                   id='photoLink'
                   name='photoLink'
                   required
-                  className='w-full px-4 py-3 border-[2px] border-[#01CDFF] focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                  className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
                   placeholder='Link to your photos(Dropbox, Google Drive, Wetransfer etc...'
                 />
               </div>
@@ -100,7 +100,7 @@ const FreeTestFiles: React.FC = () => {
                   name='request'
                   rows={4}
                   required
-                  className='w-full px-4 py-3 border-[2px] border-[#01CDFF] focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent resize-vertical'
+                  className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent resize-vertical'
                   placeholder="Request or what you want. (We will send you the tested image
                   within 24 hours, if you don't see our email in your main
                   mailbox, you able check at update  or spam)"
@@ -124,7 +124,7 @@ const FreeTestFiles: React.FC = () => {
               <div className='flex justify-center'>
                 <button
                   type='submit'
-                  className='px-[45px] py-[10px] text-white hover:to-[#00A1F8] transition-all transform hover:scale-105 bg-[#2DC5FF] font-bold'
+                  className='px-[45px] py-[10px] text-white hover:to-[#00A1F8] transition-all rounded-[12px] transform hover:scale-105 bg-[#2DC5FF] font-bold'
                 >
                   Send
                 </button>
