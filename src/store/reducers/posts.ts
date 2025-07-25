@@ -1,9 +1,5 @@
 import { ActionType, StateType } from "@/types";
-import {
-  FETCH_POSTS,
-  FETCH_POSTS_SUCCESS,
-  FETCH_POSTS_FAILURE,
-} from "../actionTypes";
+import { FETCH_POSTS, FETCH_POSTS_SUCCESS, FETCH_POSTS_FAILURE } from "../actionTypes";
 
 const initialState: StateType = {
   loading: true,
@@ -13,7 +9,7 @@ const initialState: StateType = {
   list: [],
 };
 
-const postReducer = (state = initialState, action: ActionType) => {
+const postsReducer = (state = initialState, action: ActionType) => {
   switch (action.type) {
     case FETCH_POSTS:
       return {
@@ -24,8 +20,8 @@ const postReducer = (state = initialState, action: ActionType) => {
       return {
         ...state,
         loading: false,
-        list: action.payload.data,
-        total: action.payload.total,
+        list: action.payload.data.data,
+        total: action.payload.data.total,
         error: false,
       };
     case FETCH_POSTS_FAILURE:
@@ -40,4 +36,4 @@ const postReducer = (state = initialState, action: ActionType) => {
   }
 };
 
-export default postReducer;
+export default postsReducer;

@@ -1,42 +1,31 @@
 import { AppDispatch } from "../store";
-import {
-  FETCH_POSTS,
-  FETCH_POSTS_FAILURE,
-  FETCH_POSTS_SUCCESS,
-} from "../actionTypes";
+import { FETCH_POSTS, FETCH_POSTS_FAILURE, FETCH_POSTS_SUCCESS } from "../actionTypes";
 import { fetchWithToken } from "@/app/api/index";
 import postsEndpoint from "../endpoint/posts";
 import { getSession } from "next-auth/react";
 import { postWithToken } from "@/app/api/index";
+import posts from "../endpoint/posts";
 
-export const fetchPosts = (option: any) => {
-  return async (dispatch: AppDispatch) => {
+export const fetchPosts = (accessToken: any, option: any) => {
+  return (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_POSTS });
-    try {
-      const session = await getSession();
-      const accessToken = session?.accessToken;
-      if (!accessToken) throw new Error("No access token");
-      const endpoint = postsEndpoint.fetchPosts(option);
-      const response = await fetchWithToken(endpoint, accessToken);
-      dispatch({
-        type: FETCH_POSTS_SUCCESS,
-        payload: { data: response.data, total: response.total },
+    fetchWithToken(posts.fetchPosts(option), accessToken)
+      .then((response) => {
+        dispatch({
+          type: FETCH_POSTS_SUCCESS,
+          payload: { data: response },
+        });
+      })
+      .catch((error) => {
+        dispatch({
+          type: FETCH_POSTS_FAILURE,
+          payload: { error: error.message },
+        });
       });
-    } catch (error: any) {
-      dispatch({
-        type: FETCH_POSTS_FAILURE,
-        payload: { error: error?.message || "Unknown error" },
-      });
-    }
   };
 };
 
-export const createPostCategory = (data: {
-  name: string;
-  slug: string;
-  description: string;
-  parentId: number;
-}) => {
+export const createPostCategory = (data: { name: string; slug: string; description: string; parentId: number }) => {
   return async () => {
     const session = await getSession();
     const accessToken = session?.accessToken;

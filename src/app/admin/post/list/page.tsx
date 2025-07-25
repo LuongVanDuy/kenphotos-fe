@@ -1,19 +1,10 @@
 "use client";
 
 import React, { useEffect, useCallback, useState } from "react";
-import {
-  Button,
-  Tag,
-  Avatar,
-  Space,
-  message,
-  Select,
-  Input,
-  Pagination,
-} from "antd";
+import { Button, Tag, Avatar, Space, message, Select, Input, Pagination } from "antd";
 import { UserOutlined, PlusOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch, connect } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { fetchPosts } from "@/store/actions/posts";
 import CustomTable from "@/components/Admin/UI/CustomTable";
@@ -36,7 +27,9 @@ const sortFields = [
   { value: "title", label: "Title" },
 ];
 
-const PostListPage: React.FC = () => {
+const PostListPage: React.FC = (props: any) => {
+  const { fetchPosts, postList, postTotal, postLoading } = props;
+
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [search, setSearch] = useState("");
@@ -46,56 +39,35 @@ const PostListPage: React.FC = () => {
   const [sortDesc, setSortDesc] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-
   const { data: session } = useSession();
+  const [keyword, setKeyword] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  // Get posts state from Redux
-  const {
-    list: posts,
-    loading,
-    error,
-    total = 0,
-  } = useSelector((state: RootState) => state.post);
+  function handleQuery(keyword: string, page = 1, itemsPerPage = 10) {
+    const queryParams = {
+      search: keyword,
+      status: 0,
+      page,
+      itemsPerPage,
+    };
 
-  // Debounced search
-  const debouncedSearch = useCallback(
-    debounce((value: string) => {
-      setPage(1);
-      setSearch(value);
-    }, 300),
-    []
-  );
+    fetchPosts(session?.accessToken, queryParams);
+    setPageNumber(page);
+    setPageSize(itemsPerPage);
+  }
 
-  // Fetch posts on filter/sort/page change
   useEffect(() => {
-    dispatch(
-      fetchPosts({
-        search: search || undefined,
-        status: status !== "all" ? status : undefined,
-        deleteFlg: deleteFlg !== "all" ? deleteFlg : undefined,
-        sortBy,
-        sortDesc,
-        page,
-        itemsPerPage,
-      })
-    );
-  }, [
-    search,
-    status,
-    deleteFlg,
-    sortBy,
-    sortDesc,
-    page,
-    itemsPerPage,
-    dispatch,
-  ]);
+    if (session?.accessToken) {
+      handleQuery(keyword);
+    }
+  }, [session?.accessToken]);
 
   const handleEdit = (post: any) => {
     router.push(`/admin/post/edit/${post.id}`);
   };
 
   const handleDelete = (post: any) => {
-    // TODO: Implement delete logic
     message.info("Delete post feature not implemented");
   };
 
@@ -120,21 +92,13 @@ const PostListPage: React.FC = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: number) => (
-        <Tag color={statusMap[status]?.color || "default"}>
-          {statusMap[status]?.label || status}
-        </Tag>
-      ),
+      render: (status: number) => <Tag color={statusMap[status]?.color || "default"}>{statusMap[status]?.label || status}</Tag>,
     },
     {
       title: "Deleted",
       dataIndex: "deleteFlg",
       key: "deleteFlg",
-      render: (deleteFlg: number) => (
-        <Tag color={deleteFlgMap[deleteFlg]?.color || "default"}>
-          {deleteFlgMap[deleteFlg]?.label || deleteFlg}
-        </Tag>
-      ),
+      render: (deleteFlg: number) => <Tag color={deleteFlgMap[deleteFlg]?.color || "default"}>{deleteFlgMap[deleteFlg]?.label || deleteFlg}</Tag>,
     },
     {
       title: "Created",
@@ -143,9 +107,7 @@ const PostListPage: React.FC = () => {
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">
-            {new Date(date).toLocaleTimeString()}
-          </div>
+          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
         </div>
       ),
     },
@@ -157,23 +119,14 @@ const PostListPage: React.FC = () => {
 
       <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
         <div className="flex flex-wrap gap-2 items-center">
-          <Input.Search
-            placeholder="Search posts"
-            allowClear
-            onChange={(e) => debouncedSearch(e.target.value)}
-            style={{ width: 200 }}
-          />
+          {/* <Input.Search placeholder="Search posts" allowClear onChange={(e) => debouncedSearch(e.target.value)} style={{ width: 200 }} /> */}
           <Select value={status} onChange={setStatus} style={{ width: 120 }}>
             <Option value="all">All Status</Option>
             <Option value={0}>Draft</Option>
             <Option value={1}>Published</Option>
             <Option value={2}>Archived</Option>
           </Select>
-          <Select
-            value={deleteFlg}
-            onChange={setDeleteFlg}
-            style={{ width: 120 }}
-          >
+          <Select value={deleteFlg} onChange={setDeleteFlg} style={{ width: 120 }}>
             <Option value="all">All</Option>
             <Option value={0}>Active</Option>
             <Option value={1}>Deleted</Option>
@@ -185,63 +138,46 @@ const PostListPage: React.FC = () => {
               </Option>
             ))}
           </Select>
-          <Select
-            value={sortDesc}
-            onChange={(v) => setSortDesc(v)}
-            style={{ width: 120 }}
-          >
+          <Select value={sortDesc} onChange={(v) => setSortDesc(v)} style={{ width: 120 }}>
             <Option value={false}>Ascending</Option>
             <Option value={true}>Descending</Option>
           </Select>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => router.push("/admin/post/create")}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/post/create")}>
           Add New Post
         </Button>
       </div>
+
       <CustomTable
         columns={columns}
-        data={posts}
-        loading={loading}
-        onRefresh={() => {
-          dispatch(
-            fetchPosts({
-              search: search || undefined,
-              status: status !== "all" ? status : undefined,
-              deleteFlg: deleteFlg !== "all" ? deleteFlg : undefined,
-              sortBy,
-              sortDesc,
-              page,
-              itemsPerPage,
-            })
-          );
-        }}
+        data={postList}
+        loading={postLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onView={handleView}
         searchable={false}
         exportable
         pagination={{
-          current: page,
-          pageSize: itemsPerPage,
-          total: total,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          pageSizeOptions: [5, 10, 20, 50],
-          onChange: (p: number, size?: number) => {
-            setPage(p);
-            setItemsPerPage(size || 10);
+          current: pageNumber,
+          pageSize,
+          total: postTotal,
+          onChange: (page, pageSize) => {
+            handleQuery(keyword, page, pageSize);
           },
-          showTotal: (total: number, range: [number, number]) =>
-            `Showing ${range[0]}-${range[1]} of ${total} items`,
         }}
       />
-      {error && <div className="text-red-500 mt-4">Failed to load posts.</div>}
     </div>
   );
 };
 
-export default PostListPage;
+const mapStateToProps = (state: any) => ({
+  postList: state.posts.list,
+  postTotal: state.posts.total,
+  postLoading: state.posts.loading,
+});
+
+const mapDispatchToProps = {
+  fetchPosts: fetchPosts,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PostListPage);

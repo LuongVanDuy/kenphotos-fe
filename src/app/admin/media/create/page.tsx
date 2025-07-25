@@ -6,6 +6,7 @@ import { InboxOutlined, DeleteOutlined, EyeOutlined, ArrowLeftOutlined, CloudUpl
 import { useRouter } from "next/navigation";
 import type { UploadProps, UploadFile } from "antd";
 import UploadField from "@/components/Admin/UI/UploadField";
+import { useSession } from "next-auth/react";
 
 const { Dragger } = Upload;
 const { Title, Text } = Typography;
@@ -20,49 +21,76 @@ const MediaCreatePage: React.FC = () => {
   const [fileList, setFileList] = useState<UploadedFile[]>([]);
   const [uploading, setUploading] = useState(false);
 
+  const { data: session } = useSession();
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+
   const uploadProps: UploadProps = {
-    name: "file",
+    name: "files",
     multiple: true,
-    action: "/api/upload", // This would be your actual upload endpoint
-    fileList,
+    action: `${process.env.apiUrl}/media/upload`,
+    headers: {
+      Authorization: `Bearer ${session?.accessToken}`,
+    },
+    showUploadList: {
+      showRemoveIcon: false,
+    },
     onChange(info) {
       const { status } = info.file;
-
-      if (status !== "uploading") {
-        console.log(info.file, info.fileList);
-      }
-
       if (status === "done") {
-        message.success(`${info.file.name} file uploaded successfully.`);
+        message.success(`${info.file.name} tải lên thành công`);
+        setUploadedFiles((prev) => [...prev, info.file.response?.data || info.file]);
       } else if (status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
+        message.error(`${info.file.name} tải lên thất bại`);
       }
-
-      setFileList(info.fileList);
     },
     onDrop(e) {
       console.log("Dropped files", e.dataTransfer.files);
     },
-    beforeUpload: (file) => {
-      // Check file size (10MB limit)
-      const isLt10M = file.size! / 1024 / 1024 < 10;
-      if (!isLt10M) {
-        message.error("File must be smaller than 10MB!");
-        return false;
-      }
-
-      // Check file type
-      const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "video/mp4", "video/webm", "application/pdf", "text/plain"];
-
-      if (!allowedTypes.includes(file.type!)) {
-        message.error("File type not supported!");
-        return false;
-      }
-
-      return true;
-    },
-    showUploadList: false, // We'll create our own list
   };
+
+  // const uploadProps: UploadProps = {
+  //   name: "file",
+  //   multiple: true,
+  //   action: "/api/upload", // This would be your actual upload endpoint
+  //   fileList,
+  //   onChange(info) {
+  //     const { status } = info.file;
+
+  //     if (status !== "uploading") {
+  //       console.log(info.file, info.fileList);
+  //     }
+
+  //     if (status === "done") {
+  //       message.success(`${info.file.name} file uploaded successfully.`);
+  //     } else if (status === "error") {
+  //       message.error(`${info.file.name} file upload failed.`);
+  //     }
+
+  //     setFileList(info.fileList);
+  //   },
+  //   onDrop(e) {
+  //     console.log("Dropped files", e.dataTransfer.files);
+  //   },
+  //   beforeUpload: (file) => {
+  //     // Check file size (10MB limit)
+  //     const isLt10M = file.size! / 1024 / 1024 < 10;
+  //     if (!isLt10M) {
+  //       message.error("File must be smaller than 10MB!");
+  //       return false;
+  //     }
+
+  //     // Check file type
+  //     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "video/mp4", "video/webm", "application/pdf", "text/plain"];
+
+  //     if (!allowedTypes.includes(file.type!)) {
+  //       message.error("File type not supported!");
+  //       return false;
+  //     }
+
+  //     return true;
+  //   },
+  //   showUploadList: false, // We'll create our own list
+  // };
 
   const handleRemove = (file: UploadedFile) => {
     const newFileList = fileList.filter((item) => item.uid !== file.uid);
@@ -147,6 +175,32 @@ const MediaCreatePage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upload Area */}
         <div className="lg:col-span-2">
+          <Dragger {...uploadProps} className="block h-auto">
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">Nhấn hoặc kéo thả file vào đây để tải lên</p>
+            <p className="ant-upload-hint">Hỗ trợ tải lên nhiều file. Không tải dữ liệu nhạy cảm hoặc bị cấm.</p>
+          </Dragger>
+
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+            {uploadedFiles.map((file) => {
+              const url = file.response?.url ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${file.response.url}` : null;
+
+              const isImage = /\.(jpe?g|png|gif|svg|webp)$/i.test(file.name);
+
+              return (
+                <div key={file.uid} className="p-2 border rounded shadow-sm">
+                  {url && isImage ? (
+                    <img src={url} alt={file.name} className="w-full h-auto object-cover max-h-[150px]" />
+                  ) : (
+                    <div className="text-sm text-gray-500">{file.name}</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
           <Card title="Select Files" className="mb-6">
             <Dragger {...uploadProps} className="mb-4">
               <p className="ant-upload-drag-icon">

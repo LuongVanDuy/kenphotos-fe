@@ -32,7 +32,7 @@ interface DataTableProps<T> extends Omit<TableProps<T>, "columns" | "title"> {
 function CustomTable<T extends { id: string | number }>({
   columns,
   data,
-  loading = false,
+  loading = true,
   searchable = true,
   filterable = false,
   exportable = false,
