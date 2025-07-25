@@ -133,6 +133,8 @@ const ServiceSlider: React.FC = () => {
           spaceBetween={20}
           slidesPerView={1.2}
           loop={true}
+          allowTouchMove={false}
+          simulateTouch={false}
           breakpoints={{
             640: { slidesPerView: 1.5 },
             768: { slidesPerView: 2.5 },

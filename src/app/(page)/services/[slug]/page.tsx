@@ -15,7 +15,7 @@ import ServiceSlider from '@/components/Home/ServicesSlider'
 const ServiceDetail = ({ params }: { params: { slug: string[] } }) => {
   const { slug } = params
   const swiperRef = useRef<SwiperCore | null>(null)
-  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [activeIndex, setActiveIndex] = useState<number | null>(0)
 
   const services = [
     { beforeImage: '/images/resource-1.jpg', afterImage: '/images/view-1.jpg' },
@@ -122,6 +122,8 @@ const ServiceDetail = ({ params }: { params: { slug: string[] } }) => {
             modules={[Navigation]}
             navigation
             loop={true}
+            allowTouchMove={false}
+            simulateTouch={false}
             spaceBetween={30}
             slidesPerView={1}
             onSwiper={(swiper) => {
