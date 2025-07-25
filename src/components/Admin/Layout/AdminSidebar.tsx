@@ -2,7 +2,10 @@
 
 import React from "react";
 import { Layout, Menu, Typography } from "antd";
-import { AdminMenuHelper, adminMenuConfig } from "@/components/Admin/Layout/AdminMenu";
+import {
+  AdminMenuHelper,
+  adminMenuConfig,
+} from "@/components/Admin/Layout/AdminMenu";
 import Link from "next/link";
 
 const { Sider } = Layout;
@@ -18,9 +21,20 @@ interface AdminSidebarProps {
   onNavigation: (path: string) => void;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, onCollapse, isMobile, pathname, openKeys, onOpenChange, onNavigation }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = ({
+  collapsed,
+  onCollapse,
+  isMobile,
+  pathname,
+  openKeys,
+  onOpenChange,
+  onNavigation,
+}) => {
   const selectedKeys = AdminMenuHelper.getSelectedKeys(pathname);
-  const menuItems = AdminMenuHelper.convertToAntdMenuItems(adminMenuConfig, onNavigation);
+  const menuItems = AdminMenuHelper.convertToAntdMenuItems(
+    adminMenuConfig,
+    onNavigation
+  );
 
   return (
     <Sider
@@ -45,7 +59,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, onCollapse, isMo
     >
       {/* Logo Section */}
       <div
-        className="relative overflow-hidden"
+        className="relative overflow-hidden flex justify-center items-center"
         style={{
           borderBottom: `1px solid #e5e7eb`,
           minHeight: "72px",
@@ -53,7 +67,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, onCollapse, isMo
           background: "#f9fafb",
         }}
       >
-        <div className="relative z-10 flex items-center justify-center py-4 px-4">
+        <div className="relative z-10 flex items-center justify-center  px-4">
           <div className="text-center">
             {collapsed ? (
               <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-200">
@@ -63,7 +77,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, onCollapse, isMo
               <Link href="/" className="space-y-1">
                 <div className="flex items-center justify-center space-x-2">
                   <div>
-                    <div className="text-lg font-bold text-gray-900">KenPhotos</div>
+                    <div className="text-lg font-bold text-gray-900">
+                      KenPhotos
+                    </div>
                   </div>
                 </div>
                 <Text

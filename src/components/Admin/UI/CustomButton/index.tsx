@@ -34,6 +34,7 @@ export function CustomButton({
     | "border-color"
     | "gray"
     | "white"
+    | "dark"
     | "none";
   onClick?: (value?: any) => void;
   outline?: boolean;

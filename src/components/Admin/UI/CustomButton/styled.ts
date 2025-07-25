@@ -275,4 +275,13 @@ export const ButtonStyled = styled.div`
       opacity: 0.8 !important;
     }
   }
+
+  .dark {
+    background: #000000 !important;
+    color: #ffffff !important;
+    &:hover {
+      background: #000000 !important;
+      opacity: 0.8 !important;
+    }
+  }
 `;

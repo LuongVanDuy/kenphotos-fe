@@ -16,12 +16,14 @@ interface UserFromAPI {
   email?: string | null;
   accessToken: string;
   refreshToken: string;
+  role?: string | null;
 }
 
 interface UserToken {
   id: number;
   name: string;
   email: string;
+  role?: string | null;
 }
 
 function isTokenExpired(token: string): boolean {
@@ -75,13 +77,16 @@ export const authOptions: NextAuthOptions = {
           id: typeof user.id === "string" ? parseInt(user.id, 10) : user.id,
           name: user.name ?? "",
           email: user.email ?? "",
+          role: user.role ?? null,
         } as UserToken;
         return token;
       }
 
       if (token.accessToken && isTokenExpired(token.accessToken)) {
         try {
-          const refreshed = await fetchApi("auth/refresh-token", "POST", { token: token.refreshToken });
+          const refreshed = await fetchApi("auth/refresh-token", "POST", {
+            token: token.refreshToken,
+          });
 
           if (refreshed?.accessToken) {
             token.accessToken = refreshed.accessToken;
@@ -102,6 +107,10 @@ export const authOptions: NextAuthOptions = {
       session.user = token.user as UserToken;
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
+      // Đảm bảo role có trong session.user
+      if (token.user && (token.user as any).role) {
+        (session.user as any).role = (token.user as any).role;
+      }
       return session;
     },
   },

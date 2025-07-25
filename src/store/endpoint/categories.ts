@@ -1,5 +1,5 @@
 export default {
-  fetchPosts: (params?: Record<string, any>) => {
+  fetchCategories: (params?: Record<string, any>) => {
     const queryString = params
       ? "?" +
         new URLSearchParams(
@@ -8,6 +8,6 @@ export default {
             .map(([k, v]) => [k, typeof v === "boolean" ? String(v) : v])
         ).toString()
       : "";
-    return "posts" + queryString;
+    return "tour/categories" + queryString;
   },
 };

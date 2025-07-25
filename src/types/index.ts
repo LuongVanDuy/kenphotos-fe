@@ -1,6 +1,7 @@
 export type ApiResponse = {
   status: number;
   data: any;
+  total?: number;
 };
 
 export type ActionType = {

@@ -1,245 +1,245 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Button, Tag, Avatar, Space, message, Select, Card } from "antd";
-import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined } from "@ant-design/icons";
+import React, { useEffect, useCallback, useState } from "react";
+import {
+  Button,
+  Tag,
+  Avatar,
+  Space,
+  message,
+  Select,
+  Input,
+  Pagination,
+} from "antd";
+import { UserOutlined, PlusOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { Post } from "@/types";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import { fetchPosts } from "@/store/actions/posts";
 import CustomTable from "@/components/Admin/UI/CustomTable";
+import { useSession } from "next-auth/react";
+import debounce from "lodash.debounce";
 
 const { Option } = Select;
 
+const statusMap: Record<number, { label: string; color: string }> = {
+  0: { label: "Draft", color: "orange" },
+  1: { label: "Published", color: "green" },
+  2: { label: "Archived", color: "default" },
+};
+const deleteFlgMap: Record<number, { label: string; color: string }> = {
+  0: { label: "Active", color: "blue" },
+  1: { label: "Deleted", color: "red" },
+};
+const sortFields = [
+  { value: "createdTime", label: "Created Time" },
+  { value: "title", label: "Title" },
+];
+
 const PostListPage: React.FC = () => {
   const router = useRouter();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const dispatch = useDispatch<AppDispatch>();
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<string>("all");
+  const [deleteFlg, setDeleteFlg] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("createdTime");
+  const [sortDesc, setSortDesc] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
-  // Mock data for demonstration
-  const mockPosts: Post[] = [
-    {
-      id: "1",
-      title: "Getting Started with Next.js 14",
-      content: "This is a comprehensive guide to getting started with Next.js 14...",
-      excerpt: "Learn the basics of Next.js 14 and how to build modern web applications.",
-      status: "published",
-      author: {
-        id: "1",
-        name: "John Doe",
-        email: "john@example.com",
-        role: "admin",
-        status: "active",
-        createdAt: "2024-01-15",
-      },
-      featuredImage: "",
-      tags: ["nextjs", "react", "tutorial"],
-      categories: ["Web Development", "Tutorial"],
-      createdAt: "2024-01-15",
-      updatedAt: "2024-01-15",
-      publishedAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      title: "Advanced TypeScript Patterns",
-      content: "Explore advanced TypeScript patterns and techniques...",
-      excerpt: "Deep dive into advanced TypeScript patterns for better code organization.",
-      status: "draft",
-      author: {
-        id: "2",
-        name: "Jane Smith",
-        email: "jane@example.com",
-        role: "editor",
-        status: "active",
-        createdAt: "2024-01-14",
-      },
-      tags: ["typescript", "patterns", "advanced"],
-      categories: ["Programming", "TypeScript"],
-      createdAt: "2024-01-14",
-      updatedAt: "2024-01-16",
-    },
-    {
-      id: "3",
-      title: "Building Responsive UIs with Ant Design",
-      content: "Learn how to create beautiful and responsive user interfaces...",
-      excerpt: "Master the art of building responsive UIs using Ant Design components.",
-      status: "published",
-      author: {
-        id: "1",
-        name: "John Doe",
-        email: "john@example.com",
-        role: "admin",
-        status: "active",
-        createdAt: "2024-01-15",
-      },
-      featuredImage: "",
-      tags: ["antd", "ui", "responsive"],
-      categories: ["UI/UX", "Design"],
-      createdAt: "2024-01-13",
-      updatedAt: "2024-01-13",
-      publishedAt: "2024-01-13",
-    },
-    {
-      id: "4",
-      title: "State Management with Redux Toolkit",
-      content: "Modern state management patterns using Redux Toolkit...",
-      excerpt: "Simplify your state management with Redux Toolkit's modern approach.",
-      status: "archived",
-      author: {
-        id: "2",
-        name: "Jane Smith",
-        email: "jane@example.com",
-        role: "editor",
-        status: "active",
-        createdAt: "2024-01-14",
-      },
-      tags: ["redux", "state-management", "toolkit"],
-      categories: ["Programming", "State Management"],
-      createdAt: "2024-01-12",
-      updatedAt: "2024-01-12",
-      publishedAt: "2024-01-12",
-    },
-  ];
+  const { data: session } = useSession();
 
+  // Get posts state from Redux
+  const {
+    list: posts,
+    loading,
+    error,
+    total = 0,
+  } = useSelector((state: RootState) => state.post);
+
+  // Debounced search
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      setPage(1);
+      setSearch(value);
+    }, 300),
+    []
+  );
+
+  // Fetch posts on filter/sort/page change
   useEffect(() => {
-    loadPosts();
-  }, [statusFilter]);
+    dispatch(
+      fetchPosts({
+        search: search || undefined,
+        status: status !== "all" ? status : undefined,
+        deleteFlg: deleteFlg !== "all" ? deleteFlg : undefined,
+        sortBy,
+        sortDesc,
+        page,
+        itemsPerPage,
+      })
+    );
+  }, [
+    search,
+    status,
+    deleteFlg,
+    sortBy,
+    sortDesc,
+    page,
+    itemsPerPage,
+    dispatch,
+  ]);
 
-  const loadPosts = async () => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      let filteredPosts = mockPosts;
-      if (statusFilter !== "all") {
-        filteredPosts = mockPosts.filter((post) => post.status === statusFilter);
-      }
-
-      setPosts(filteredPosts);
-    } catch (error) {
-      message.error("Failed to load posts");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEdit = (post: Post) => {
+  const handleEdit = (post: any) => {
     router.push(`/admin/post/edit/${post.id}`);
   };
 
-  const handleDelete = (post: Post) => {};
-
-  const handleView = (post: Post) => {
-    router.push(`/admin/post/${post.id}`);
+  const handleDelete = (post: any) => {
+    // TODO: Implement delete logic
+    message.info("Delete post feature not implemented");
   };
 
-  const handleStatusChange = async (post: Post, newStatus: string) => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setPosts(posts.map((p) => (p.id === post.id ? { ...p, status: newStatus as any } : p)));
-      message.success(`Post status updated to ${newStatus}`);
-    } catch (error) {
-      message.error("Failed to update post status");
-    }
+  const handleView = (post: any) => {
+    router.push(`/admin/post/${post.id}`);
   };
 
   const columns = [
     {
-      title: "Post",
-      key: "post",
-      render: (_: any, record: Post) => (
-        <div className="flex items-start space-x-3">
-          {record.featuredImage && <img src={record.featuredImage} alt={record.title} className="w-16 h-16 object-cover rounded" />}
-          <div className="flex-1">
-            <div className="font-medium text-base mb-1">{record.title}</div>
-            {record.excerpt && <div className="text-sm text-gray-500 mb-2 line-clamp-2">{record.excerpt}</div>}
-            <div className="flex flex-wrap gap-1">
-              {record.tags.slice(0, 3).map((tag) => (
-                <Tag key={tag} className="text-xs px-2 py-0.5" color="blue">
-                  {tag}
-                </Tag>
-              ))}
-              {record.tags.length > 3 && <Tag className="text-xs px-2 py-0.5">+{record.tags.length - 3}</Tag>}
-            </div>
-          </div>
-        </div>
-      ),
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      width: 80,
     },
     {
-      title: "Author",
-      key: "author",
-      render: (_: any, record: Post) => (
-        <Space>
-          <Avatar size="small" icon={<UserOutlined />} />
-          <div>
-            <div className="font-medium">{record.author.name}</div>
-            <div className="text-xs text-gray-500">{record.author.role}</div>
-          </div>
-        </Space>
-      ),
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
+      render: (title: string) => <span className="font-medium">{title}</span>,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: string, record: Post) => <Tag color={status === "published" ? "green" : "orange"}>{status}</Tag>,
+      render: (status: number) => (
+        <Tag color={statusMap[status]?.color || "default"}>
+          {statusMap[status]?.label || status}
+        </Tag>
+      ),
     },
     {
-      title: "Categories",
-      dataIndex: "categories",
-      key: "categories",
-      render: (categories: string[]) => (
-        <div className="space-y-1">
-          {categories.map((category) => (
-            <Tag key={category} className="text-xs px-2 py-0.5">
-              {category}
-            </Tag>
-          ))}
-        </div>
+      title: "Deleted",
+      dataIndex: "deleteFlg",
+      key: "deleteFlg",
+      render: (deleteFlg: number) => (
+        <Tag color={deleteFlgMap[deleteFlg]?.color || "default"}>
+          {deleteFlgMap[deleteFlg]?.label || deleteFlg}
+        </Tag>
       ),
     },
     {
       title: "Created",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      dataIndex: "createdTime",
+      key: "createdTime",
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
+          <div className="text-xs text-gray-500">
+            {new Date(date).toLocaleTimeString()}
+          </div>
         </div>
       ),
-    },
-    {
-      title: "Updated",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      render: (date: string) => <div className="text-sm">{new Date(date).toLocaleDateString()}</div>,
     },
   ];
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Posts</h1>
+      <h1 className="text-4xl font-bold mb-5">Posts</h1>
+
+      <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
+        <div className="flex flex-wrap gap-2 items-center">
+          <Input.Search
+            placeholder="Search posts"
+            allowClear
+            onChange={(e) => debouncedSearch(e.target.value)}
+            style={{ width: 200 }}
+          />
+          <Select value={status} onChange={setStatus} style={{ width: 120 }}>
+            <Option value="all">All Status</Option>
+            <Option value={0}>Draft</Option>
+            <Option value={1}>Published</Option>
+            <Option value={2}>Archived</Option>
+          </Select>
+          <Select
+            value={deleteFlg}
+            onChange={setDeleteFlg}
+            style={{ width: 120 }}
+          >
+            <Option value="all">All</Option>
+            <Option value={0}>Active</Option>
+            <Option value={1}>Deleted</Option>
+          </Select>
+          <Select value={sortBy} onChange={setSortBy} style={{ width: 150 }}>
+            {sortFields.map((f) => (
+              <Option key={f.value} value={f.value}>
+                {f.label}
+              </Option>
+            ))}
+          </Select>
+          <Select
+            value={sortDesc}
+            onChange={(v) => setSortDesc(v)}
+            style={{ width: 120 }}
+          >
+            <Option value={false}>Ascending</Option>
+            <Option value={true}>Descending</Option>
+          </Select>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/post/create")}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => router.push("/admin/post/create")}
+        >
           Add New Post
         </Button>
       </div>
-
       <CustomTable
         columns={columns}
         data={posts}
         loading={loading}
-        onRefresh={loadPosts}
+        onRefresh={() => {
+          dispatch(
+            fetchPosts({
+              search: search || undefined,
+              status: status !== "all" ? status : undefined,
+              deleteFlg: deleteFlg !== "all" ? deleteFlg : undefined,
+              sortBy,
+              sortDesc,
+              page,
+              itemsPerPage,
+            })
+          );
+        }}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onView={handleView}
-        searchable
+        searchable={false}
         exportable
+        pagination={{
+          current: page,
+          pageSize: itemsPerPage,
+          total: total,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          pageSizeOptions: [5, 10, 20, 50],
+          onChange: (p: number, size?: number) => {
+            setPage(p);
+            setItemsPerPage(size || 10);
+          },
+          showTotal: (total: number, range: [number, number]) =>
+            `Showing ${range[0]}-${range[1]} of ${total} items`,
+        }}
       />
+      {error && <div className="text-red-500 mt-4">Failed to load posts.</div>}
     </div>
   );
 };

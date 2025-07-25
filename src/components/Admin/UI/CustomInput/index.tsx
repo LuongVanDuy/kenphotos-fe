@@ -76,11 +76,10 @@ export const CustomInput = forwardRef<
             setLabel(Number(formatValue).toLocaleString("en-US"));
           } else {
             onChange(0);
-
             setLabel("");
           }
         } else {
-          onChange(value);
+          onChange(e); // Always pass event for text type (react-hook-form compatibility)
           setLabel(value);
         }
     };

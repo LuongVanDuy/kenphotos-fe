@@ -11,7 +11,7 @@ export const LoadingIcon: React.FC<Props> = ({
   className,
   width = 25,
   height = 25,
-  color = "#e65605",
+  color = "#1677ff",
 }) => {
   return (
     <div className={`animate-spin text-[${color}] ${className}`}>

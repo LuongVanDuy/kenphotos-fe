@@ -1,30 +1,30 @@
 import { AppDispatch } from "../store";
 import {
-  FETCH_POSTS,
-  FETCH_POSTS_FAILURE,
-  FETCH_POSTS_SUCCESS,
+  FETCH_CATEGORIES,
+  FETCH_CATEGORIES_SUCCESS,
+  FETCH_CATEGORIES_FAILURE,
 } from "../actionTypes";
 import { fetchWithToken } from "@/app/api/index";
-import postsEndpoint from "../endpoint/posts";
+import categoriesEndpoint from "../endpoint/categories";
 import { getSession } from "next-auth/react";
 import { postWithToken } from "@/app/api/index";
 
-export const fetchPosts = (option: any) => {
+export const fetchCategories = (option: any) => {
   return async (dispatch: AppDispatch) => {
-    dispatch({ type: FETCH_POSTS });
+    dispatch({ type: FETCH_CATEGORIES });
     try {
       const session = await getSession();
       const accessToken = session?.accessToken;
       if (!accessToken) throw new Error("No access token");
-      const endpoint = postsEndpoint.fetchPosts(option);
+      const endpoint = categoriesEndpoint.fetchCategories(option);
       const response = await fetchWithToken(endpoint, accessToken);
       dispatch({
-        type: FETCH_POSTS_SUCCESS,
+        type: FETCH_CATEGORIES_SUCCESS,
         payload: { data: response.data, total: response.total },
       });
     } catch (error: any) {
       dispatch({
-        type: FETCH_POSTS_FAILURE,
+        type: FETCH_CATEGORIES_FAILURE,
         payload: { error: error?.message || "Unknown error" },
       });
     }
@@ -38,6 +38,7 @@ export const createPostCategory = (data: {
   parentId: number;
 }) => {
   return async () => {
+    const { getSession } = await import("next-auth/react");
     const session = await getSession();
     const accessToken = session?.accessToken;
     if (!accessToken) throw new Error("No access token");
