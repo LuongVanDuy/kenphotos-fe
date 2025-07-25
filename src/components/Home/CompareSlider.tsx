@@ -40,7 +40,7 @@ export const CompareSlider: React.FC<CompareSliderProps> = ({
               alt='Before'
               className='object-cover w-full h-full'
             />
-            {position > 5 && (
+            {position > 10 && (
               <div className='absolute top-3 left-3 bg-white/70 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full z-10'>
                 Before
               </div>
