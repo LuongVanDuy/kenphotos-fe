@@ -2,17 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { Button, Tag, Avatar, Space, message, Select, Card } from "antd";
-import {
-  UserOutlined,
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  FileTextOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { Post } from "@/types";
-import CustomTable from "@/components/UI/CustomTable";
+import CustomTable from "@/components/Admin/UI/CustomTable";
 
 const { Option } = Select;
 
@@ -27,10 +20,8 @@ const PostListPage: React.FC = () => {
     {
       id: "1",
       title: "Getting Started with Next.js 14",
-      content:
-        "This is a comprehensive guide to getting started with Next.js 14...",
-      excerpt:
-        "Learn the basics of Next.js 14 and how to build modern web applications.",
+      content: "This is a comprehensive guide to getting started with Next.js 14...",
+      excerpt: "Learn the basics of Next.js 14 and how to build modern web applications.",
       status: "published",
       author: {
         id: "1",
@@ -40,7 +31,7 @@ const PostListPage: React.FC = () => {
         status: "active",
         createdAt: "2024-01-15",
       },
-      featuredImage: "/images/nextjs-guide.jpg",
+      featuredImage: "",
       tags: ["nextjs", "react", "tutorial"],
       categories: ["Web Development", "Tutorial"],
       createdAt: "2024-01-15",
@@ -51,8 +42,7 @@ const PostListPage: React.FC = () => {
       id: "2",
       title: "Advanced TypeScript Patterns",
       content: "Explore advanced TypeScript patterns and techniques...",
-      excerpt:
-        "Deep dive into advanced TypeScript patterns for better code organization.",
+      excerpt: "Deep dive into advanced TypeScript patterns for better code organization.",
       status: "draft",
       author: {
         id: "2",
@@ -70,10 +60,8 @@ const PostListPage: React.FC = () => {
     {
       id: "3",
       title: "Building Responsive UIs with Ant Design",
-      content:
-        "Learn how to create beautiful and responsive user interfaces...",
-      excerpt:
-        "Master the art of building responsive UIs using Ant Design components.",
+      content: "Learn how to create beautiful and responsive user interfaces...",
+      excerpt: "Master the art of building responsive UIs using Ant Design components.",
       status: "published",
       author: {
         id: "1",
@@ -83,7 +71,7 @@ const PostListPage: React.FC = () => {
         status: "active",
         createdAt: "2024-01-15",
       },
-      featuredImage: "/images/antd-ui.jpg",
+      featuredImage: "",
       tags: ["antd", "ui", "responsive"],
       categories: ["UI/UX", "Design"],
       createdAt: "2024-01-13",
@@ -94,8 +82,7 @@ const PostListPage: React.FC = () => {
       id: "4",
       title: "State Management with Redux Toolkit",
       content: "Modern state management patterns using Redux Toolkit...",
-      excerpt:
-        "Simplify your state management with Redux Toolkit's modern approach.",
+      excerpt: "Simplify your state management with Redux Toolkit's modern approach.",
       status: "archived",
       author: {
         id: "2",
@@ -125,9 +112,7 @@ const PostListPage: React.FC = () => {
 
       let filteredPosts = mockPosts;
       if (statusFilter !== "all") {
-        filteredPosts = mockPosts.filter(
-          (post) => post.status === statusFilter
-        );
+        filteredPosts = mockPosts.filter((post) => post.status === statusFilter);
       }
 
       setPosts(filteredPosts);
@@ -152,11 +137,7 @@ const PostListPage: React.FC = () => {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 500));
-      setPosts(
-        posts.map((p) =>
-          p.id === post.id ? { ...p, status: newStatus as any } : p
-        )
-      );
+      setPosts(posts.map((p) => (p.id === post.id ? { ...p, status: newStatus as any } : p)));
       message.success(`Post status updated to ${newStatus}`);
     } catch (error) {
       message.error("Failed to update post status");
@@ -169,31 +150,17 @@ const PostListPage: React.FC = () => {
       key: "post",
       render: (_: any, record: Post) => (
         <div className="flex items-start space-x-3">
-          {record.featuredImage && (
-            <img
-              src={record.featuredImage}
-              alt={record.title}
-              className="w-16 h-16 object-cover rounded"
-            />
-          )}
+          {record.featuredImage && <img src={record.featuredImage} alt={record.title} className="w-16 h-16 object-cover rounded" />}
           <div className="flex-1">
             <div className="font-medium text-base mb-1">{record.title}</div>
-            {record.excerpt && (
-              <div className="text-sm text-gray-500 mb-2 line-clamp-2">
-                {record.excerpt}
-              </div>
-            )}
+            {record.excerpt && <div className="text-sm text-gray-500 mb-2 line-clamp-2">{record.excerpt}</div>}
             <div className="flex flex-wrap gap-1">
               {record.tags.slice(0, 3).map((tag) => (
                 <Tag key={tag} className="text-xs px-2 py-0.5" color="blue">
                   {tag}
                 </Tag>
               ))}
-              {record.tags.length > 3 && (
-                <Tag className="text-xs px-2 py-0.5">
-                  +{record.tags.length - 3}
-                </Tag>
-              )}
+              {record.tags.length > 3 && <Tag className="text-xs px-2 py-0.5">+{record.tags.length - 3}</Tag>}
             </div>
           </div>
         </div>
@@ -216,11 +183,7 @@ const PostListPage: React.FC = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: string, record: Post) => (
-        <Tag color={status === "published" ? "green" : "orange"}>
-          {status}
-        </Tag>
-      ),
+      render: (status: string, record: Post) => <Tag color={status === "published" ? "green" : "orange"}>{status}</Tag>,
     },
     {
       title: "Categories",
@@ -243,9 +206,7 @@ const PostListPage: React.FC = () => {
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">
-            {new Date(date).toLocaleTimeString()}
-          </div>
+          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
         </div>
       ),
     },
@@ -253,9 +214,7 @@ const PostListPage: React.FC = () => {
       title: "Updated",
       dataIndex: "updatedAt",
       key: "updatedAt",
-      render: (date: string) => (
-        <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-      ),
+      render: (date: string) => <div className="text-sm">{new Date(date).toLocaleDateString()}</div>,
     },
   ];
 
@@ -265,11 +224,7 @@ const PostListPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold">Posts</h1>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => router.push("/admin/post/create")}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/post/create")}>
           Add New Post
         </Button>
       </div>

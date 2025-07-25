@@ -3,9 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import authService from "@/services/authService";
 import { customMessage } from "@/utils/messageHelper";
-import { CustomButton } from "@/components/UI/CustomButton";
+import { CustomButton } from "@/components/Admin/UI/CustomButton";
 
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,28 +15,7 @@ const LoginForm = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const response = await authService.login(form);
-      if (response.success && response.data) {
-        customMessage.success("Đăng nhập thành công!");
-        const user = authService.getUser();
-        if (user?.isSuperAdmin === 1) {
-          router.push("/admin/dashboard");
-        } else {
-          router.push("/");
-        }
-      } else {
-        customMessage.error(response.error || "Đăng nhập thất bại!");
-      }
-    } catch (error) {
-      customMessage.error("Đã xảy ra lỗi, vui lòng thử lại.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleSubmit = async (e: React.FormEvent) => {};
 
   const handleGoogleLogin = async () => {
     customMessage.info("Tính năng đăng nhập Google sẽ được cập nhật sớm!");
@@ -54,7 +32,7 @@ const LoginForm = () => {
         <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
           <h1 className="text-3xl font-bold mb-2">Login to KenPhoto</h1>
           <p className="mb-6 text-gray-500">
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link href="/auth/register" className="text-blue-600 hover:underline">
               Create an account here.
             </Link>
@@ -88,12 +66,7 @@ const LoginForm = () => {
                 Forgot your password?
               </Link>
             </div>
-            <CustomButton
-              type="primary"
-              isLoading={isLoading}
-              htmlType="submit"
-              className="w-full bg-black text-white py-2 rounded-lg font-semibold"
-            >
+            <CustomButton type="primary" isLoading={isLoading} htmlType="submit" className="w-full bg-black text-white py-2 rounded-lg font-semibold">
               Login
             </CustomButton>
             <div className="flex items-center my-4">

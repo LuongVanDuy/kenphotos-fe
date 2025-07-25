@@ -142,25 +142,25 @@ export const adminMenuConfig: MenuItemConfig[] = [
 // Cấu hình user menu
 export const userMenuConfig = [
   {
-    key: 'profile',
+    key: "profile",
     icon: <UserOutlined />,
-    label: 'Profile',
-    path: '/admin/profile',
+    label: "Profile",
+    path: "/admin/profile",
   },
   {
-    key: 'settings',
+    key: "settings",
     icon: <SettingOutlined />,
-    label: 'Settings',
-    path: '/admin/settings',
+    label: "Settings",
+    path: "/admin/settings",
   },
   {
-    type: 'divider' as const,
+    type: "divider" as const,
   },
   {
-    key: 'logout',
+    key: "logout",
     icon: <LogoutOutlined />,
-    label: 'Logout',
-    path: '/',
+    label: "Logout",
+    path: "/",
   },
 ];
 
@@ -168,32 +168,32 @@ export const userMenuConfig = [
 export class AdminMenuHelper {
   private static flattenMenu(items: MenuItemConfig[]): MenuItemConfig[] {
     const result: MenuItemConfig[] = [];
-    
-    items.forEach(item => {
+
+    items.forEach((item) => {
       result.push(item);
       if (item.children) {
         result.push(...this.flattenMenu(item.children));
       }
     });
-    
+
     return result;
   }
 
   // Lấy selected keys dựa trên pathname
   static getSelectedKeys(pathname: string): string[] {
     const flatItems = this.flattenMenu(adminMenuConfig);
-    
+
     // Tìm exact match trước
-    const exactMatch = flatItems.find(item => item.path === pathname);
+    const exactMatch = flatItems.find((item) => item.path === pathname);
     if (exactMatch) {
       return [exactMatch.key];
     }
 
     // Xử lý các trường hợp edit (highlight parent list)
-    if (pathname.includes('/edit/')) {
-      const basePath = pathname.split('/edit/')[0];
-      const listPath = basePath + '/list';
-      const listItem = flatItems.find(item => item.path === listPath);
+    if (pathname.includes("/edit/")) {
+      const basePath = pathname.split("/edit/")[0];
+      const listPath = basePath + "/list";
+      const listItem = flatItems.find((item) => item.path === listPath);
       if (listItem) {
         return [listItem.key];
       }
@@ -201,9 +201,9 @@ export class AdminMenuHelper {
 
     // Tìm match theo prefix
     const prefixMatch = flatItems
-      .filter(item => item.path && pathname.startsWith(item.path))
+      .filter((item) => item.path && pathname.startsWith(item.path))
       .sort((a, b) => (b.path?.length || 0) - (a.path?.length || 0))[0];
-    
+
     if (prefixMatch) {
       return [prefixMatch.key];
     }
@@ -222,33 +222,29 @@ export class AdminMenuHelper {
 
   // Tạo breadcrumbs động
   static getBreadcrumbs(pathname: string): BreadcrumbConfig[] {
-    const breadcrumbs: BreadcrumbConfig[] = [
-      { title: 'Dashboard', path: '/admin' }
-    ];
+    const breadcrumbs: BreadcrumbConfig[] = [{ title: "Dashboard", path: "/admin" }];
 
-    const pathSegments = pathname.split('/').filter(Boolean);
-    
+    const pathSegments = pathname.split("/").filter(Boolean);
+
     if (pathSegments.length > 1) {
       const section = pathSegments[1];
-      
+
       // Tìm section trong menu config
-      const sectionConfig = adminMenuConfig.find(item => item.key === section);
+      const sectionConfig = adminMenuConfig.find((item) => item.key === section);
       if (sectionConfig) {
-        breadcrumbs.push({ 
+        breadcrumbs.push({
           title: sectionConfig.breadcrumbTitle || sectionConfig.label,
-          path: sectionConfig.path 
+          path: sectionConfig.path,
         });
 
         // Nếu có action (như list, create)
         if (pathSegments.length > 2) {
           const action = pathSegments[2];
-          const actionConfig = sectionConfig.children?.find(child => 
-            child.path?.includes(`/${action}`)
-          );
-          
+          const actionConfig = sectionConfig.children?.find((child) => child.path?.includes(`/${action}`));
+
           if (actionConfig) {
-            breadcrumbs.push({ 
-              title: actionConfig.breadcrumbTitle || actionConfig.label 
+            breadcrumbs.push({
+              title: actionConfig.breadcrumbTitle || actionConfig.label,
             });
           }
         }
@@ -259,11 +255,8 @@ export class AdminMenuHelper {
   }
 
   // Convert config thành Ant Design menu items
-  static convertToAntdMenuItems(
-    items: MenuItemConfig[], 
-    handleNavigation: (path: any) => void
-  ): any[] {
-    return items.map(item => ({
+  static convertToAntdMenuItems(items: MenuItemConfig[], handleNavigation: (path: any) => void): any[] {
+    return items.map((item) => ({
       key: item.key,
       icon: item.icon,
       label: item.label,
@@ -274,7 +267,7 @@ export class AdminMenuHelper {
 
   // Convert user menu config
   static convertUserMenuToAntd(handleNavigation: (path: string) => void) {
-    return userMenuConfig.map(item => ({
+    return userMenuConfig.map((item) => ({
       ...item,
       onClick: item.path ? () => handleNavigation(item.path) : undefined,
     }));

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Layout } from "antd";
 import { usePathname, useRouter } from "next/navigation";
-import { AdminMenuHelper } from "@/config/adminMenu";
+import { AdminMenuHelper } from "@/components/Admin/Layout/AdminMenu";
 import AdminSidebar from "./AdminSidebar";
 import AdminHeader from "./AdminHeader";
 

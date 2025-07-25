@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import { Form, Card, message, Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { CustomInput } from "@/components/UI/CustomInput";
-import { CustomSelect } from "@/components/UI/CustomSelect";
-import { CustomSwitch } from "@/components/UI/CustomSwitch";
-import FormActions from "@/components/UI/FormActions";
-import UploadField from "@/components/UI/UploadField";
+import { CustomInput } from "@/components/Admin/UI/CustomInput";
+import { CustomSelect } from "@/components/Admin/UI/CustomSelect";
+import { CustomSwitch } from "@/components/Admin/UI/CustomSwitch";
+import FormActions from "@/components/Admin/UI/FormActions";
+import UploadField from "@/components/Admin/UI/UploadField";
 import { User } from "@/types";
 
 const CreateUserPage: React.FC = () => {
@@ -29,19 +29,7 @@ const CreateUserPage: React.FC = () => {
   ];
 
   const handleSubmit = async (values: any) => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      console.log("Creating user:", values);
-      message.success("User created successfully!");
-      router.push("/admin/user/list");
-    } catch (error) {
-      message.error("Failed to create user");
-    } finally {
-      setLoading(false);
-    }
+    console.log(values);
   };
 
   const handleCancel = () => {
@@ -51,12 +39,7 @@ const CreateUserPage: React.FC = () => {
   return (
     <div>
       <div className="mb-6">
-        <Button
-          type="text"
-          icon={<ArrowLeftOutlined />}
-          onClick={() => router.back()}
-          className="mb-4"
-        >
+        <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => router.back()} className="mb-4">
           Back to Users
         </Button>
         <h1 className="text-2xl font-bold">Create New User</h1>
@@ -81,35 +64,21 @@ const CreateUserPage: React.FC = () => {
                   Full Name
                 </label>
                 <CustomInput id="name" placeholder="Enter full name" />
-                <div style={{ color: "#888", fontSize: 12 }}>
-                  The user's display name
-                </div>
+                <div style={{ color: "#888", fontSize: 12 }}>The user's display name</div>
               </div>
               <div style={{ marginBottom: 16 }}>
                 <label htmlFor="email" style={{ fontWeight: 500 }}>
                   Email Address
                 </label>
-                <CustomInput
-                  id="email"
-                  placeholder="Enter email address"
-                  type="text"
-                />
-                <div style={{ color: "#888", fontSize: 12 }}>
-                  This will be used for login and notifications
-                </div>
+                <CustomInput id="email" placeholder="Enter email address" type="text" />
+                <div style={{ color: "#888", fontSize: 12 }}>This will be used for login and notifications</div>
               </div>
               <div style={{ marginBottom: 16 }}>
                 <label htmlFor="password" style={{ fontWeight: 500 }}>
                   Password
                 </label>
-                <CustomInput
-                  id="password"
-                  placeholder="Enter password"
-                  type="password"
-                />
-                <div style={{ color: "#888", fontSize: 12 }}>
-                  Set a secure password for the user
-                </div>
+                <CustomInput id="password" placeholder="Enter password" type="password" />
+                <div style={{ color: "#888", fontSize: 12 }}>Set a secure password for the user</div>
               </div>
             </div>
             <div>
@@ -118,28 +87,19 @@ const CreateUserPage: React.FC = () => {
                   Role
                 </label>
                 <CustomSelect options={roleOptions} style={{ width: "100%" }} />
-                <div style={{ color: "#888", fontSize: 12 }}>
-                  Assign a role to the user
-                </div>
+                <div style={{ color: "#888", fontSize: 12 }}>Assign a role to the user</div>
               </div>
               <div style={{ marginBottom: 16 }}>
                 <label htmlFor="status" style={{ fontWeight: 500 }}>
                   Status
                 </label>
-                <CustomSelect
-                  options={statusOptions}
-                  style={{ width: "100%" }}
-                />
-                <div style={{ color: "#888", fontSize: 12 }}>
-                  Set the user's account status
-                </div>
+                <CustomSelect options={statusOptions} style={{ width: "100%" }} />
+                <div style={{ color: "#888", fontSize: 12 }}>Set the user's account status</div>
               </div>
               <div style={{ marginBottom: 16 }}>
                 <CustomSwitch />
                 <span style={{ marginLeft: 8 }}>Email Notifications</span>
-                <div style={{ color: "#888", fontSize: 12 }}>
-                  Enable email notifications for this user
-                </div>
+                <div style={{ color: "#888", fontSize: 12 }}>Enable email notifications for this user</div>
               </div>
               <div style={{ marginBottom: 16 }}>
                 <UploadField
@@ -155,12 +115,7 @@ const CreateUserPage: React.FC = () => {
           </div>
 
           <div className="mt-8 pt-6 border-t">
-            <FormActions
-              loading={loading}
-              onCancel={handleCancel}
-              submitText="Create User"
-              cancelText="Cancel"
-            />
+            <FormActions loading={loading} onCancel={handleCancel} submitText="Create User" cancelText="Cancel" />
           </div>
         </Form>
       </Card>

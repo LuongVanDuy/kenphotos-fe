@@ -1,33 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Form,
-  Card,
-  Row,
-  Col,
-  Button,
-  message,
-  Upload,
-  Image,
-  Divider,
-  Space,
-  Tag,
-} from "antd";
-import {
-  ArrowLeftOutlined,
-  PlusOutlined,
-  EyeOutlined,
-  SaveOutlined,
-  SendOutlined,
-} from "@ant-design/icons";
+import { Form, Card, Row, Col, Button, message, Upload, Image, Divider, Space, Tag } from "antd";
+import { ArrowLeftOutlined, PlusOutlined, EyeOutlined, SaveOutlined, SendOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { CustomInput, CustomTextarea } from "@/components/UI/CustomInput";
-import { CustomSelect } from "@/components/UI/CustomSelect";
-import { CustomSwitch } from "@/components/UI/CustomSwitch";
-import FormActions from "@/components/UI/FormActions";
-import UploadField from "@/components/UI/UploadField";
-import CustomQuill from "@/components/UI/CustomQuill";
+import { CustomInput, CustomTextarea } from "@/components/Admin/UI/CustomInput";
+import { CustomSelect } from "@/components/Admin/UI/CustomSelect";
+import { CustomSwitch } from "@/components/Admin/UI/CustomSwitch";
+import FormActions from "@/components/Admin/UI/FormActions";
+import UploadField from "@/components/Admin/UI/UploadField";
+import CustomQuill from "@/components/Admin/UI/CustomQuill";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -101,12 +83,7 @@ const CreatePostPage: React.FC = () => {
 
   return (
     <div>
-      <Button
-        type="text"
-        icon={<ArrowLeftOutlined />}
-        onClick={() => router.back()}
-        className="mb-4"
-      >
+      <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => router.back()} className="mb-4">
         Back to Posts
       </Button>
       <div className="text-start mb-5">
@@ -119,22 +96,8 @@ const CreatePostPage: React.FC = () => {
               {/* Title */}
               <div className="mb-8">
                 <label className="font-semibold block mb-2">Title</label>
-                <Controller
-                  name="title"
-                  control={control}
-                  render={({ field }) => (
-                    <CustomInput
-                      {...field}
-                      placeholder="Title"
-                      maxLength={300}
-                    />
-                  )}
-                />
-                {errors.title && (
-                  <div className="text-red-500 text-xs mt-1">
-                    {errors.title.message}
-                  </div>
-                )}
+                <Controller name="title" control={control} render={({ field }) => <CustomInput {...field} placeholder="Title" maxLength={300} />} />
+                {errors.title && <div className="text-red-500 text-xs mt-1">{errors.title.message}</div>}
               </div>
               {/* Content */}
               <div className="mb-10">
@@ -142,19 +105,10 @@ const CreatePostPage: React.FC = () => {
                   name="content"
                   control={control}
                   render={({ field }) => (
-                    <CustomQuill
-                      {...field}
-                      placeholder="Write your post content here..."
-                      style={{ height: "500px" }}
-                      className="quill-editor"
-                    />
+                    <CustomQuill {...field} placeholder="Write your post content here..." style={{ height: "500px" }} className="quill-editor" />
                   )}
                 />
-                {errors.content && (
-                  <div className="text-red-500 text-xs mt-1">
-                    {errors.content.message}
-                  </div>
-                )}
+                {errors.content && <div className="text-red-500 text-xs mt-1">{errors.content.message}</div>}
               </div>
               {/* Excerpt */}
               <div className="mb-0">
@@ -162,35 +116,15 @@ const CreatePostPage: React.FC = () => {
                 <Controller
                   name="excerpt"
                   control={control}
-                  render={({ field }) => (
-                    <CustomInput
-                      {...field}
-                      placeholder="Brief description of the post"
-                      maxLength={300}
-                    />
-                  )}
+                  render={({ field }) => <CustomInput {...field} placeholder="Brief description of the post" maxLength={300} />}
                 />
-                {errors.excerpt && (
-                  <div className="text-red-500 text-xs mt-1">
-                    {errors.excerpt.message}
-                  </div>
-                )}
+                {errors.excerpt && <div className="text-red-500 text-xs mt-1">{errors.excerpt.message}</div>}
               </div>
               {/* Slug */}
               <div className="mt-6">
                 <label className="font-semibold block mb-1">URL Slug</label>
-                <Controller
-                  name="slug"
-                  control={control}
-                  render={({ field }) => (
-                    <CustomInput {...field} placeholder="post-url-slug" />
-                  )}
-                />
-                {errors.slug && (
-                  <div className="text-red-500 text-xs mt-1">
-                    {errors.slug.message}
-                  </div>
-                )}
+                <Controller name="slug" control={control} render={({ field }) => <CustomInput {...field} placeholder="post-url-slug" />} />
+                {errors.slug && <div className="text-red-500 text-xs mt-1">{errors.slug.message}</div>}
               </div>
             </div>
           </div>
@@ -212,29 +146,13 @@ const CreatePostPage: React.FC = () => {
                     />
                   )}
                 />
-                {errors.status && (
-                  <div className="text-red-500 text-xs mt-1">
-                    {errors.status.message}
-                  </div>
-                )}
+                {errors.status && <div className="text-red-500 text-xs mt-1">{errors.status.message}</div>}
               </div>
               <div className="flex gap-2 mb-8">
-                <Button
-                  type="default"
-                  onClick={handleSubmit((data) =>
-                    onSubmit({ ...data, status: 0 })
-                  )}
-                  className="flex-1"
-                  disabled={loading}
-                >
+                <Button type="default" onClick={handleSubmit((data) => onSubmit({ ...data, status: 0 }))} className="flex-1" disabled={loading}>
                   Save Draft
                 </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  className="flex-1 font-semibold"
-                >
+                <Button type="primary" htmlType="submit" loading={loading} className="flex-1 font-semibold">
                   Publish
                 </Button>
               </div>
@@ -255,11 +173,7 @@ const CreatePostPage: React.FC = () => {
                     />
                   )}
                 />
-                {errors.categoryIds && (
-                  <div className="text-red-500 text-xs mt-1">
-                    {errors.categoryIds.message}
-                  </div>
-                )}
+                {errors.categoryIds && <div className="text-red-500 text-xs mt-1">{errors.categoryIds.message}</div>}
               </div>
               {/* Thumbnail */}
               <div className="mb-6">
@@ -280,33 +194,17 @@ const CreatePostPage: React.FC = () => {
                     />
                   )}
                 />
-                {errors.thumbnail && (
-                  <div className="text-red-500 text-xs mt-1">
-                    {errors.thumbnail.message}
-                  </div>
-                )}
+                {errors.thumbnail && <div className="text-red-500 text-xs mt-1">{errors.thumbnail.message}</div>}
               </div>
               {/* Password */}
               <div className="mb-0">
-                <label className="font-semibold block mb-2">
-                  Password (optional)
-                </label>
+                <label className="font-semibold block mb-2">Password (optional)</label>
                 <Controller
                   name="password"
                   control={control}
-                  render={({ field }) => (
-                    <CustomInput
-                      {...field}
-                      placeholder="Password to protect post"
-                      type="password"
-                    />
-                  )}
+                  render={({ field }) => <CustomInput {...field} placeholder="Password to protect post" type="password" />}
                 />
-                {errors.password && (
-                  <div className="text-red-500 text-xs mt-1">
-                    {errors.password.message}
-                  </div>
-                )}
+                {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password.message}</div>}
               </div>
             </div>
           </div>

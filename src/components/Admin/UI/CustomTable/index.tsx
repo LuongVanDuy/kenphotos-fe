@@ -1,41 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Table,
-  Input,
-  Button,
-  Space,
-  Dropdown,
-  Tag,
-  Popconfirm,
-  message,
-  Card,
-  Row,
-  Col,
-  Select,
-  Typography,
-  Tooltip,
-  DatePicker,
-} from "antd";
-import {
-  SearchOutlined,
-  FilterOutlined,
-  DownloadOutlined,
-  ReloadOutlined,
-  MoreOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  ClearOutlined,
-  SortAscendingOutlined,
-  SortDescendingOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { Table, Input, Button, Space, Dropdown, Tag, Popconfirm, message, Card, Row, Col, Select, Typography, Tooltip, DatePicker } from "antd";
+import { MoreOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import type { ColumnsType, TableProps } from "antd/es/table";
 
-const { Search } = Input;
-const { Option } = Select;
 const { Text } = Typography;
 
 interface DataTableProps<T> extends Omit<TableProps<T>, "columns" | "title"> {
@@ -92,11 +61,7 @@ function CustomTable<T extends { id: string | number }>({
       onSearch(value);
     } else {
       // Default local search
-      const filtered = data.filter((item) =>
-        Object.values(item).some((val) =>
-          String(val).toLowerCase().includes(value.toLowerCase())
-        )
-      );
+      const filtered = data.filter((item) => Object.values(item).some((val) => String(val).toLowerCase().includes(value.toLowerCase())));
       setFilteredData(filtered);
     }
   };

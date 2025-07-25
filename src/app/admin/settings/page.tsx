@@ -1,30 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Card,
-  Tabs,
-  Form,
-  message,
-  Divider,
-  Typography,
-  Space,
-  Button,
-  Alert,
-} from "antd";
-import {
-  SaveOutlined,
-  SettingOutlined,
-  GlobalOutlined,
-  MailOutlined,
-  SecurityScanOutlined,
-  DatabaseOutlined,
-} from "@ant-design/icons";
-import { CustomInput, CustomTextarea } from "@/components/UI/CustomInput";
-import { CustomSelect } from "@/components/UI/CustomSelect";
-import { CustomSwitch } from "@/components/UI/CustomSwitch";
-import FormActions from "@/components/UI/FormActions";
-import UploadField from "@/components/UI/UploadField";
+import { Card, Tabs, Form, message, Divider, Typography, Space, Button, Alert } from "antd";
+import { SaveOutlined, SettingOutlined, GlobalOutlined, MailOutlined, SecurityScanOutlined, DatabaseOutlined } from "@ant-design/icons";
+import { CustomInput, CustomTextarea } from "@/components/Admin/UI/CustomInput";
+import { CustomSelect } from "@/components/Admin/UI/CustomSelect";
+import { CustomSwitch } from "@/components/Admin/UI/CustomSwitch";
+import FormActions from "@/components/Admin/UI/FormActions";
+import UploadField from "@/components/Admin/UI/UploadField";
 
 const { Title, Text } = Typography;
 
@@ -98,11 +81,7 @@ const SettingsPage: React.FC = () => {
           <label htmlFor="siteDescription" style={{ fontWeight: 500 }}>
             Site Description
           </label>
-          <CustomTextarea
-            id="siteDescription"
-            placeholder="Enter site description"
-            rows={3}
-          />
+          <CustomTextarea id="siteDescription" placeholder="Enter site description" rows={3} />
         </div>
         <div style={{ marginBottom: 16 }}>
           <label htmlFor="siteUrl" style={{ fontWeight: 500 }}>
@@ -110,12 +89,7 @@ const SettingsPage: React.FC = () => {
           </label>
           <CustomInput id="siteUrl" placeholder="https://example.com" />
         </div>
-        <UploadField
-          name="siteLogo"
-          accept="image/*"
-          listType="picture-card"
-          maxCount={1}
-        />
+        <UploadField name="siteLogo" accept="image/*" listType="picture-card" maxCount={1} />
 
         <Divider />
 
@@ -147,11 +121,7 @@ const SettingsPage: React.FC = () => {
           <span style={{ marginLeft: 8 }}>Allow Registration</span>
         </div>
 
-        <FormActions
-          loading={loading}
-          submitText="Save General Settings"
-          showCancel={false}
-        />
+        <FormActions loading={loading} submitText="Save General Settings" showCancel={false} />
       </Form>
     </Card>
   );
@@ -219,11 +189,7 @@ const SettingsPage: React.FC = () => {
           <label htmlFor="smtpPassword" style={{ fontWeight: 500 }}>
             SMTP Password
           </label>
-          <CustomInput
-            id="smtpPassword"
-            placeholder="Enter password"
-            type="password"
-          />
+          <CustomInput id="smtpPassword" placeholder="Enter password" type="password" />
         </div>
 
         <Divider />
@@ -256,11 +222,7 @@ const SettingsPage: React.FC = () => {
           <span style={{ marginLeft: 8 }}>Enable Email Notifications</span>
         </div>
 
-        <FormActions
-          loading={loading}
-          submitText="Save Email Settings"
-          showCancel={false}
-        />
+        <FormActions loading={loading} submitText="Save Email Settings" showCancel={false} />
       </Form>
     </Card>
   );
@@ -333,11 +295,7 @@ const SettingsPage: React.FC = () => {
           />
         </div>
 
-        <FormActions
-          loading={loading}
-          submitText="Save Security Settings"
-          showCancel={false}
-        />
+        <FormActions loading={loading} submitText="Save Security Settings" showCancel={false} />
       </Form>
     </Card>
   );
@@ -443,17 +401,10 @@ const SettingsPage: React.FC = () => {
     <div>
       <div className="mb-6">
         <Title level={2}>Settings</Title>
-        <Text type="secondary">
-          Configure your application settings and preferences
-        </Text>
+        <Text type="secondary">Configure your application settings and preferences</Text>
       </div>
 
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={tabItems}
-        size="large"
-      />
+      <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} size="large" />
     </div>
   );
 };

@@ -20,11 +20,12 @@ export type StateType = {
 // Admin Dashboard Types
 export interface User {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   avatar?: string;
-  role: 'admin' | 'editor' | 'user';
-  status: 'active' | 'inactive' | 'pending';
+  role: "admin" | "editor" | "user";
+  status: number;
   createdAt: string;
   lastLogin?: string;
 }
@@ -34,7 +35,7 @@ export interface Post {
   title: string;
   content: string;
   excerpt?: string;
-  status: 'published' | 'draft' | 'archived';
+  status: "published" | "draft" | "archived";
   author: User;
   featuredImage?: string;
   tags: string[];

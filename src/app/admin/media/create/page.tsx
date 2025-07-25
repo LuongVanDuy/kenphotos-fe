@@ -1,29 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Card,
-  Upload,
-  Button,
-  message,
-  Progress,
-  List,
-  Image,
-  Space,
-  Tag,
-  Typography,
-  Divider,
-} from "antd";
-import {
-  InboxOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  ArrowLeftOutlined,
-  CloudUploadOutlined,
-} from "@ant-design/icons";
+import { Card, Upload, Button, message, Progress, List, Image, Space, Tag, Typography, Divider } from "antd";
+import { InboxOutlined, DeleteOutlined, EyeOutlined, ArrowLeftOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import type { UploadProps, UploadFile } from "antd";
-import UploadField from "@/components/UI/UploadField";
+import UploadField from "@/components/Admin/UI/UploadField";
 
 const { Dragger } = Upload;
 const { Title, Text } = Typography;
@@ -70,16 +52,7 @@ const MediaCreatePage: React.FC = () => {
       }
 
       // Check file type
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp",
-        "video/mp4",
-        "video/webm",
-        "application/pdf",
-        "text/plain",
-      ];
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "video/mp4", "video/webm", "application/pdf", "text/plain"];
 
       if (!allowedTypes.includes(file.type!)) {
         message.error("File type not supported!");
@@ -146,11 +119,7 @@ const MediaCreatePage: React.FC = () => {
       for (let i = 0; i < fileList.length; i++) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         // Update file status
-        setFileList((prev) =>
-          prev.map((file, index) =>
-            index === i ? { ...file, status: "done" } : file
-          )
-        );
+        setFileList((prev) => prev.map((file, index) => (index === i ? { ...file, status: "done" } : file)));
       }
 
       message.success("All files uploaded successfully!");
@@ -166,20 +135,13 @@ const MediaCreatePage: React.FC = () => {
 
   return (
     <div>
-      <Button
-        type="text"
-        icon={<ArrowLeftOutlined />}
-        onClick={() => router.back()}
-        className="mb-4"
-      >
+      <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => router.back()} className="mb-4">
         Back to Media Library
       </Button>
 
       <div className="mb-6">
         <Title level={2}>Upload Media</Title>
-        <Text type="secondary">
-          Upload images, videos, documents and other media files to your library
-        </Text>
+        <Text type="secondary">Upload images, videos, documents and other media files to your library</Text>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -190,14 +152,11 @@ const MediaCreatePage: React.FC = () => {
               <p className="ant-upload-drag-icon">
                 <InboxOutlined style={{ fontSize: "48px", color: "#1890ff" }} />
               </p>
-              <p className="ant-upload-text">
-                Click or drag files to this area to upload
-              </p>
+              <p className="ant-upload-text">Click or drag files to this area to upload</p>
               <p className="ant-upload-hint">
                 Support for single or bulk upload. Maximum file size: 10MB.
                 <br />
-                Supported formats: Images (JPEG, PNG, GIF, WebP), Videos (MP4,
-                WebM), Documents (PDF, TXT)
+                Supported formats: Images (JPEG, PNG, GIF, WebP), Videos (MP4, WebM), Documents (PDF, TXT)
               </p>
             </Dragger>
 
@@ -206,12 +165,7 @@ const MediaCreatePage: React.FC = () => {
                 <Divider />
                 <div className="flex justify-between items-center mb-4">
                   <Text strong>Selected Files ({fileList.length})</Text>
-                  <Button
-                    type="primary"
-                    icon={<CloudUploadOutlined />}
-                    loading={uploading}
-                    onClick={handleUploadAll}
-                  >
+                  <Button type="primary" icon={<CloudUploadOutlined />} loading={uploading} onClick={handleUploadAll}>
                     Upload All
                   </Button>
                 </div>
@@ -222,47 +176,25 @@ const MediaCreatePage: React.FC = () => {
                     <List.Item
                       actions={[
                         file.type?.startsWith("image/") && (
-                          <Button
-                            type="text"
-                            icon={<EyeOutlined />}
-                            onClick={() => handlePreview(file)}
-                            key="preview"
-                          />
+                          <Button type="text" icon={<EyeOutlined />} onClick={() => handlePreview(file)} key="preview" />
                         ),
-                        <Button
-                          type="text"
-                          danger
-                          icon={<DeleteOutlined />}
-                          onClick={() => handleRemove(file)}
-                          key="delete"
-                        />,
+                        <Button type="text" danger icon={<DeleteOutlined />} onClick={() => handleRemove(file)} key="delete" />,
                       ].filter(Boolean)}
                     >
                       <List.Item.Meta
                         avatar={
                           file.type?.startsWith("image/") && file.thumbUrl ? (
-                            <Image
-                              width={40}
-                              height={40}
-                              src={file.thumbUrl}
-                              alt={file.name}
-                              className="object-cover rounded"
-                              preview={false}
-                            />
+                            <Image width={40} height={40} src={file.thumbUrl} alt={file.name} className="object-cover rounded" preview={false} />
                           ) : (
                             <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded">
-                              <span className="text-lg">
-                                {getFileIcon(file.type)}
-                              </span>
+                              <span className="text-lg">{getFileIcon(file.type)}</span>
                             </div>
                           )
                         }
                         title={
                           <div className="flex items-center space-x-2">
                             <span>{file.name}</span>
-                            <Tag color={getStatusColor(file.status)}>
-                              {file.status || "ready"}
-                            </Tag>
+                            <Tag color={getStatusColor(file.status)}>{file.status || "ready"}</Tag>
                           </div>
                         }
                         description={
@@ -270,13 +202,7 @@ const MediaCreatePage: React.FC = () => {
                             <div className="text-sm text-gray-500">
                               {formatFileSize(file.size)} • {file.type}
                             </div>
-                            {file.status === "uploading" && file.percent && (
-                              <Progress
-                                percent={file.percent}
-                                size="small"
-                                className="mt-1"
-                              />
-                            )}
+                            {file.status === "uploading" && file.percent && <Progress percent={file.percent} size="small" className="mt-1" />}
                           </div>
                         }
                       />
@@ -299,9 +225,7 @@ const MediaCreatePage: React.FC = () => {
                 <div className="space-y-1">
                   <div className="flex items-center">
                     <span className="mr-2">🖼️</span>
-                    <Text className="text-sm">
-                      Images: JPEG, PNG, GIF, WebP
-                    </Text>
+                    <Text className="text-sm">Images: JPEG, PNG, GIF, WebP</Text>
                   </div>
                   <div className="flex items-center">
                     <span className="mr-2">🎥</span>
@@ -321,12 +245,8 @@ const MediaCreatePage: React.FC = () => {
                   File Size Limits:
                 </Text>
                 <div className="space-y-1">
-                  <Text className="text-sm block">
-                    • Maximum: 10MB per file
-                  </Text>
-                  <Text className="text-sm block">
-                    • Recommended: Under 5MB
-                  </Text>
+                  <Text className="text-sm block">• Maximum: 10MB per file</Text>
+                  <Text className="text-sm block">• Recommended: Under 5MB</Text>
                 </div>
               </div>
 
@@ -337,12 +257,8 @@ const MediaCreatePage: React.FC = () => {
                   Best Practices:
                 </Text>
                 <div className="space-y-1">
-                  <Text className="text-sm block">
-                    • Use descriptive filenames
-                  </Text>
-                  <Text className="text-sm block">
-                    • Optimize images before upload
-                  </Text>
+                  <Text className="text-sm block">• Use descriptive filenames</Text>
+                  <Text className="text-sm block">• Optimize images before upload</Text>
                   <Text className="text-sm block">• Check file quality</Text>
                 </div>
               </div>

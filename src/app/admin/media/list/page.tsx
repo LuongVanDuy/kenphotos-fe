@@ -1,22 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Card,
-  Row,
-  Col,
-  Image,
-  Button,
-  Space,
-  Tag,
-  Dropdown,
-  Input,
-  Select,
-  message,
-  Modal,
-  Typography,
-  Tooltip,
-} from "antd";
+import { Card, Row, Col, Image, Button, Space, Tag, Dropdown, Input, Select, message, Modal, Typography, Tooltip } from "antd";
 import {
   PlusOutlined,
   DownloadOutlined,
@@ -30,9 +15,9 @@ import {
   MoreOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { CustomShowConfirmModal } from "@/components/UI/CustomModal";
+import { CustomShowConfirmModal } from "@/components/Admin/UI/CustomModal";
 import { Media } from "@/types";
-import CustomTable from "@/components/UI/CustomTable";
+import CustomTable from "@/components/Admin/UI/CustomTable";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -194,9 +179,7 @@ const MediaListPage: React.FC = () => {
               ) : (
                 <div className="h-48 flex items-center justify-center bg-gray-100">
                   <div className="text-center">
-                    <div className="text-4xl mb-2">
-                      {getFileIcon(item.mimeType)}
-                    </div>
+                    <div className="text-4xl mb-2">{getFileIcon(item.mimeType)}</div>
                     <Text className="text-sm">{item.mimeType}</Text>
                   </div>
                 </div>
@@ -204,26 +187,13 @@ const MediaListPage: React.FC = () => {
             }
             actions={[
               <Tooltip title="Preview" key="preview">
-                <Button
-                  type="text"
-                  icon={<EyeOutlined />}
-                  onClick={() => handlePreview(item)}
-                />
+                <Button type="text" icon={<EyeOutlined />} onClick={() => handlePreview(item)} />
               </Tooltip>,
               <Tooltip title="Edit" key="edit">
-                <Button
-                  type="text"
-                  icon={<EditOutlined />}
-                  onClick={() => handleEdit(item)}
-                />
+                <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(item)} />
               </Tooltip>,
               <Tooltip title="Delete" key="delete">
-                <Button
-                  type="text"
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(item)}
-                />
+                <Button type="text" danger icon={<DeleteOutlined />} onClick={() => handleDelete(item)} />
               </Tooltip>,
             ]}
           >
@@ -235,12 +205,8 @@ const MediaListPage: React.FC = () => {
               }
               description={
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">
-                    {formatFileSize(item.size)}
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    {new Date(item.createdAt).toLocaleDateString()}
-                  </div>
+                  <div className="text-xs text-gray-500 mb-1">{formatFileSize(item.size)}</div>
+                  <div className="text-xs text-gray-400">{new Date(item.createdAt).toLocaleDateString()}</div>
                 </div>
               }
             />
@@ -287,9 +253,7 @@ const MediaListPage: React.FC = () => {
       title: "Type",
       dataIndex: "mimeType",
       key: "mimeType",
-      render: (mimeType: string) => (
-        <Tag>{mimeType.split("/")[1].toUpperCase()}</Tag>
-      ),
+      render: (mimeType: string) => <Tag>{mimeType.split("/")[1].toUpperCase()}</Tag>,
     },
     {
       title: "Size",
@@ -317,11 +281,7 @@ const MediaListPage: React.FC = () => {
           <h1 className="text-2xl font-bold">Media Library</h1>
           <p className="text-gray-600">Manage your media files and assets</p>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => router.push("/admin/media/create")}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/media/create")}>
           Upload Media
         </Button>
       </div>
@@ -329,11 +289,7 @@ const MediaListPage: React.FC = () => {
       <Card className="mb-4">
         <div className="flex justify-between items-center">
           <Space>
-            <Search
-              placeholder="Search media..."
-              allowClear
-              style={{ width: 300 }}
-            />
+            <Search placeholder="Search media..." allowClear style={{ width: 300 }} />
             <Select defaultValue="all" style={{ width: 120 }}>
               <Option value="all">All Types</Option>
               <Option value="image">Images</Option>
@@ -344,16 +300,8 @@ const MediaListPage: React.FC = () => {
 
           <Space>
             <Button.Group>
-              <Button
-                type={viewMode === "grid" ? "primary" : "default"}
-                icon={<AppstoreOutlined />}
-                onClick={() => setViewMode("grid")}
-              />
-              <Button
-                type={viewMode === "list" ? "primary" : "default"}
-                icon={<UnorderedListOutlined />}
-                onClick={() => setViewMode("list")}
-              />
+              <Button type={viewMode === "grid" ? "primary" : "default"} icon={<AppstoreOutlined />} onClick={() => setViewMode("grid")} />
+              <Button type={viewMode === "list" ? "primary" : "default"} icon={<UnorderedListOutlined />} onClick={() => setViewMode("list")} />
             </Button.Group>
           </Space>
         </div>
@@ -375,14 +323,7 @@ const MediaListPage: React.FC = () => {
         />
       )}
 
-      <Modal
-        open={previewVisible}
-        title="Image Preview"
-        footer={null}
-        onCancel={() => setPreviewVisible(false)}
-        width="80%"
-        style={{ top: 20 }}
-      >
+      <Modal open={previewVisible} title="Image Preview" footer={null} onCancel={() => setPreviewVisible(false)} width="80%" style={{ top: 20 }}>
         <Image alt="preview" style={{ width: "100%" }} src={previewImage} />
       </Modal>
     </div>
