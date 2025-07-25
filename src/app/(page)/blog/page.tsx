@@ -35,16 +35,6 @@ const blogs = [
       'Professional real estate photography is crucial for marketing properties effectively. Learn expert tips for capturing stunning property photos that attract potential buyers...',
     slug: 'real-estate-photography-tips',
   },
-  {
-    id: 4,
-    title: 'Virtual Tour Creation Guide',
-    author: 'Nhật Long',
-    date: 'Tháng 2 26, 2025',
-    image: '/images/resourse-3.jpg',
-    description:
-      'Create immersive virtual tours that give potential buyers a realistic view of properties. This guide covers the best practices and tools for creating engaging virtual tours...',
-    slug: 'virtual-tour-creation-guide',
-  },
 ]
 
 const BlogPage = () => {
@@ -68,18 +58,28 @@ const BlogPage = () => {
       </div>
 
       {/* Blog grid */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:md:grid-cols-3 gap-8'>
         {blogs.map((blog) => (
-          <div key={blog.id} className='border rounded-lg overflow-hidden shadow-sm'>
-            <img src={blog.image} alt={blog.title} className='w-full h-[300px] object-cover' />
+          <div
+            key={blog.id}
+            className='border rounded-[12px] overflow-hidden shadow-sm hover:bg-gray-100'
+          >
+            <div className='w-full h-[300px] overflow-hidden'>
+              <img
+                src={blog.image}
+                alt={blog.title}
+                className='w-full h-full object-cover transform transition-transform duration-400 ease-linear hover:scale-110'
+              />
+            </div>
+
             <div className='p-6'>
               <div className='flex items-center text-gray-600 text-sm mb-4'>
                 <span>{blog.author}</span>
                 <span className='mx-2'>•</span>
                 <span>{blog.date}</span>
               </div>
-              <h3 className='text-xl font-semibold mb-3'>{blog.title}</h3>
-              <p className='text-gray-600 mb-4'>{blog.description}</p>
+              <h3 className='text-xl font-semibold mb-3 cursor-pointer'>{blog.title}</h3>
+              <p className='text-gray-600 mb-4 line-clamp-4'>{blog.description}</p>
               <button className='bg-[#00A3FF] text-white px-6 py-2 rounded'>READ MORE</button>
             </div>
           </div>
