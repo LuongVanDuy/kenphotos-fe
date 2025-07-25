@@ -28,34 +28,34 @@ const menuItems: MenuItem[] = [
         items: [
           {
             label: 'Single Exposure',
-            href: '/services/photo-editing/single-exposure',
+            href: '/services/single-exposure',
           },
-          { label: 'HDR Bracket', href: '/services/photo-editing/hdr-bracket' },
-          { label: 'Flambient', href: '/services/photo-editing/flambient' },
+          { label: 'HDR Bracket', href: '/services/hdr-bracket' },
+          { label: 'Flambient', href: '/services/flambient' },
           {
             label: 'Day To Twilight or Dusk',
-            href: '/services/photo-editing/day-to-twilight',
+            href: '/services/day-to-twilight',
           },
           {
             label: 'Water in Pool',
-            href: '/services/photo-editing/water-in-pool',
+            href: '/services/water-in-pool',
           },
         ],
       },
       {
         title: '3D Visualizations',
         items: [
-          { label: '360° Image Enhancement', href: '/services/3d/360-image' },
-          { label: 'Virtual Staging', href: '/services/3d/virtual-staging' },
+          { label: '360° Image Enhancement', href: '/services/360-image' },
+          { label: 'Virtual Staging', href: '/services/virtual-staging' },
           {
             label: 'Virtual Renovations',
-            href: '/services/3d/virtual-renovations',
+            href: '/services/virtual-renovations',
           },
           {
             label: '360° Virtual Staging',
-            href: '/services/3d/360-virtual-staging',
+            href: '/services/360-virtual-staging',
           },
-          { label: 'Changing Seasons', href: '/services/3d/changing-seasons' },
+          { label: 'Changing Seasons', href: '/services/changing-seasons' },
         ],
       },
       {
@@ -63,17 +63,17 @@ const menuItems: MenuItem[] = [
         items: [
           {
             label: 'Real Estate Video Editing',
-            href: '/services/advanced/video-editing',
+            href: '/services/video-editing',
           },
-          { label: 'Item Removal', href: '/services/advanced/item-removal' },
+          { label: 'Item Removal', href: '/services/item-removal' },
           {
             label: 'Aerial/ Drone Highlight',
-            href: '/services/advanced/aerial-drone',
+            href: '/services/aerial-drone',
           },
-          { label: 'Yacht', href: '/services/advanced/yacht' },
+          { label: 'Yacht', href: '/services/yacht' },
           {
             label: 'Lawn Replacement',
-            href: '/services/advanced/lawn-replacement',
+            href: '/services/lawn-replacement',
           },
         ],
       },
@@ -214,7 +214,7 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void }> = ({ onSendFreeTest }) =
           {/* CTA Button Desktop */}
           <button
             onClick={onSendFreeTest}
-            className='hidden md:flex ml-6 bg-[#51C6FF] text-black px-[30px] py-[15px] text-[16px] font-medium items-center gap-2 shadow hover:bg-[#000] hover:text-[#fff] transition-colors'
+            className='hidden md:flex ml-6 bg-[#51C6FF] rounded-[12px] text-black px-[30px] py-[15px] text-[16px] font-medium items-center gap-2 shadow hover:bg-[#000] hover:text-[#fff] transition-colors'
             role='button'
             title='Send Free Test'
           >

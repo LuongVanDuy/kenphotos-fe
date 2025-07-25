@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -23,9 +23,26 @@ body {
   background: var(--background);
   font-family: var(--font-poppins), sans-serif;
   line-height: 1.5;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ReactCompareSliderImage */
+.react-compare-slider .__rcs-handle-button {
+  width: 32px !important;
+  height: 32px !important;
+  border: 2px solid #fff !important;
+  /* box-shadow: 0 0 2px rgba(0, 0, 0, 0.2) !important; */
+  backdrop-filter: blur(4px) !important;
+  /* background-color: rgba(0, 0, 0, 0.1) !important; */
+}
+
+/* Thu nhỏ mũi tên bên trong */
+.react-compare-slider .__rcs-handle-arrow {
+  border-top: 5px solid transparent !important;
+  border-right: 7px solid rgb(255, 254, 254) !important;
+  border-bottom: 5px solid transparent !important;
 }
 
 .ant-layout-content {
