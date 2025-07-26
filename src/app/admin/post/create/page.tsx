@@ -1,55 +1,36 @@
 "use client";
 
 import React, { useState } from "react";
-import { Form, Card, Row, Col, Button, message, Upload, Image, Divider, Space, Tag } from "antd";
-import { ArrowLeftOutlined, PlusOutlined, EyeOutlined, SaveOutlined, SendOutlined } from "@ant-design/icons";
+import {
+  Form,
+  Button,
+  message,
+  Upload,
+  Input,
+  Select,
+  Space,
+  Divider,
+  Typography,
+} from "antd";
+import {
+  ArrowLeftOutlined,
+  PlusOutlined,
+  EyeOutlined,
+  SaveOutlined,
+  SendOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { CustomInput, CustomTextarea } from "@/components/Admin/UI/CustomInput";
-import { CustomSelect } from "@/components/Admin/UI/CustomSelect";
-import { CustomSwitch } from "@/components/Admin/UI/CustomSwitch";
-import FormActions from "@/components/Admin/UI/FormActions";
-import UploadField from "@/components/Admin/UI/UploadField";
-import CustomQuill from "@/components/Admin/UI/CustomQuill";
-import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import CustomQuill from "@/components/UI/CustomQuill";
 
-const schema = yup.object().shape({
-  title: yup.string().required("Please enter the title"),
-  slug: yup.string().required("Please enter the slug"),
-  excerpt: yup.string().required("Please enter the excerpt"),
-  content: yup.string().required("Please enter the content"),
-  status: yup.number().required("Please select status"),
-  password: yup.string(),
-  thumbnail: yup.mixed().nullable().required("Please upload a thumbnail"),
-  categoryIds: yup.array().of(yup.number()).min(1, "Please select categories"),
-});
-
-const defaultValues = {
-  title: "",
-  slug: "",
-  excerpt: "",
-  content: "",
-  status: 0,
-  password: "",
-  thumbnail: "",
-  categoryIds: [],
-};
+const { TextArea } = Input;
+const { Option } = Select;
+const { Title } = Typography;
 
 const CreatePostPage: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-    reset,
-  } = useForm({
-    defaultValues,
-    resolver: yupResolver(schema),
-    mode: "onTouched",
-  });
+  const [form] = Form.useForm();
 
   const statusOptions = [
     { value: 0, label: "Draft" },
@@ -67,7 +48,7 @@ const CreatePostPage: React.FC = () => {
     { value: 7, label: "State Management" },
   ];
 
-  const onSubmit = async (values: any) => {
+  const onFinish = async (values: any) => {
     setLoading(true);
     try {
       // Simulate API call
@@ -81,135 +62,242 @@ const CreatePostPage: React.FC = () => {
     }
   };
 
+  const onSaveDraft = () => {
+    form.setFieldsValue({ status: 0 });
+    form.submit();
+  };
+
+  const normFile = (e: any) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
+
   return (
     <div>
-      <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => router.back()} className="mb-4">
-        Back to Posts
-      </Button>
-      <div className="text-start mb-5">
-        <h1 className="text-3xl font-bold">Create New Post</h1>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-7">
+        <div className="flex items-center space-x-4">
+          <Title level={4} className="!mb-0">
+            Add New Post
+          </Title>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button type="default" onClick={onSaveDraft} disabled={loading}>
+            Save Draft
+          </Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            onClick={() => form.submit()}
+          >
+            Publish
+          </Button>
+        </div>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="flex-1 min-w-0">
-            <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-              {/* Title */}
-              <div className="mb-8">
-                <label className="font-semibold block mb-2">Title</label>
-                <Controller name="title" control={control} render={({ field }) => <CustomInput {...field} placeholder="Title" maxLength={300} />} />
-                {errors.title && <div className="text-red-500 text-xs mt-1">{errors.title.message}</div>}
+
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{
+          title: "",
+          slug: "",
+          excerpt: "",
+          content: "",
+          status: 1,
+          password: "",
+          categoryIds: [],
+        }}
+      >
+        <div className="flex gap-8">
+          {/* Main Content Area */}
+          <div className="flex-1">
+            <div className="space-y-6">
+              {/* Title Input - WordPress style */}
+              <div>
+                <Form.Item
+                  name="title"
+                  rules={[
+                    { required: true, message: "Please enter the title" },
+                  ]}
+                  className="!mb-0"
+                >
+                  <Input
+                    placeholder="Add title"
+                    style={{ fontSize: "24px", fontWeight: "400" }}
+                  />
+                </Form.Item>
               </div>
-              {/* Content */}
-              <div className="mb-10">
-                <Controller
-                  name="content"
-                  control={control}
-                  render={({ field }) => (
-                    <CustomQuill {...field} placeholder="Write your post content here..." style={{ height: "500px" }} className="quill-editor" />
-                  )}
-                />
-                {errors.content && <div className="text-red-500 text-xs mt-1">{errors.content.message}</div>}
+
+              {/* Permalink Box */}
+              <div className="">
+                <h3 className="text-sm font-semibold text-gray-700">
+                  Permalink
+                </h3>
+                <div className="">
+                  <Form.Item
+                    name="slug"
+                    rules={[
+                      { required: true, message: "Please enter the slug" },
+                    ]}
+                    className="!mb-0"
+                  >
+                    <Input
+                      placeholder="post-url-slug"
+                      size="small"
+                      addonBefore="https://example.com/"
+                    />
+                  </Form.Item>
+                </div>
               </div>
-              {/* Excerpt */}
-              <div className="mb-0">
-                <label className="font-semibold block mb-1">Excerpt</label>
-                <Controller
-                  name="excerpt"
-                  control={control}
-                  render={({ field }) => <CustomInput {...field} placeholder="Brief description of the post" maxLength={300} />}
-                />
-                {errors.excerpt && <div className="text-red-500 text-xs mt-1">{errors.excerpt.message}</div>}
+
+              {/* Content Editor with CustomQuill */}
+              <div className="">
+                <h3 className="text-sm font-semibold text-gray-700">Content</h3>
+                <div className="bg-white">
+                  <Form.Item
+                    name="content"
+                    rules={[
+                      { required: true, message: "Please enter the content" },
+                    ]}
+                    className="!mb-0"
+                  >
+                    <CustomQuill
+                      placeholder="Start writing or type / to choose a block..."
+                      style={{ minHeight: "400px" }}
+                      className="quill-editor"
+                      onChange={(value) =>
+                        form.setFieldsValue({ content: value })
+                      }
+                    />
+                  </Form.Item>
+                </div>
               </div>
-              {/* Slug */}
-              <div className="mt-6">
-                <label className="font-semibold block mb-1">URL Slug</label>
-                <Controller name="slug" control={control} render={({ field }) => <CustomInput {...field} placeholder="post-url-slug" />} />
-                {errors.slug && <div className="text-red-500 text-xs mt-1">{errors.slug.message}</div>}
+
+              {/* Excerpt Box */}
+              <div className="border border-gray-300 rounded-sm">
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Excerpt
+                  </h3>
+                </div>
+                <div className="bg-white p-4">
+                  <Form.Item
+                    name="excerpt"
+                    rules={[
+                      { required: true, message: "Please enter the excerpt" },
+                    ]}
+                    className="!mb-0"
+                  >
+                    <TextArea
+                      placeholder="Write an excerpt (optional)"
+                      rows={4}
+                      size="small"
+                    />
+                  </Form.Item>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="w-full lg:w-80 flex-shrink-0">
-            <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-              <div className="mb-6">
-                <label className="font-semibold block mb-2">Status</label>
-                <Controller
-                  name="status"
-                  control={control}
-                  render={({ field }) => (
-                    <CustomSelect
-                      {...field}
-                      options={statusOptions}
-                      style={{ width: "100%" }}
-                      value={field.value}
-                      onChange={(val) => field.onChange(val)}
-                    />
-                  )}
-                />
-                {errors.status && <div className="text-red-500 text-xs mt-1">{errors.status.message}</div>}
+          {/* Sidebar */}
+          <div className="w-80 flex-shrink-0">
+            <div className="space-y-6">
+              {/* Publish Box */}
+              <div className="border border-gray-300 rounded-sm">
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Publish
+                  </h3>
+                </div>
+                <div className="p-4 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Status:</span>
+                    <Form.Item
+                      name="status"
+                      rules={[
+                        { required: true, message: "Please select status" },
+                      ]}
+                      className="!mb-0"
+                    >
+                      <Select
+                        size="small"
+                        style={{ width: 120 }}
+                        options={statusOptions}
+                      />
+                    </Form.Item>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Visibility:</span>
+                    <span className="text-sm text-gray-800">Public</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex gap-2 mb-8">
-                <Button type="default" onClick={handleSubmit((data) => onSubmit({ ...data, status: 0 }))} className="flex-1" disabled={loading}>
-                  Save Draft
-                </Button>
-                <Button type="primary" htmlType="submit" loading={loading} className="flex-1 font-semibold">
-                  Publish
-                </Button>
-              </div>
-              {/* Categories */}
-              <div className="mb-6">
-                <label className="font-semibold block mb-2">Categories</label>
-                <Controller
-                  name="categoryIds"
-                  control={control}
-                  render={({ field }) => (
-                    <CustomSelect
-                      {...field}
-                      options={categoryOptions}
+
+              {/* Categories Box */}
+              <div className="border border-gray-300 rounded-sm">
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Categories
+                  </h3>
+                </div>
+                <div className="p-4">
+                  <Form.Item
+                    name="categoryIds"
+                    rules={[
+                      { required: true, message: "Please select categories" },
+                    ]}
+                    className="!mb-0"
+                  >
+                    <Select
                       mode="multiple"
-                      style={{ width: "100%" }}
-                      value={field.value}
-                      onChange={(val) => field.onChange(val)}
+                      placeholder="Select categories"
+                      options={categoryOptions}
+                      size="small"
                     />
-                  )}
-                />
-                {errors.categoryIds && <div className="text-red-500 text-xs mt-1">{errors.categoryIds.message}</div>}
+                  </Form.Item>
+                </div>
               </div>
-              {/* Thumbnail */}
-              <div className="mb-6">
-                <label className="font-semibold block mb-2">Thumbnail</label>
-                <Controller
-                  name="thumbnail"
-                  control={control}
-                  render={({ field }) => (
-                    <UploadField
-                      {...field}
+
+              {/* Featured Image Box */}
+              <div className="border border-gray-300 rounded-sm">
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Featured Image
+                  </h3>
+                </div>
+                <div className="p-4">
+                  <Form.Item
+                    name="thumbnail"
+                    valuePropName="fileList"
+                    getValueFromEvent={normFile}
+                    rules={[
+                      { required: true, message: "Please upload a thumbnail" },
+                    ]}
+                    className="!mb-0"
+                  >
+                    <Upload
                       name="thumbnail"
-                      label="Upload Image"
-                      description="Main image for the post"
-                      accept="image/*"
                       listType="picture-card"
                       maxCount={1}
-                      onChange={(file) => field.onChange(file)}
-                    />
-                  )}
-                />
-                {errors.thumbnail && <div className="text-red-500 text-xs mt-1">{errors.thumbnail.message}</div>}
-              </div>
-              {/* Password */}
-              <div className="mb-0">
-                <label className="font-semibold block mb-2">Password (optional)</label>
-                <Controller
-                  name="password"
-                  control={control}
-                  render={({ field }) => <CustomInput {...field} placeholder="Password to protect post" type="password" />}
-                />
-                {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password.message}</div>}
+                      beforeUpload={() => false}
+                      className="!w-full"
+                    >
+                      <div className="text-center">
+                        <PlusOutlined />
+                        <div style={{ marginTop: 8 }}>Set featured image</div>
+                      </div>
+                    </Upload>
+                  </Form.Item>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </form>
+      </Form>
     </div>
   );
 };

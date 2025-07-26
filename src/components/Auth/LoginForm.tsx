@@ -4,30 +4,22 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { customMessage } from "@/utils/messageHelper";
-import { CustomButton } from "@/components/Admin/UI/CustomButton";
+import { Button, Form, Input } from "antd";
 import { signIn, getSession } from "next-auth/react";
-import { useSession } from "next-auth/react";
 
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "" });
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onFinish = async (values: { email: string; password: string }) => {
     setIsLoading(true);
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        email: form.email,
-        password: form.password,
+        email: values.email,
+        password: values.password,
       });
       if (res?.ok) {
-        // Lấy lại session để lấy role
         const session = await getSession();
         if (session?.user?.role === "ADMIN") {
           customMessage.success(
@@ -55,60 +47,61 @@ const LoginForm = () => {
       <div className="flex w-full  bg-white h-full flex-col md:flex-row">
         {/* Left: Form */}
         <div className="w-full md:w-2/3 p-8 flex justify-center items-center h-full">
-          <div className="flex flex-col justify-center w-full md:w-2/5 ">
-            <h1 className="text-3xl font-bold mb-2">Login to KenPhoto</h1>
+          <div className="flex flex-col justify-center w-full md:w-1/2 px-5">
+            <h1 className="text-3xl font-semibold mb-2">Login to KenPhoto</h1>
             <p className="mb-6 text-gray-500 text-sm md:text-base">
               Don't have an account?{" "}
-              <Link
-                href="/auth/register"
-                className="text-blue-600 hover:underline"
-              >
+              <Link href="/auth/register" className="text-link hover:underline">
                 Create an account here.
               </Link>
             </p>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block mb-1 font-medium text-sm">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-medium text-sm">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            <Form
+              layout="vertical"
+              onFinish={onFinish}
+              className="space-y-4"
+              requiredMark={false}
+            >
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  { required: true, message: "Please enter your email" },
+                  { type: "email", message: "Please enter a valid email" },
+                ]}
+                className="mb-2"
+              >
+                <Input placeholder="Email" autoComplete="email" />
+              </Form.Item>
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  { required: true, message: "Please enter your password" },
+                ]}
+                className="mb-2"
+              >
+                <Input.Password
                   placeholder="••••••"
-                  required
+                  autoComplete="current-password"
                 />
-              </div>
+              </Form.Item>
               <div className="flex justify-end mb-2">
                 <Link
                   href="/auth/forgot-password"
-                  className="text-blue-600 text-xs hover:underline"
+                  className="!text-link text-sm  hover:underline"
                 >
                   Forgot your password?
                 </Link>
               </div>
-              <CustomButton
-                type="dark"
-                isLoading={isLoading}
+              <Button
+                type="primary"
                 htmlType="submit"
-                className="w-full bg-black text-white py-2 rounded-lg font-semibold text-base "
+                className="w-full !rounded-[32px]"
+                loading={isLoading}
               >
                 Login
-              </CustomButton>
-            </form>
+              </Button>
+            </Form>
           </div>
         </div>
         {/* Right: Brand */}

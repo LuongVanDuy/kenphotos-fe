@@ -23,6 +23,43 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
   const quillRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<any>(null); // Dùng any hoặc import kiểu từ @types/quill nếu cần
   const [isEditorReady, setIsEditorReady] = useState(false);
+  const cleanupResizeRef = useRef<(() => void) | null>(null);
+
+  // Function to calculate and set max-width for ql-editor
+  const calculateAndSetEditorMaxWidth = () => {
+    if (!editorRef.current || !quillRef.current) return;
+
+    try {
+      const quillContainer = editorRef.current.container;
+      const toolbar = quillContainer?.querySelector(".ql-toolbar");
+      const editor = quillContainer?.querySelector(".ql-editor");
+
+      if (quillContainer && editor) {
+        // Lấy width của quill container
+        const containerWidth = quillContainer.offsetWidth;
+
+        // Tính toán padding và border của container
+        const containerStyle = window.getComputedStyle(quillContainer);
+        const containerPadding =
+          parseFloat(containerStyle.paddingLeft) +
+          parseFloat(containerStyle.paddingRight);
+        const containerBorder =
+          parseFloat(containerStyle.borderLeftWidth) +
+          parseFloat(containerStyle.borderRightWidth);
+
+        // Tính toán width thực tế có thể sử dụng cho content
+        const availableWidth =
+          containerWidth - containerPadding - containerBorder;
+
+        // Set max-width cho ql-editor
+        (editor as HTMLElement).style.maxWidth = `${availableWidth}px`;
+
+        console.log("Editor max-width set to:", availableWidth, "px");
+      }
+    } catch (error) {
+      console.warn("Error calculating editor max-width:", error);
+    }
+  };
 
   // Add undo/redo functions với kiểm tra tốt hơn
   const handleUndo = () => {
@@ -184,14 +221,18 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
         customMessage.loading("Uploading blog editor image...", messageKey);
 
         try {
-          let imageUrl
+          let imageUrl;
           // const imageUrl = await uploadFileS3(
           //   renamedFile,
           //   "blog-admin-upload",
           //   "image-upload"
           // );
+          // Use the environment variable for image URL
+          const fullImageUrl = imageUrl
+            ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${imageUrl}`
+            : imageUrl;
           const range = editorRef.current.getSelection(); // get current cursor position
-          editorRef.current.insertEmbed(range.index, "image", imageUrl); // embed image at cursor position
+          editorRef.current.insertEmbed(range.index, "image", fullImageUrl); // embed image at cursor position
           customMessage.destroy(messageKey);
           customMessage.success("Blog Image editor created successfully!");
         } catch (err) {
@@ -285,8 +326,8 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
 
       cell.onclick = () => {
         onSelect(row, col);
-        if (document.body.contains(selector)) {
-          document.body.removeChild(selector);
+        if (editorRef.current?.container.contains(selector)) {
+          editorRef.current.container.removeChild(selector);
         }
       };
 
@@ -313,16 +354,44 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
           tableModule.insertTable(rows, cols);
           customMessage.success(`Table ${rows}x${cols} inserted successfully!`);
 
-          // Focus vào cell đầu tiên sau khi tạo table
+          // Focus vào cell đầu tiên và điều chỉnh table sau khi tạo
           setTimeout(() => {
             try {
+              // Điều chỉnh table để responsive
+              const table = quill.container.querySelector("table");
+              if (table) {
+                table.style.width = "100%";
+                table.style.maxWidth = "100%";
+                table.style.tableLayout = "fixed";
+                table.style.wordWrap = "break-word";
+                table.style.overflowWrap = "break-word";
+
+                // Điều chỉnh tất cả cells
+                const cells = table.querySelectorAll("td, th");
+                cells.forEach((cell: any) => {
+                  cell.style.minWidth = "60px";
+                  cell.style.maxWidth = "200px";
+                  cell.style.wordWrap = "break-word";
+                  cell.style.overflowWrap = "break-word";
+                  cell.style.whiteSpace = "normal";
+                  cell.style.padding = "8px";
+                  cell.style.border = "1px solid #ddd";
+                });
+              }
+
+              // Cập nhật max-width của editor sau khi tạo table
+              calculateAndSetEditorMaxWidth();
+
               const firstCell = quill.container.querySelector("td");
               if (firstCell && currentSelection) {
                 // Sử dụng selection đã lưu thay vì lấy mới
                 quill.setSelection(currentSelection.index + 1, 0);
               }
             } catch (error) {
-              console.warn("Could not focus on table cell:", error);
+              console.warn(
+                "Could not adjust table or focus on table cell:",
+                error
+              );
             }
           }, 100);
         } else {
@@ -332,36 +401,77 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
 
       if (!selector) return;
 
-      // Position selector với error handling
+      // Position selector trong quill container
       try {
-        const toolbar = quillRef.current?.querySelector(".ql-toolbar");
-        if (toolbar) {
-          const rect = toolbar.getBoundingClientRect();
-          selector.style.top = `${rect.bottom + 5}px`;
-          selector.style.left = `${rect.left}px`;
+        const quillContainer = editorRef.current?.container;
+        if (quillContainer) {
+          // Set position relative để selector có thể định vị tuyệt đối
+          quillContainer.style.position = "relative";
+
+          // Position selector ở góc trên bên phải của editor
+          selector.style.top = "5%";
+          selector.style.right = "15%";
+          selector.style.left = "auto";
         } else {
-          // Fallback positioning nếu không tìm thấy toolbar
-          selector.style.top = "50px";
-          selector.style.left = "50px";
+          // Fallback positioning
+          selector.style.top = "5%";
+          selector.style.right = "15%";
+          selector.style.left = "auto";
         }
       } catch (error) {
         console.warn("Could not position table selector:", error);
-        selector.style.top = "50px";
-        selector.style.left = "50px";
+        selector.style.top = "5%";
+        selector.style.right = "15%";
+        selector.style.left = "auto";
       }
 
-      // Close selector when clicking outside
+      // Close selector when clicking outside or pressing Escape
       const closeSelector = (e: Event) => {
-        if (!selector.contains(e.target as Node)) {
-          if (document.body.contains(selector)) {
-            document.body.removeChild(selector);
+        const target = e.target as Node;
+
+        // Kiểm tra xem click có phải là ra ngoài selector không
+        if (!selector.contains(target)) {
+          // Kiểm tra xem click có phải là ra ngoài quill editor không
+          const quillContainer = editorRef.current?.container;
+          if (quillContainer && !quillContainer.contains(target)) {
+            // Click ra ngoài hoàn toàn quill editor
+            if (quillContainer.contains(selector)) {
+              quillContainer.removeChild(selector);
+            }
+            cleanupEventListeners();
           }
-          document.removeEventListener("click", closeSelector);
         }
       };
 
-      document.body.appendChild(selector);
-      setTimeout(() => document.addEventListener("click", closeSelector), 0);
+      // Handle Escape key
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          const quillContainer = editorRef.current?.container;
+          if (quillContainer && quillContainer.contains(selector)) {
+            quillContainer.removeChild(selector);
+          }
+          cleanupEventListeners();
+        }
+      };
+
+      // Cleanup function
+      const cleanupEventListeners = () => {
+        document.removeEventListener("click", closeSelector, true);
+        document.removeEventListener("mousedown", closeSelector, true);
+        document.removeEventListener("keydown", handleEscape, true);
+      };
+
+      // Append selector vào quill container thay vì document.body
+      if (editorRef.current?.container) {
+        editorRef.current.container.appendChild(selector);
+
+        // Thêm event listeners với delay để tránh trigger ngay lập tức
+        setTimeout(() => {
+          document.addEventListener("click", closeSelector, true);
+          document.addEventListener("mousedown", closeSelector, true);
+          document.addEventListener("keydown", handleEscape, true);
+        }, 100);
+      }
     }
   };
 
@@ -394,6 +504,56 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
       Quill.register(Formula, true);
 
       addUndoRedoCSS();
+
+      // Add CSS for table overflow handling
+      const addTableOverflowCSS = () => {
+        if (typeof document === "undefined") return;
+
+        const styleId = "quill-table-overflow-styles";
+        if (document.getElementById(styleId)) return;
+
+        const style = document.createElement("style");
+        style.id = styleId;
+        style.textContent = `
+          .ql-editor {
+            overflow-x: auto;
+            max-width: 100%;
+          }
+          
+          .ql-editor table {
+            min-width: 100%;
+            table-layout: fixed;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+          }
+          
+          .ql-editor table td,
+          .ql-editor table th {
+            min-width: 60px;
+            max-width: 200px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            padding: 8px;
+            border: 1px solid #ddd;
+          }
+          
+          .ql-editor table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+          }
+          
+          /* Ensure table doesn't break editor layout */
+          .ql-editor .ql-table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+          }
+        `;
+        document.head.appendChild(style);
+      };
+
+      addTableOverflowCSS();
 
       // Cấu hình Quill với đầy đủ tính năng
       editorRef.current = new Quill(quillRef.current, {
@@ -477,6 +637,23 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
             // Thêm config để preserve table structure khi undo/redo
             tableId: () => Math.random().toString(36).substr(2, 9),
             toolbarId: () => Math.random().toString(36).substr(2, 9),
+            // Cấu hình table để responsive và không vượt quá width
+            tableStyles: {
+              width: "100%",
+              maxWidth: "100%",
+              tableLayout: "fixed",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            },
+            cellStyles: {
+              minWidth: "60px",
+              maxWidth: "200px",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              whiteSpace: "normal",
+              padding: "8px",
+              border: "1px solid #ddd",
+            },
           },
           keyboard: {
             bindings: QuillBetterTable.keyboardBindings,
@@ -528,12 +705,31 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
         }
       );
 
+      // Tính toán và set max-width cho editor
+      calculateAndSetEditorMaxWidth();
+
+      // Thêm resize listener để cập nhật max-width khi window resize
+      const handleResize = () => {
+        calculateAndSetEditorMaxWidth();
+      };
+
+      window.addEventListener("resize", handleResize);
+
+      // Store handleResize reference for cleanup
+      cleanupResizeRef.current = () => {
+        window.removeEventListener("resize", handleResize);
+      };
+
       setIsEditorReady(true);
       onReady?.(); // báo parent biết editor đã sẵn sàng
     });
 
     return () => {
       isMounted = false;
+      // Cleanup resize listener
+      if (cleanupResizeRef.current) {
+        cleanupResizeRef.current();
+      }
     };
   }, [onChange]);
 

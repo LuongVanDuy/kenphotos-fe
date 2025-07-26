@@ -16,6 +16,9 @@ export type StateType = {
   detail: any;
   list: any[];
   total?: number;
+  uploadLoading?: boolean;
+  uploadError?: boolean;
+  uploadMessage?: string;
 };
 
 // Admin Dashboard Types
@@ -47,17 +50,16 @@ export interface Post {
 }
 
 export interface Media {
-  id: string;
-  filename: string;
-  originalName: string;
-  mimeType: string;
-  size: number;
-  url: string;
-  thumbnailUrl?: string;
-  alt?: string;
-  caption?: string;
-  uploadedBy: User;
-  createdAt: string;
+  id: number;
+  name: string;
+  slug: string;
+  createdTime: string;
+  uploadedBy: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
 export interface DashboardStats {

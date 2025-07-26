@@ -1,12 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
-import { Card, Upload, Button, message, Progress, List, Image, Space, Tag, Typography, Divider } from "antd";
-import { InboxOutlined, DeleteOutlined, EyeOutlined, ArrowLeftOutlined, CloudUploadOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  Upload,
+  Button,
+  message,
+  Progress,
+  List,
+  Image,
+  Space,
+  Tag,
+  Typography,
+  Divider,
+  Alert,
+} from "antd";
+import {
+  InboxOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  ArrowLeftOutlined,
+  CloudUploadOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import type { UploadProps, UploadFile } from "antd";
-import UploadField from "@/components/Admin/UI/UploadField";
 import { useSession } from "next-auth/react";
+import { connect } from "react-redux";
+import { uploadMedia } from "@/store/actions/media";
 
 const { Dragger } = Upload;
 const { Title, Text } = Typography;
@@ -14,33 +36,90 @@ const { Title, Text } = Typography;
 interface UploadedFile extends UploadFile {
   size?: number;
   type?: string;
+  status?: "uploading" | "done" | "error" | "removed";
+  percent?: number;
+  uploadedUrl?: string; // URL của ảnh đã upload thành công
 }
 
-const MediaCreatePage: React.FC = () => {
+const MediaCreatePage: React.FC = (props: any) => {
+  const { uploadMedia, uploadLoading, uploadError, uploadMessage } = props;
   const router = useRouter();
-  const [fileList, setFileList] = useState<UploadedFile[]>([]);
-  const [uploading, setUploading] = useState(false);
-
   const { data: session } = useSession();
+
+  const [fileList, setFileList] = useState<UploadedFile[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+
+  // Handle upload success/error from Redux
+  useEffect(() => {
+    if (uploadMessage) {
+      if (uploadError) {
+        message.error(uploadMessage);
+      } else {
+        message.success(uploadMessage);
+      }
+    }
+  }, [uploadMessage, uploadError]);
+
+  // Auto redirect when all files are uploaded successfully
+  useEffect(() => {
+    const allFilesUploaded =
+      fileList.length > 0 && fileList.every((file) => file.status === "done");
+    const hasUploadedFiles = uploadedFiles.length > 0;
+
+    if (allFilesUploaded && hasUploadedFiles) {
+      // Wait a bit to show success message
+      setTimeout(() => {
+        message.success(
+          "All files uploaded successfully! Redirecting to Media Library..."
+        );
+        setTimeout(() => {
+          router.push("/admin/media/list");
+        }, 1500);
+      }, 1000);
+    }
+  }, [fileList, uploadedFiles, router]);
 
   const uploadProps: UploadProps = {
     name: "files",
-    multiple: true,
-    action: `${process.env.apiUrl}/media/upload`,
-    headers: {
-      Authorization: `Bearer ${session?.accessToken}`,
-    },
-    showUploadList: {
-      showRemoveIcon: false,
+    multiple: false, // Chỉ cho phép chọn 1 file
+    fileList,
+    beforeUpload: (file) => {
+      // Check file size (10MB limit)
+      const isLt10M = file.size! / 1024 / 1024 < 10;
+      if (!isLt10M) {
+        message.error("File must be smaller than 10MB!");
+        return false;
+      }
+
+      // Only allow images and GIF
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "image/svg+xml",
+      ];
+
+      if (!allowedTypes.includes(file.type!)) {
+        message.error(
+          "Only image files (JPG, PNG, GIF, WebP, SVG) are allowed!"
+        );
+        return false;
+      }
+
+      return false; // Prevent auto upload
     },
     onChange(info) {
-      const { status } = info.file;
-      if (status === "done") {
-        message.success(`${info.file.name} tải lên thành công`);
-        setUploadedFiles((prev) => [...prev, info.file.response?.data || info.file]);
-      } else if (status === "error") {
-        message.error(`${info.file.name} tải lên thất bại`);
+      setFileList(info.fileList);
+
+      // Auto upload file mới được chọn
+      const newFile = info.fileList.find(
+        (file) => file.status === undefined && file.originFileObj
+      );
+
+      if (newFile) {
+        handleUpload(newFile);
       }
     },
     onDrop(e) {
@@ -48,49 +127,73 @@ const MediaCreatePage: React.FC = () => {
     },
   };
 
-  // const uploadProps: UploadProps = {
-  //   name: "file",
-  //   multiple: true,
-  //   action: "/api/upload", // This would be your actual upload endpoint
-  //   fileList,
-  //   onChange(info) {
-  //     const { status } = info.file;
+  // Upload function - chỉ upload 1 file
+  const handleUpload = async (file: UploadedFile) => {
+    if (!session?.accessToken) {
+      message.error("Authentication required");
+      return;
+    }
 
-  //     if (status !== "uploading") {
-  //       console.log(info.file, info.fileList);
-  //     }
+    // Update file status to uploading
+    setFileList((prev) =>
+      prev.map((f) =>
+        f.uid === file.uid ? { ...f, status: "uploading", percent: 0 } : f
+      )
+    );
 
-  //     if (status === "done") {
-  //       message.success(`${info.file.name} file uploaded successfully.`);
-  //     } else if (status === "error") {
-  //       message.error(`${info.file.name} file upload failed.`);
-  //     }
+    try {
+      const formData = new FormData();
+      formData.append("files", file.originFileObj!);
 
-  //     setFileList(info.fileList);
-  //   },
-  //   onDrop(e) {
-  //     console.log("Dropped files", e.dataTransfer.files);
-  //   },
-  //   beforeUpload: (file) => {
-  //     // Check file size (10MB limit)
-  //     const isLt10M = file.size! / 1024 / 1024 < 10;
-  //     if (!isLt10M) {
-  //       message.error("File must be smaller than 10MB!");
-  //       return false;
-  //     }
+      // Simulate progress
+      const progressInterval = setInterval(() => {
+        setFileList((prev) =>
+          prev.map((f) =>
+            f.uid === file.uid
+              ? { ...f, percent: Math.min((f.percent || 0) + 10, 90) }
+              : f
+          )
+        );
+      }, 200);
 
-  //     // Check file type
-  //     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "video/mp4", "video/webm", "application/pdf", "text/plain"];
+      // Call Redux action
+      const result = await uploadMedia(session.accessToken, formData);
 
-  //     if (!allowedTypes.includes(file.type!)) {
-  //       message.error("File type not supported!");
-  //       return false;
-  //     }
+      clearInterval(progressInterval);
 
-  //     return true;
-  //   },
-  //   showUploadList: false, // We'll create our own list
-  // };
+      // Update file status to done and add uploaded URL
+      setFileList((prev) =>
+        prev.map((f) =>
+          f.uid === file.uid
+            ? {
+                ...f,
+                status: "done",
+                percent: 100,
+                uploadedUrl: result?.data?.url || result?.url, // Lấy URL từ response
+              }
+            : f
+        )
+      );
+
+      // Add to uploaded files list
+      if (result?.data) {
+        setUploadedFiles((prev) => [...prev, result.data]);
+      }
+
+      // Toast notification khi upload thành công
+      message.success(`${file.name} uploaded successfully!`);
+    } catch (error) {
+      // Update file status to error
+      setFileList((prev) =>
+        prev.map((f) =>
+          f.uid === file.uid ? { ...f, status: "error", percent: 0 } : f
+        )
+      );
+
+      // Toast notification khi upload thất bại
+      message.error(`Failed to upload ${file.name}`);
+    }
+  };
 
   const handleRemove = (file: UploadedFile) => {
     const newFileList = fileList.filter((item) => item.uid !== file.uid);
@@ -98,8 +201,11 @@ const MediaCreatePage: React.FC = () => {
   };
 
   const handlePreview = (file: UploadedFile) => {
-    if (file.type?.startsWith("image/")) {
-      // Open image preview
+    // Nếu file đã upload thành công, dùng URL từ server
+    if (file.uploadedUrl) {
+      window.open(file.uploadedUrl, "_blank");
+    } else if (file.type?.startsWith("image/")) {
+      // Nếu chưa upload, dùng URL local
       const url = file.url || URL.createObjectURL(file.originFileObj!);
       window.open(url, "_blank");
     }
@@ -119,6 +225,8 @@ const MediaCreatePage: React.FC = () => {
     if (type.startsWith("video/")) return "🎥";
     if (type.startsWith("audio/")) return "🎵";
     if (type === "application/pdf") return "📄";
+    if (type.includes("word")) return "📝";
+    if (type.includes("excel")) return "📊";
     return "📁";
   };
 
@@ -135,120 +243,99 @@ const MediaCreatePage: React.FC = () => {
     }
   };
 
-  const handleUploadAll = async () => {
-    if (fileList.length === 0) {
-      message.warning("Please select files to upload");
-      return;
-    }
-
-    setUploading(true);
-    try {
-      // Simulate upload process
-      for (let i = 0; i < fileList.length; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        // Update file status
-        setFileList((prev) => prev.map((file, index) => (index === i ? { ...file, status: "done" } : file)));
-      }
-
-      message.success("All files uploaded successfully!");
-      setTimeout(() => {
-        router.push("/admin/media/list");
-      }, 1500);
-    } catch (error) {
-      message.error("Upload failed");
-    } finally {
-      setUploading(false);
-    }
+  const handleClearAll = () => {
+    setFileList([]);
+    setUploadedFiles([]);
   };
 
   return (
-    <div>
-      <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => router.back()} className="mb-4">
+    <div className="max-w-6xl mx-auto p-6">
+      <Button
+        type="text"
+        icon={<ArrowLeftOutlined />}
+        onClick={() => router.back()}
+        className="mb-4"
+      >
         Back to Media Library
       </Button>
 
       <div className="mb-6">
-        <Title level={2}>Upload Media</Title>
-        <Text type="secondary">Upload images, videos, documents and other media files to your library</Text>
+        <Title level={2}>Upload Images</Title>
+        <Text type="secondary">
+          Select image files to upload automatically. Only JPG, PNG, GIF, WebP,
+          and SVG files are supported.
+        </Text>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upload Area */}
         <div className="lg:col-span-2">
-          <Dragger {...uploadProps} className="block h-auto">
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">Nhấn hoặc kéo thả file vào đây để tải lên</p>
-            <p className="ant-upload-hint">Hỗ trợ tải lên nhiều file. Không tải dữ liệu nhạy cảm hoặc bị cấm.</p>
-          </Dragger>
-
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {uploadedFiles.map((file) => {
-              const url = file.response?.url ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${file.response.url}` : null;
-
-              const isImage = /\.(jpe?g|png|gif|svg|webp)$/i.test(file.name);
-
-              return (
-                <div key={file.uid} className="p-2 border rounded shadow-sm">
-                  {url && isImage ? (
-                    <img src={url} alt={file.name} className="w-full h-auto object-cover max-h-[150px]" />
-                  ) : (
-                    <div className="text-sm text-gray-500">{file.name}</div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <Card title="Select Files" className="mb-6">
-            <Dragger {...uploadProps} className="mb-4">
+          <Card>
+            <Dragger {...uploadProps} className="block h-auto">
               <p className="ant-upload-drag-icon">
-                <InboxOutlined style={{ fontSize: "48px", color: "#1890ff" }} />
+                <InboxOutlined />
               </p>
-              <p className="ant-upload-text">Click or drag files to this area to upload</p>
+              <p className="ant-upload-text">
+                Click or drag image file to this area to upload automatically
+              </p>
               <p className="ant-upload-hint">
-                Support for single or bulk upload. Maximum file size: 10MB.
-                <br />
-                Supported formats: Images (JPEG, PNG, GIF, WebP), Videos (MP4, WebM), Documents (PDF, TXT)
+                Only JPG, PNG, GIF, WebP, and SVG files are supported. File will
+                be uploaded immediately when selected.
               </p>
             </Dragger>
 
-            {fileList.length > 0 && (
-              <div>
-                <Divider />
-                <div className="flex justify-between items-center mb-4">
-                  <Text strong>Selected Files ({fileList.length})</Text>
-                  <Button type="primary" icon={<CloudUploadOutlined />} loading={uploading} onClick={handleUploadAll}>
-                    Upload All
-                  </Button>
-                </div>
+            {/* Upload Controls */}
+            <div className="mt-4 flex gap-2">
+              <Button
+                onClick={handleClearAll}
+                disabled={fileList.length === 0}
+                size="large"
+              >
+                Clear All
+              </Button>
+            </div>
 
+            {/* Upload Progress & Preview */}
+            {fileList.length > 0 && (
+              <div className="mt-4">
+                <Title level={4}>Upload Status</Title>
                 <List
                   dataSource={fileList}
-                  renderItem={(file) => (
+                  renderItem={(file, index) => (
                     <List.Item
+                      key={file.uid}
                       actions={[
-                        file.type?.startsWith("image/") && (
-                          <Button type="text" icon={<EyeOutlined />} onClick={() => handlePreview(file)} key="preview" />
-                        ),
-                        <Button type="text" danger icon={<DeleteOutlined />} onClick={() => handleRemove(file)} key="delete" />,
-                      ].filter(Boolean)}
+                        <Button
+                          key="preview"
+                          type="text"
+                          icon={<EyeOutlined />}
+                          onClick={() => handlePreview(file)}
+                          disabled={!file.type?.startsWith("image/")}
+                        />,
+                        <Button
+                          key="remove"
+                          type="text"
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={() => handleRemove(file)}
+                        />,
+                      ]}
                     >
                       <List.Item.Meta
                         avatar={
-                          file.type?.startsWith("image/") && file.thumbUrl ? (
-                            <Image width={40} height={40} src={file.thumbUrl} alt={file.name} className="object-cover rounded" preview={false} />
-                          ) : (
-                            <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded">
-                              <span className="text-lg">{getFileIcon(file.type)}</span>
-                            </div>
-                          )
+                          <div className="text-2xl">
+                            {getFileIcon(file.type)}
+                          </div>
                         }
                         title={
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center gap-2">
                             <span>{file.name}</span>
-                            <Tag color={getStatusColor(file.status)}>{file.status || "ready"}</Tag>
+                            {file.status === "done" && (
+                              <CheckCircleOutlined className="text-green-500" />
+                            )}
+                            {file.status === "error" && (
+                              <CloseCircleOutlined className="text-red-500" />
+                            )}
                           </div>
                         }
                         description={
@@ -256,7 +343,29 @@ const MediaCreatePage: React.FC = () => {
                             <div className="text-sm text-gray-500">
                               {formatFileSize(file.size)} • {file.type}
                             </div>
-                            {file.status === "uploading" && file.percent && <Progress percent={file.percent} size="small" className="mt-1" />}
+                            {file.status === "uploading" && (
+                              <Progress
+                                percent={file.percent || 0}
+                                size="small"
+                                status="active"
+                              />
+                            )}
+                            {/* Preview ảnh đã upload thành công */}
+                            {file.status === "done" && file.uploadedUrl && (
+                              <div className="mt-2">
+                                <Image
+                                  src={file.uploadedUrl}
+                                  alt={file.name}
+                                  width={100}
+                                  height={100}
+                                  style={{
+                                    objectFit: "cover",
+                                    borderRadius: "4px",
+                                  }}
+                                  preview={false}
+                                />
+                              </div>
+                            )}
                           </div>
                         }
                       />
@@ -268,60 +377,74 @@ const MediaCreatePage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Upload Guidelines */}
-        <div>
-          <Card title="Upload Guidelines" size="small">
+        {/* Upload Info */}
+        <div className="lg:col-span-1">
+          <Card title="Upload Information">
             <div className="space-y-4">
               <div>
-                <Text strong className="block mb-2">
-                  Supported Formats:
-                </Text>
-                <div className="space-y-1">
-                  <div className="flex items-center">
-                    <span className="mr-2">🖼️</span>
-                    <Text className="text-sm">Images: JPEG, PNG, GIF, WebP</Text>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="mr-2">🎥</span>
-                    <Text className="text-sm">Videos: MP4, WebM</Text>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="mr-2">📄</span>
-                    <Text className="text-sm">Documents: PDF, TXT</Text>
-                  </div>
+                <Text strong>Supported Formats:</Text>
+                <div className="mt-2 space-y-1">
+                  <Tag color="blue">Images (JPG, PNG, GIF, WebP, SVG)</Tag>
                 </div>
               </div>
 
               <Divider />
 
               <div>
-                <Text strong className="block mb-2">
-                  File Size Limits:
-                </Text>
-                <div className="space-y-1">
-                  <Text className="text-sm block">• Maximum: 10MB per file</Text>
-                  <Text className="text-sm block">• Recommended: Under 5MB</Text>
+                <Text strong>File Limits:</Text>
+                <div className="mt-2 text-sm text-gray-600">
+                  <div>• Maximum file size: 10MB</div>
+                  <div>• Single file upload</div>
+                  <div>• Auto upload on selection</div>
+                  <div>• Drag & drop enabled</div>
                 </div>
               </div>
 
               <Divider />
 
               <div>
-                <Text strong className="block mb-2">
-                  Best Practices:
-                </Text>
-                <div className="space-y-1">
-                  <Text className="text-sm block">• Use descriptive filenames</Text>
-                  <Text className="text-sm block">• Optimize images before upload</Text>
-                  <Text className="text-sm block">• Check file quality</Text>
+                <Text strong>Upload Status:</Text>
+                <div className="mt-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <Text className="text-sm">Ready to upload</Text>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <Text className="text-sm">Uploaded successfully</Text>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <Text className="text-sm">Upload failed</Text>
+                  </div>
                 </div>
               </div>
             </div>
           </Card>
         </div>
       </div>
+
+      {uploadMessage && uploadError && (
+        <Alert
+          message="Upload Failed"
+          description={uploadMessage}
+          type="error"
+          showIcon
+          className="mt-4"
+        />
+      )}
     </div>
   );
 };
 
-export default MediaCreatePage;
+const mapStateToProps = (state: any) => ({
+  uploadLoading: state.media.uploadLoading,
+  uploadError: state.media.uploadError,
+  uploadMessage: state.media.uploadMessage,
+});
+
+const mapDispatchToProps = {
+  uploadMedia: uploadMedia,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MediaCreatePage);

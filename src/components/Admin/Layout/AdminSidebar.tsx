@@ -61,16 +61,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       <div
         className="relative overflow-hidden flex justify-center items-center"
         style={{
-          borderBottom: `1px solid #e5e7eb`,
           minHeight: "72px",
           position: "relative",
-          background: "#f9fafb",
         }}
       >
         <div className="relative z-10 flex items-center justify-center  px-4">
           <div className="text-center">
             {collapsed ? (
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-200">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center ">
                 <span className="text-lg font-bold text-gray-700">K</span>
               </div>
             ) : (
@@ -82,16 +80,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     </div>
                   </div>
                 </div>
-                <Text
-                  style={{
-                    color: "#6b7280",
-                    fontSize: "13px",
-                    fontWeight: 400,
-                    letterSpacing: "0.5px",
-                  }}
-                >
-                  Admin Dashboard
-                </Text>
               </Link>
             )}
           </div>
@@ -108,23 +96,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           background: "#fff",
         }}
       >
-        {/* Navigation Section Label */}
-        {!collapsed && (
-          <div style={{ padding: "0 20px 12px 20px" }}>
-            <Text
-              style={{
-                color: "#9ca3af",
-                fontSize: "11px",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-              }}
-            >
-              Navigation
-            </Text>
-          </div>
-        )}
-
         <Menu
           key={pathname}
           theme="light"

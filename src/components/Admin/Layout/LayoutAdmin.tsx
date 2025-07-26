@@ -132,7 +132,7 @@ const AdminLayout = ({ children }: Props) => {
             className=" fade-in"
             style={{
               padding: isMobile ? "16px" : "32px",
-              background: "#ffffff",
+              background: "#f0f0f0",
               minHeight: "calc(100vh - 200px)",
             }}
           >

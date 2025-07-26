@@ -1,13 +1,30 @@
 "use client";
 
 import React, { useEffect, useCallback, useState } from "react";
-import { Button, Tag, Avatar, Space, message, Select, Input, Pagination } from "antd";
-import { UserOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Tag,
+  Avatar,
+  Space,
+  message,
+  Select,
+  Input,
+  Pagination,
+  Table,
+  Dropdown,
+} from "antd";
+import {
+  UserOutlined,
+  PlusOutlined,
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch, connect } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { fetchPosts } from "@/store/actions/posts";
-import CustomTable from "@/components/Admin/UI/CustomTable";
 import { useSession } from "next-auth/react";
 import debounce from "lodash.debounce";
 
@@ -92,13 +109,21 @@ const PostListPage: React.FC = (props: any) => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: number) => <Tag color={statusMap[status]?.color || "default"}>{statusMap[status]?.label || status}</Tag>,
+      render: (status: number) => (
+        <Tag color={statusMap[status]?.color || "default"}>
+          {statusMap[status]?.label || status}
+        </Tag>
+      ),
     },
     {
       title: "Deleted",
       dataIndex: "deleteFlg",
       key: "deleteFlg",
-      render: (deleteFlg: number) => <Tag color={deleteFlgMap[deleteFlg]?.color || "default"}>{deleteFlgMap[deleteFlg]?.label || deleteFlg}</Tag>,
+      render: (deleteFlg: number) => (
+        <Tag color={deleteFlgMap[deleteFlg]?.color || "default"}>
+          {deleteFlgMap[deleteFlg]?.label || deleteFlg}
+        </Tag>
+      ),
     },
     {
       title: "Created",
@@ -107,8 +132,44 @@ const PostListPage: React.FC = (props: any) => {
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
+          <div className="text-xs text-gray-500">
+            {new Date(date).toLocaleTimeString()}
+          </div>
         </div>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 120,
+      render: (_: any, record: any) => (
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "view",
+                label: "View",
+                icon: <EyeOutlined />,
+                onClick: () => handleView(record),
+              },
+              {
+                key: "edit",
+                label: "Edit",
+                icon: <EditOutlined />,
+                onClick: () => handleEdit(record),
+              },
+              {
+                key: "delete",
+                label: "Delete",
+                icon: <DeleteOutlined />,
+                onClick: () => handleDelete(record),
+              },
+            ],
+          }}
+          trigger={["click"]}
+        >
+          <Button type="text" icon={<MoreOutlined />} />
+        </Dropdown>
       ),
     },
   ];
@@ -126,7 +187,11 @@ const PostListPage: React.FC = (props: any) => {
             <Option value={1}>Published</Option>
             <Option value={2}>Archived</Option>
           </Select>
-          <Select value={deleteFlg} onChange={setDeleteFlg} style={{ width: 120 }}>
+          <Select
+            value={deleteFlg}
+            onChange={setDeleteFlg}
+            style={{ width: 120 }}
+          >
             <Option value="all">All</Option>
             <Option value={0}>Active</Option>
             <Option value={1}>Deleted</Option>
@@ -138,29 +203,37 @@ const PostListPage: React.FC = (props: any) => {
               </Option>
             ))}
           </Select>
-          <Select value={sortDesc} onChange={(v) => setSortDesc(v)} style={{ width: 120 }}>
+          <Select
+            value={sortDesc}
+            onChange={(v) => setSortDesc(v)}
+            style={{ width: 120 }}
+          >
             <Option value={false}>Ascending</Option>
             <Option value={true}>Descending</Option>
           </Select>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/post/create")}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => router.push("/admin/post/create")}
+        >
           Add New Post
         </Button>
       </div>
 
-      <CustomTable
+      <Table
         columns={columns}
-        data={postList}
+        dataSource={postList}
         loading={postLoading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onView={handleView}
-        searchable={false}
-        exportable
+        rowKey="id"
         pagination={{
           current: pageNumber,
           pageSize,
           total: postTotal,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
           onChange: (page, pageSize) => {
             handleQuery(keyword, page, pageSize);
           },

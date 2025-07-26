@@ -1,0 +1,117 @@
+/* Custom style for Ant Design primary button giống Pixlmob */
+
+.ant-btn {
+  height: 40px !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  box-shadow: none !important;
+  transition: background 0.2s;
+}
+
+.ant-btn-primary {
+  background: #18181b !important;
+  border: none !important;
+  color: #fff !important;
+}
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background: #23272f !important;
+  color: #fff !important;
+}
+
+/* Default button */
+.ant-btn-default {
+  background: #fff !important;
+  color: #2563eb !important;
+  box-shadow: none !important;
+  transition: background 0.2s, border 0.2s;
+}
+.ant-btn-default:hover,
+.ant-btn-default:focus {
+  background: #f3f4f6 !important;
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+}
+
+/* Dashed button */
+.ant-btn-dashed {
+  background: #fff !important;
+  border: 1.5px dashed #2563eb !important;
+  border-radius: 8px !important;
+  color: #2563eb !important;
+  box-shadow: none !important;
+  transition: background 0.2s, border 0.2s;
+}
+.ant-btn-dashed:hover,
+.ant-btn-dashed:focus {
+  background: #f3f4f6 !important;
+  border-color: #1d4ed8 !important;
+  color: #1d4ed8 !important;
+}
+
+/* Text button */
+.ant-btn-text {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #2563eb !important;
+  box-shadow: none !important;
+  transition: background 0.2s, color 0.2s;
+}
+.ant-btn-text:hover,
+.ant-btn-text:focus {
+  background: #e0e7ff !important;
+  color: #1d4ed8 !important;
+}
+
+/* Link button */
+.ant-btn-link {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #2563eb !important;
+  box-shadow: none !important;
+  transition: color 0.2s;
+  padding: 0 8px !important;
+}
+.ant-btn-link:hover,
+.ant-btn-link:focus {
+  color: #1d4ed8 !important;
+  text-decoration: underline !important;
+}
+
+.ant-input {
+  background: #fff !important;
+  box-shadow: none !important;
+  transition: border 0.2s, box-shadow 0.2s;
+  min-height: 36px !important;
+}
+
+.ant-input-affix-wrapper {
+  padding: 0 16px !important;
+  height: 100% !important;
+}
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper-focused {
+  border-color: #18181b !important;
+  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.08) !important;
+  background: #fff !important;
+}
+
+/* Remove background on autofill */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #18181b !important;
+}
+
+/* Custom style for Ant Design Form label giống Pixlmob */
+.ant-form-item-label > label {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #18181b !important;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}

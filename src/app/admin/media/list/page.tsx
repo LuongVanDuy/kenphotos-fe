@@ -1,333 +1,323 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Image, Button, Space, Tag, Dropdown, Input, Select, message, Modal, Typography, Tooltip } from "antd";
 import {
-  PlusOutlined,
-  DownloadOutlined,
-  DeleteOutlined,
-  EditOutlined,
+  Card,
+  Row,
+  Col,
+  Image,
+  Button,
+  Space,
+  Tag,
+  Input,
+  Select,
+  message,
+  Modal,
+  Typography,
+  Tooltip,
+  Dropdown,
+  Checkbox,
+  Divider,
+  Badge,
+} from "antd";
+import {
   EyeOutlined,
-  SearchOutlined,
-  FilterOutlined,
   AppstoreOutlined,
   UnorderedListOutlined,
-  MoreOutlined,
+  UploadOutlined,
+  SortAscendingOutlined,
+  SortDescendingOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { CustomShowConfirmModal } from "@/components/Admin/UI/CustomModal";
 import { Media } from "@/types";
+import { connect } from "react-redux";
+import { fetchMedia } from "@/store/actions/media";
+import { useSession } from "next-auth/react";
 import CustomTable from "@/components/Admin/UI/CustomTable";
+import MediaItem from "@/components/Admin/Media/MediaItem";
 
 const { Search } = Input;
 const { Option } = Select;
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
-const MediaListPage: React.FC = () => {
+const MediaListPage: React.FC = (props: any) => {
+  const { fetchMedia, mediaList, mediaTotal, mediaLoading } = props;
   const router = useRouter();
-  const [media, setMedia] = useState<Media[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data: session } = useSession();
+
+  // State management
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [statusFilter, setStatusFilter] = useState<number | undefined>(
+    undefined
+  );
+  const [sortBy, setSortBy] = useState("createdTime");
+  const [sortDesc, setSortDesc] = useState(true);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
-  // Mock data for demonstration
-  const mockMedia: Media[] = [
-    {
-      id: "1",
-      filename: "hero-image.jpg",
-      originalName: "hero-image.jpg",
-      mimeType: "image/jpeg",
-      size: 1024000,
-      url: "/images/hero-image.jpg",
-      thumbnailUrl: "/images/hero-image-thumb.jpg",
-      alt: "Hero image",
-      caption: "Main hero image for homepage",
-      uploadedBy: {
-        id: "1",
-        name: "John Doe",
-        email: "john@example.com",
-        role: "admin",
-        status: "active",
-        createdAt: "2024-01-15",
-      },
-      createdAt: "2024-01-15",
-    },
+  // Query function
+  function handleQuery(keyword: string, page = 1, itemsPerPage = 20) {
+    const queryParams: any = {
+      search: keyword,
+      page,
+      itemsPerPage,
+      sortBy,
+      sortDesc,
+    };
 
-    {
-      id: "2",
-      filename: "product-1.png",
-      originalName: "product-showcase.png",
-      mimeType: "image/png",
-      size: 2048000,
-      url: "/images/product-1.png",
-      thumbnailUrl: "/images/product-1-thumb.png",
-      alt: "Product showcase",
-      uploadedBy: {
-        id: "2",
-        name: "Jane Smith",
-        email: "jane@example.com",
-        role: "editor",
-        status: "active",
-        createdAt: "2024-01-14",
-      },
-      createdAt: "2024-01-14",
-    },
-    {
-      id: "3",
-      filename: "document.pdf",
-      originalName: "user-manual.pdf",
-      mimeType: "application/pdf",
-      size: 5120000,
-      url: "/documents/document.pdf",
-      uploadedBy: {
-        id: "1",
-        name: "John Doe",
-        email: "john@example.com",
-        role: "admin",
-        status: "active",
-        createdAt: "2024-01-15",
-      },
-      createdAt: "2024-01-13",
-    },
-  ];
+    if (statusFilter !== undefined) {
+      queryParams.status = statusFilter;
+    }
+
+    fetchMedia(session?.accessToken, queryParams);
+    setPageNumber(page);
+    setPageSize(itemsPerPage);
+  }
 
   useEffect(() => {
-    loadMedia();
-  }, []);
-
-  const loadMedia = async () => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setMedia(mockMedia);
-    } catch (error) {
-      message.error("Failed to load media");
-    } finally {
-      setLoading(false);
+    if (session?.accessToken) {
+      handleQuery(searchKeyword);
     }
+  }, [session?.accessToken, sortBy, sortDesc, statusFilter]);
+
+  // Handle search
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+    handleQuery(value, 1, pageSize);
   };
 
-  const handleDelete = (mediaItem: Media) => {
-    CustomShowConfirmModal({
-      title: "Delete Media",
-      content: `Are you sure you want to delete "${mediaItem.originalName}"? This action cannot be undone.`,
-      onConfirm: async () => {
-        try {
-          // Simulate API call
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          setMedia(media.filter((m) => m.id !== mediaItem.id));
-          message.success("Media deleted successfully");
-        } catch (error) {
-          message.error("Failed to delete media");
-        }
-      },
-      type: "error",
-      okText: "Delete",
-      cancelText: "Cancel",
-    });
-  };
-
-  const handleEdit = (mediaItem: Media) => {
-    router.push(`/admin/media/${mediaItem.id}`);
+  // Handle sort
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortDesc(!sortDesc);
+    } else {
+      setSortBy(field);
+      setSortDesc(true);
+    }
   };
 
   const handlePreview = (mediaItem: Media) => {
-    if (mediaItem.mimeType.startsWith("image/")) {
-      setPreviewImage(mediaItem.url);
+    // Check if it's an image by file extension
+    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(mediaItem.name);
+    if (isImage) {
+      setPreviewImage(`${process.env.NEXT_PUBLIC_IMAGE_URL}${mediaItem.slug}`);
       setPreviewVisible(true);
     } else {
-      window.open(mediaItem.url, "_blank");
+      // For non-image files, use the full URL if it's a relative path
+      const fileUrl = mediaItem.slug.startsWith("http")
+        ? mediaItem.slug
+        : `${process.env.NEXT_PUBLIC_IMAGE_URL}${mediaItem.slug}`;
+      window.open(fileUrl, "_blank");
     }
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const getFileIcon = (mimeType: string) => {
-    if (mimeType.startsWith("image/")) return "🖼️";
-    if (mimeType.startsWith("video/")) return "🎥";
-    if (mimeType.startsWith("audio/")) return "🎵";
-    if (mimeType === "application/pdf") return "📄";
-    return "📁";
-  };
-
+  // WordPress-style grid view
   const renderGridView = () => (
-    <Row gutter={[16, 16]}>
-      {media.map((item) => (
-        <Col xs={24} sm={12} md={8} lg={6} xl={4} key={item.id}>
-          <Card
-            hoverable
-            cover={
-              item.mimeType.startsWith("image/") ? (
-                <div className="h-48 overflow-hidden">
-                  <Image
-                    alt={item.alt || item.originalName}
-                    src={item.thumbnailUrl || item.url}
-                    preview={false}
-                    className="w-full h-full object-cover"
-                    onClick={() => handlePreview(item)}
-                  />
-                </div>
-              ) : (
-                <div className="h-48 flex items-center justify-center bg-gray-100">
-                  <div className="text-center">
-                    <div className="text-4xl mb-2">{getFileIcon(item.mimeType)}</div>
-                    <Text className="text-sm">{item.mimeType}</Text>
-                  </div>
-                </div>
-              )
-            }
-            actions={[
-              <Tooltip title="Preview" key="preview">
-                <Button type="text" icon={<EyeOutlined />} onClick={() => handlePreview(item)} />
-              </Tooltip>,
-              <Tooltip title="Edit" key="edit">
-                <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(item)} />
-              </Tooltip>,
-              <Tooltip title="Delete" key="delete">
-                <Button type="text" danger icon={<DeleteOutlined />} onClick={() => handleDelete(item)} />
-              </Tooltip>,
-            ]}
-          >
-            <Card.Meta
-              title={
-                <Tooltip title={item.originalName}>
-                  <div className="truncate">{item.originalName}</div>
-                </Tooltip>
-              }
-              description={
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">{formatFileSize(item.size)}</div>
-                  <div className="text-xs text-gray-400">{new Date(item.createdAt).toLocaleDateString()}</div>
-                </div>
-              }
-            />
-          </Card>
-        </Col>
-      ))}
-    </Row>
+    <div className="media-library-content">
+      {/* Media Grid */}
+      <div className="media-grid">
+        {mediaList.map((item: Media) => (
+          <MediaItem key={item.id} item={item} onPreview={handlePreview} />
+        ))}
+      </div>
+    </div>
   );
 
+  // Table columns for list view
   const tableColumns = [
     {
       title: "Preview",
       key: "preview",
       width: 80,
-      render: (_: any, record: Media) =>
-        record.mimeType.startsWith("image/") ? (
-          <Image
-            width={50}
-            height={50}
-            src={record.thumbnailUrl || record.url}
-            alt={record.alt || record.originalName}
-            className="object-cover rounded"
-            preview={false}
-            onClick={() => handlePreview(record)}
-          />
-        ) : (
-          <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded">
-            <span className="text-lg">{getFileIcon(record.mimeType)}</span>
-          </div>
-        ),
+      render: (_: any, record: Media) => (
+        <div className="relative">
+          {/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(record.name) ? (
+            <Image
+              width={50}
+              height={50}
+              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${record.slug}`}
+              alt={record.name}
+              className="object-cover rounded"
+              preview={false}
+              onClick={() => handlePreview(record)}
+            />
+          ) : (
+            <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded">
+              <span className="text-lg">📄</span>
+            </div>
+          )}
+        </div>
+      ),
     },
     {
       title: "Name",
-      dataIndex: "originalName",
-      key: "originalName",
+      dataIndex: "name",
+      key: "name",
       render: (text: string, record: Media) => (
         <div>
           <div className="font-medium">{text}</div>
-          <div className="text-sm text-gray-500">{record.filename}</div>
+          <div className="text-sm text-gray-500">
+            Uploaded by {record.uploadedBy.firstName}{" "}
+            {record.uploadedBy.lastName}
+          </div>
         </div>
       ),
     },
     {
       title: "Type",
-      dataIndex: "mimeType",
-      key: "mimeType",
-      render: (mimeType: string) => <Tag>{mimeType.split("/")[1].toUpperCase()}</Tag>,
-    },
-    {
-      title: "Size",
-      dataIndex: "size",
-      key: "size",
-      render: (size: number) => formatFileSize(size),
-    },
-    {
-      title: "Uploaded By",
-      key: "uploadedBy",
-      render: (_: any, record: Media) => record.uploadedBy.name,
+      key: "type",
+      render: (_: any, record: Media) => {
+        const ext = record.name.split(".").pop()?.toUpperCase();
+        return <Tag>{ext || "Unknown"}</Tag>;
+      },
     },
     {
       title: "Date",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      dataIndex: "createdTime",
+      key: "createdTime",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
   ];
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Media Library</h1>
-          <p className="text-gray-600">Manage your media files and assets</p>
+    <div className="media-library-container">
+      {/* Header */}
+      <div className="media-library-header">
+        <div className="flex justify-between items-center">
+          <div>
+            <Title level={2} className="mb-1">
+              Media Library
+            </Title>
+            <Text className="text-gray-600">
+              Manage your media files and assets
+            </Text>
+          </div>
+          <Button
+            type="primary"
+            icon={<UploadOutlined />}
+            onClick={() => router.push("/admin/media/create")}
+            size="large"
+          >
+            Add New
+          </Button>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/media/create")}>
-          Upload Media
-        </Button>
       </div>
 
-      <Card className="mb-4">
-        <div className="flex justify-between items-center">
-          <Space>
-            <Search placeholder="Search media..." allowClear style={{ width: 300 }} />
-            <Select defaultValue="all" style={{ width: 120 }}>
+      {/* Filters and Controls */}
+      <div className="media-filters">
+        <div className="media-filters-row">
+          <div className="media-filters-left">
+            {/* <Search
+              placeholder="Search media..."
+              allowClear
+              style={{ width: 300 }}
+              onSearch={handleSearch}
+              defaultValue={searchKeyword}
+            /> */}
+            <Select
+              defaultValue="all"
+              className="w-[120px] !h-[40px]"
+              onChange={(value) =>
+                setStatusFilter(value === "all" ? undefined : Number(value))
+              }
+            >
               <Option value="all">All Types</Option>
-              <Option value="image">Images</Option>
-              <Option value="video">Videos</Option>
-              <Option value="document">Documents</Option>
+              <Option value="1">Images</Option>
+              <Option value="2">Documents</Option>
+              <Option value="3">Videos</Option>
             </Select>
-          </Space>
-
-          <Space>
             <Button.Group>
-              <Button type={viewMode === "grid" ? "primary" : "default"} icon={<AppstoreOutlined />} onClick={() => setViewMode("grid")} />
-              <Button type={viewMode === "list" ? "primary" : "default"} icon={<UnorderedListOutlined />} onClick={() => setViewMode("list")} />
+              <Button
+                type={
+                  sortBy === "createdTime" && sortDesc ? "primary" : "default"
+                }
+                icon={<SortDescendingOutlined />}
+                onClick={() => handleSort("createdTime")}
+                size="small"
+              >
+                Newest
+              </Button>
+              <Button
+                type={
+                  sortBy === "createdTime" && !sortDesc ? "primary" : "default"
+                }
+                icon={<SortAscendingOutlined />}
+                onClick={() => handleSort("createdTime")}
+                size="small"
+              >
+                Oldest
+              </Button>
             </Button.Group>
-          </Space>
-        </div>
-      </Card>
+          </div>
 
+          <div className="media-filters-right">
+            <Button.Group>
+              <Button
+                type={viewMode === "grid" ? "primary" : "default"}
+                icon={<AppstoreOutlined />}
+                onClick={() => setViewMode("grid")}
+              />
+              <Button
+                type={viewMode === "list" ? "primary" : "default"}
+                icon={<UnorderedListOutlined />}
+                onClick={() => setViewMode("list")}
+              />
+            </Button.Group>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
       {viewMode === "grid" ? (
         renderGridView()
       ) : (
         <CustomTable
           columns={tableColumns}
-          data={media}
-          loading={loading}
-          onRefresh={loadMedia}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
+          data={mediaList}
+          loading={mediaLoading}
+          onRefresh={() => handleQuery(searchKeyword, pageNumber, pageSize)}
           onView={handlePreview}
           searchable={false}
           exportable
+          pagination={{
+            current: pageNumber,
+            pageSize,
+            total: mediaTotal,
+            onChange: (page, pageSize) => {
+              handleQuery(searchKeyword, page, pageSize);
+            },
+          }}
         />
       )}
 
-      <Modal open={previewVisible} title="Image Preview" footer={null} onCancel={() => setPreviewVisible(false)} width="80%" style={{ top: 20 }}>
+      {/* Image Preview Modal */}
+      <Modal
+        open={previewVisible}
+        title="Image Preview"
+        footer={null}
+        onCancel={() => setPreviewVisible(false)}
+        width="30%"
+        style={{ top: 50 }}
+      >
         <Image alt="preview" style={{ width: "100%" }} src={previewImage} />
       </Modal>
     </div>
   );
 };
 
-export default MediaListPage;
+const mapStateToProps = (state: any) => ({
+  mediaList: state.media.list,
+  mediaTotal: state.media.total,
+  mediaLoading: state.media.loading,
+});
+
+const mapDispatchToProps = {
+  fetchMedia: fetchMedia,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MediaListPage);
