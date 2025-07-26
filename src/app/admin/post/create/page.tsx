@@ -169,7 +169,6 @@ const PostForm: React.FC<{
   }, [dispatch]);
 
   useEffect(() => {
-
     if (initialValues?.thumbnail && initialValues.thumbnail.trim() !== "") {
       setSelectedImage({ slug: initialValues.thumbnail });
     }
@@ -198,6 +197,7 @@ const PostForm: React.FC<{
   const treeData: any[] = buildTree(categories);
 
   const handleMediaSelect = (media: any) => {
+    // Set both form field and selectedImage state
     form.setFieldsValue({ thumbnail: media.slug });
     setSelectedImage(media);
     setIsModalMediaOpen(false);
@@ -216,6 +216,7 @@ const PostForm: React.FC<{
 
   const onFinish = async (values: PostFormValues) => {
     setLoading(true);
+
     try {
       const payload = {
         title: values.title,
@@ -223,11 +224,13 @@ const PostForm: React.FC<{
         excerpt: values.excerpt,
         slug: values.slug,
         status: values.status,
-        thumbnail: values.thumbnail || "",
+        thumbnail: values.thumbnail || selectedImage?.slug || "",
         categoryIds: Array.isArray(values.categoryIds)
           ? values.categoryIds.map(Number)
           : [],
       };
+
+
       if (mode === "edit" && postId && updatePost) {
         await updatePost(postId, payload);
       } else if (createPost) {
@@ -243,6 +246,7 @@ const PostForm: React.FC<{
       if (onSuccess) onSuccess();
       router.push("/admin/post/list");
     } catch (error) {
+      console.error("Submit error:", error);
       message.error(
         mode === "edit" ? "Failed to update post" : "Failed to create post"
       );
@@ -297,6 +301,11 @@ const PostForm: React.FC<{
               : initialValues?.categoryIds || [],
           }}
         >
+          {/* Hidden field for thumbnail to ensure it's included in form values */}
+          <Form.Item name="thumbnail" style={{ display: "none" }}>
+            <Input />
+          </Form.Item>
+
           <div className="flex gap-8">
             {/* Main Content Area */}
             <div className="flex-1">
@@ -345,7 +354,7 @@ const PostForm: React.FC<{
                     rules={[
                       { required: true, message: "Please enter the content" },
                     ]}
-                    className="!mb-0"
+                    className="!mb-0 bg-white"
                   >
                     <CustomQuill
                       placeholder="Start writing or type / to choose a block..."
