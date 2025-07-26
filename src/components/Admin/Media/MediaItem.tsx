@@ -30,17 +30,6 @@ const MediaItem: React.FC<MediaItemProps> = ({ item, onPreview }) => {
       case "webp":
       case "svg":
         return <FileImageOutlined className="text-blue-500" />;
-      case "pdf":
-        return <FilePdfOutlined className="text-red-500" />;
-      case "doc":
-      case "docx":
-        return <FileWordOutlined className="text-blue-600" />;
-      case "xls":
-      case "xlsx":
-        return <FileExcelOutlined className="text-green-600" />;
-      case "zip":
-      case "rar":
-        return <FileZipOutlined className="text-purple-500" />;
       default:
         return <FileTextOutlined className="text-gray-500" />;
     }

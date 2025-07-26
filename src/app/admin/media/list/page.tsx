@@ -2,32 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Card,
-  Row,
-  Col,
   Image,
   Button,
-  Space,
   Tag,
   Input,
   Select,
-  message,
   Modal,
   Typography,
-  Tooltip,
-  Dropdown,
-  Checkbox,
-  Divider,
-  Badge,
+
 } from "antd";
 import {
-  EyeOutlined,
   AppstoreOutlined,
   UnorderedListOutlined,
   UploadOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
-  ReloadOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { CustomShowConfirmModal } from "@/components/Admin/UI/CustomModal";
@@ -37,6 +26,7 @@ import { fetchMedia } from "@/store/actions/media";
 import { useSession } from "next-auth/react";
 import CustomTable from "@/components/Admin/UI/CustomTable";
 import MediaItem from "@/components/Admin/Media/MediaItem";
+import { getImageUrl } from "@/utils";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -104,14 +94,15 @@ const MediaListPage: React.FC = (props: any) => {
   const handlePreview = (mediaItem: Media) => {
     // Check if it's an image by file extension
     const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(mediaItem.name);
+    const imageUrl = getImageUrl(mediaItem.slug);
     if (isImage) {
-      setPreviewImage(`${process.env.NEXT_PUBLIC_IMAGE_URL}${mediaItem.slug}`);
+      setPreviewImage(imageUrl);
       setPreviewVisible(true);
     } else {
       // For non-image files, use the full URL if it's a relative path
       const fileUrl = mediaItem.slug.startsWith("http")
         ? mediaItem.slug
-        : `${process.env.NEXT_PUBLIC_IMAGE_URL}${mediaItem.slug}`;
+        : imageUrl;
       window.open(fileUrl, "_blank");
     }
   };
@@ -140,7 +131,7 @@ const MediaListPage: React.FC = (props: any) => {
             <Image
               width={50}
               height={50}
-              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${record.slug}`}
+              src={getImageUrl(record.slug)}
               alt={record.name}
               className="object-cover rounded"
               preview={false}
