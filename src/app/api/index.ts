@@ -1,6 +1,11 @@
 import { ApiResponse } from "@/types";
+import { getAccessToken } from "@/utils/getAccessToken";
 
-export async function fetchApi(endpoint: string, method: string, body: any = null) {
+export async function fetchApi(
+  endpoint: string,
+  method: string,
+  body: any = null
+) {
   const url = `${process.env.apiUrl}/${endpoint}`;
 
   const headers: { [key: string]: string } = {
@@ -17,7 +22,9 @@ export async function fetchApi(endpoint: string, method: string, body: any = nul
     const response = await fetch(url, options);
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+      throw new Error(
+        errorData.message || `HTTP error! status: ${response.status}`
+      );
     }
     const data = await response.json();
     return data;
@@ -27,7 +34,11 @@ export async function fetchApi(endpoint: string, method: string, body: any = nul
   }
 }
 
-export const fetchWithToken = async (url: string, token: string, callback: ((data: ApiResponse) => void) | null = null): Promise<ApiResponse> => {
+export const fetchWithToken = async (
+  url: string,
+  callback: ((data: ApiResponse) => void) | null = null
+): Promise<ApiResponse> => {
+  const token = await getAccessToken();
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "GET",
     headers: {
@@ -49,7 +60,10 @@ export const fetchWithToken = async (url: string, token: string, callback: ((dat
   return data;
 };
 
-export const fetchNoToken = async (url: string, callback: ((data: ApiResponse) => void) | null = null): Promise<ApiResponse> => {
+export const fetchNoToken = async (
+  url: string,
+  callback: ((data: ApiResponse) => void) | null = null
+): Promise<ApiResponse> => {
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "GET",
     headers: {
@@ -73,10 +87,10 @@ export const fetchNoToken = async (url: string, callback: ((data: ApiResponse) =
 
 export const postWithToken = async (
   url: string,
-  token: string,
   body: any,
   callback: ((data: ApiResponse) => void) | null = null
 ): Promise<ApiResponse> => {
+  const token = await getAccessToken();
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "POST",
     headers: {
@@ -93,13 +107,17 @@ export const postWithToken = async (
   }
 
   const data = await response.json();
-  if (callback) {
+  if (callback && typeof callback === "function") {
     callback(data);
   }
   return data;
 };
 
-export const postNoToken = async (url: string, body: any, callback: ((data: ApiResponse) => void) | null = null): Promise<ApiResponse> => {
+export const postNoToken = async (
+  url: string,
+  body: any,
+  callback: ((data: ApiResponse) => void) | null = null
+): Promise<ApiResponse> => {
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "POST",
     headers: {
@@ -123,10 +141,10 @@ export const postNoToken = async (url: string, body: any, callback: ((data: ApiR
 
 export const putWithToken = async (
   url: string,
-  token: string,
   body: any,
   callback: ((data: ApiResponse) => void) | null = null
 ): Promise<ApiResponse> => {
+  const token = await getAccessToken();
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "PUT",
     headers: {
@@ -143,13 +161,17 @@ export const putWithToken = async (
   }
 
   const data = await response.json();
-  if (callback) {
+  if (callback && typeof callback === "function") {
     callback(data);
   }
   return data;
 };
 
-export const deleteWithToken = async (url: string, token: string, callback: ((data: ApiResponse) => void) | null = null): Promise<ApiResponse> => {
+export const deleteWithToken = async (
+  url: string,
+  callback: ((data: ApiResponse) => void) | null = null
+): Promise<ApiResponse> => {
+  const token = await getAccessToken();
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "DELETE",
     headers: {
@@ -173,10 +195,10 @@ export const deleteWithToken = async (url: string, token: string, callback: ((da
 
 export const patchWithToken = async (
   url: string,
-  token: string,
   body: any = {},
   callback: ((data: ApiResponse) => void) | null = null
 ): Promise<ApiResponse> => {
+  const token = await getAccessToken();
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "PATCH",
     headers: {
@@ -184,6 +206,33 @@ export const patchWithToken = async (
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    const errorMessage = errorData?.message || "Unknown error";
+    throw new Error(errorMessage);
+  }
+
+  const data = await response.json();
+  if (callback && typeof callback === "function") {
+    callback(data);
+  }
+  return data;
+};
+
+export const postWithTokenFormData = async (
+  url: string,
+  body: any,
+  callback: ((data: ApiResponse) => void) | null = null
+): Promise<ApiResponse> => {
+  const token = await getAccessToken();
+  const response = await fetch(`${process.env.apiUrl}/${url}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: body ? body : null,
   });
 
   if (!response.ok) {

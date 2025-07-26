@@ -11,7 +11,7 @@ export default {
     return "media" + queryString;
   },
   fetchMediaById: (id: string) => `media/${id}`,
-  uploadMedia: () => "media/upload",
+  uploadMedia: () => "media",
   updateMedia: (id: string) => `media/${id}`,
   deleteMedia: (id: string) => `media/${id}`,
 };
