@@ -9,9 +9,11 @@ import { CustomSelect } from "@/components/Admin/UI/CustomSelect";
 import { CustomSwitch } from "@/components/Admin/UI/CustomSwitch";
 import FormActions from "@/components/Admin/UI/FormActions";
 import UploadField from "@/components/Admin/UI/UploadField";
-import { User } from "@/types";
+import { createUser } from "@/store/actions/users";
+import { connect } from "react-redux";
 
-const CreateUserPage: React.FC = () => {
+const CreateUserPage: React.FC = (props: any) => {
+  const { createUser } = props;
   const router = useRouter();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -29,7 +31,15 @@ const CreateUserPage: React.FC = () => {
   ];
 
   const handleSubmit = async (values: any) => {
-    console.log(values);
+    const dateOfBirthValue = values.dateOfBirth ? new Date(values.dateOfBirth) : null;
+
+    const payload = {
+      ...values,
+      avatar: values.avatar,
+      dateOfBirth: dateOfBirthValue,
+    };
+
+    // createUser(session?.user.accessToken, payload, () => onSuccess("Thêm người dùng thành công"), onFailure);
   };
 
   const handleCancel = () => {
@@ -123,4 +133,10 @@ const CreateUserPage: React.FC = () => {
   );
 };
 
-export default CreateUserPage;
+const mapStateToProps = (state: any) => ({});
+
+const mapDispatchToProps = {
+  createUser: createUser,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateUserPage);

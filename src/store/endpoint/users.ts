@@ -8,5 +8,5 @@ export default {
   fetchUser: (id: string) => `users/${id}`,
   createUser: () => "users",
   updateUser: (id: string) => `users/${id}`,
-  deleteUser: (id: string) => `users/${id}`,
+  // deleteUser: (id: string) => `users/${id}`,
 };
