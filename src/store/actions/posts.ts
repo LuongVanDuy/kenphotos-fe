@@ -20,10 +20,10 @@ import { fetchWithToken, putWithToken, deleteWithToken } from "@/app/api/index";
 import postsEndpoint from "../endpoint/posts";
 import { postWithToken } from "@/app/api/index";
 
-export const fetchPosts = (accessToken: any, option: any) => {
+export const fetchPosts = (option: any) => {
   return (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_POSTS });
-    fetchWithToken(postsEndpoint.fetchPosts(option), accessToken)
+    fetchWithToken(postsEndpoint.fetchPosts(option))
       .then((response) => {
         dispatch({
           type: FETCH_POSTS_SUCCESS,

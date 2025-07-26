@@ -9,7 +9,7 @@ import {
   Select,
   Modal,
   Typography,
-
+  Table,
 } from "antd";
 import {
   AppstoreOutlined,
@@ -24,7 +24,6 @@ import { Media } from "@/types";
 import { connect } from "react-redux";
 import { fetchMedia } from "@/store/actions/media";
 import { useSession } from "next-auth/react";
-import CustomTable from "@/components/Admin/UI/CustomTable";
 import MediaItem from "@/components/Admin/Media/MediaItem";
 import { getImageUrl } from "@/utils";
 
@@ -267,14 +266,10 @@ const MediaListPage: React.FC = (props: any) => {
       {viewMode === "grid" ? (
         renderGridView()
       ) : (
-        <CustomTable
+        <Table
           columns={tableColumns}
-          data={mediaList}
+          dataSource={mediaList}
           loading={mediaLoading}
-          onRefresh={() => handleQuery(searchKeyword, pageNumber, pageSize)}
-          onView={handlePreview}
-          searchable={false}
-          exportable
           pagination={{
             current: pageNumber,
             pageSize,

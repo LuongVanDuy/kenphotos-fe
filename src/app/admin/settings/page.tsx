@@ -1,15 +1,33 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, Tabs, Form, message, Divider, Typography, Space, Button, Alert } from "antd";
-import { SaveOutlined, SettingOutlined, GlobalOutlined, MailOutlined, SecurityScanOutlined, DatabaseOutlined } from "@ant-design/icons";
-import { CustomInput, CustomTextarea } from "@/components/Admin/UI/CustomInput";
-import { CustomSelect } from "@/components/Admin/UI/CustomSelect";
-import { CustomSwitch } from "@/components/Admin/UI/CustomSwitch";
-import FormActions from "@/components/Admin/UI/FormActions";
-import UploadField from "@/components/Admin/UI/UploadField";
+import {
+  Card,
+  Tabs,
+  Form,
+  message,
+  Divider,
+  Typography,
+  Space,
+  Button,
+  Alert,
+  Input,
+  Select,
+  Switch,
+  Upload,
+} from "antd";
+import {
+  SaveOutlined,
+  SettingOutlined,
+  GlobalOutlined,
+  MailOutlined,
+  SecurityScanOutlined,
+  DatabaseOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 
 const { Title, Text } = Typography;
+const { TextArea } = Input;
 
 const SettingsPage: React.FC = () => {
   const [generalForm] = Form.useForm();
@@ -71,57 +89,92 @@ const SettingsPage: React.FC = () => {
       >
         <Title level={4}>Site Information</Title>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="siteName" style={{ fontWeight: 500 }}>
-            Site Name
-          </label>
-          <CustomInput id="siteName" placeholder="Enter site name" />
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="siteDescription" style={{ fontWeight: 500 }}>
-            Site Description
-          </label>
-          <CustomTextarea id="siteDescription" placeholder="Enter site description" rows={3} />
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="siteUrl" style={{ fontWeight: 500 }}>
-            Site URL
-          </label>
-          <CustomInput id="siteUrl" placeholder="https://example.com" />
-        </div>
-        <UploadField name="siteLogo" accept="image/*" listType="picture-card" maxCount={1} />
+        <Form.Item
+          name="siteName"
+          label="Site Name"
+          rules={[{ required: true, message: "Please enter site name" }]}
+        >
+          <Input placeholder="Enter site name" />
+        </Form.Item>
+
+        <Form.Item
+          name="siteDescription"
+          label="Site Description"
+          rules={[{ required: true, message: "Please enter site description" }]}
+        >
+          <TextArea placeholder="Enter site description" rows={3} />
+        </Form.Item>
+
+        <Form.Item
+          name="siteUrl"
+          label="Site URL"
+          rules={[{ required: true, message: "Please enter site URL" }]}
+        >
+          <Input placeholder="https://example.com" />
+        </Form.Item>
+
+        <Form.Item name="siteLogo" label="Site Logo">
+          <Upload
+            name="logo"
+            listType="picture-card"
+            maxCount={1}
+            beforeUpload={() => false}
+          >
+            <div>
+              <UploadOutlined />
+              <div style={{ marginTop: 8 }}>Upload</div>
+            </div>
+          </Upload>
+        </Form.Item>
 
         <Divider />
 
         <Title level={4}>Localization</Title>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="timezone" style={{ fontWeight: 500 }}>
-            Timezone
-          </label>
-          <CustomSelect options={timezoneOptions} style={{ width: "100%" }} />
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="language" style={{ fontWeight: 500 }}>
-            Language
-          </label>
-          <CustomSelect options={languageOptions} style={{ width: "100%" }} />
-        </div>
+        <Form.Item
+          name="timezone"
+          label="Timezone"
+          rules={[{ required: true, message: "Please select timezone" }]}
+        >
+          <Select options={timezoneOptions} style={{ width: "100%" }} />
+        </Form.Item>
+
+        <Form.Item
+          name="language"
+          label="Language"
+          rules={[{ required: true, message: "Please select language" }]}
+        >
+          <Select options={languageOptions} style={{ width: "100%" }} />
+        </Form.Item>
 
         <Divider />
 
         <Title level={4}>Site Settings</Title>
 
+        <Form.Item name="maintenanceMode" valuePropName="checked">
+          <Switch />
+        </Form.Item>
         <div style={{ marginBottom: 16 }}>
-          <CustomSwitch />
           <span style={{ marginLeft: 8 }}>Maintenance Mode</span>
         </div>
+
+        <Form.Item name="allowRegistration" valuePropName="checked">
+          <Switch />
+        </Form.Item>
         <div style={{ marginBottom: 16 }}>
-          <CustomSwitch />
           <span style={{ marginLeft: 8 }}>Allow Registration</span>
         </div>
 
-        <FormActions loading={loading} submitText="Save General Settings" showCancel={false} />
+        <div style={{ marginTop: 24 }}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+          >
+            Save General Settings
+          </Button>
+        </div>
       </Form>
     </Card>
   );
@@ -150,25 +203,28 @@ const SettingsPage: React.FC = () => {
 
         <Title level={4}>SMTP Configuration</Title>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="smtpHost" style={{ fontWeight: 500 }}>
-            SMTP Host
-          </label>
-          <CustomInput id="smtpHost" placeholder="smtp.gmail.com" />
-        </div>
+        <Form.Item
+          name="smtpHost"
+          label="SMTP Host"
+          rules={[{ required: true, message: "Please enter SMTP host" }]}
+        >
+          <Input placeholder="smtp.gmail.com" />
+        </Form.Item>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="smtpPort" style={{ fontWeight: 500 }}>
-            SMTP Port
-          </label>
-          <CustomInput id="smtpPort" placeholder="587" />
-        </div>
+        <Form.Item
+          name="smtpPort"
+          label="SMTP Port"
+          rules={[{ required: true, message: "Please enter SMTP port" }]}
+        >
+          <Input placeholder="587" />
+        </Form.Item>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="smtpSecurity" style={{ fontWeight: 500 }}>
-            Security
-          </label>
-          <CustomSelect
+        <Form.Item
+          name="smtpSecurity"
+          label="Security"
+          rules={[{ required: true, message: "Please select security type" }]}
+        >
+          <Select
             options={[
               { value: "none", label: "None" },
               { value: "tls", label: "TLS" },
@@ -176,53 +232,69 @@ const SettingsPage: React.FC = () => {
             ]}
             style={{ width: "100%" }}
           />
-        </div>
+        </Form.Item>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="smtpUsername" style={{ fontWeight: 500 }}>
-            SMTP Username
-          </label>
-          <CustomInput id="smtpUsername" placeholder="your-email@gmail.com" />
-        </div>
+        <Form.Item
+          name="smtpUsername"
+          label="SMTP Username"
+          rules={[{ required: true, message: "Please enter SMTP username" }]}
+        >
+          <Input placeholder="your-email@gmail.com" />
+        </Form.Item>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="smtpPassword" style={{ fontWeight: 500 }}>
-            SMTP Password
-          </label>
-          <CustomInput id="smtpPassword" placeholder="Enter password" type="password" />
-        </div>
+        <Form.Item
+          name="smtpPassword"
+          label="SMTP Password"
+          rules={[{ required: true, message: "Please enter SMTP password" }]}
+        >
+          <Input.Password placeholder="Enter password" />
+        </Form.Item>
 
         <Divider />
 
         <Title level={4}>Email Settings</Title>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="adminEmail" style={{ fontWeight: 500 }}>
-            Admin Email
-          </label>
-          <CustomInput id="adminEmail" placeholder="admin@example.com" />
-        </div>
+        <Form.Item
+          name="adminEmail"
+          label="Admin Email"
+          rules={[{ required: true, message: "Please enter admin email" }]}
+        >
+          <Input placeholder="admin@example.com" />
+        </Form.Item>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="fromEmail" style={{ fontWeight: 500 }}>
-            From Email
-          </label>
-          <CustomInput id="fromEmail" placeholder="noreply@example.com" />
-        </div>
+        <Form.Item
+          name="fromEmail"
+          label="From Email"
+          rules={[{ required: true, message: "Please enter from email" }]}
+        >
+          <Input placeholder="noreply@example.com" />
+        </Form.Item>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="fromName" style={{ fontWeight: 500 }}>
-            From Name
-          </label>
-          <CustomInput id="fromName" placeholder="Your Site Name" />
-        </div>
+        <Form.Item
+          name="fromName"
+          label="From Name"
+          rules={[{ required: true, message: "Please enter from name" }]}
+        >
+          <Input placeholder="Your Site Name" />
+        </Form.Item>
 
+        <Form.Item name="emailNotifications" valuePropName="checked">
+          <Switch />
+        </Form.Item>
         <div style={{ marginBottom: 16 }}>
-          <CustomSwitch />
           <span style={{ marginLeft: 8 }}>Enable Email Notifications</span>
         </div>
 
-        <FormActions loading={loading} submitText="Save Email Settings" showCancel={false} />
+        <div style={{ marginTop: 24 }}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+          >
+            Save Email Settings
+          </Button>
+        </div>
       </Form>
     </Card>
   );
@@ -251,27 +323,35 @@ const SettingsPage: React.FC = () => {
 
         <Title level={4}>Authentication</Title>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="sessionTimeout" style={{ fontWeight: 500 }}>
-            Session Timeout (hours)
-          </label>
-          <CustomInput id="sessionTimeout" placeholder="24" />
-        </div>
+        <Form.Item
+          name="sessionTimeout"
+          label="Session Timeout (hours)"
+          rules={[{ required: true, message: "Please enter session timeout" }]}
+        >
+          <Input placeholder="24" />
+        </Form.Item>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="maxLoginAttempts" style={{ fontWeight: 500 }}>
-            Max Login Attempts
-          </label>
-          <CustomInput id="maxLoginAttempts" placeholder="5" />
-        </div>
+        <Form.Item
+          name="maxLoginAttempts"
+          label="Max Login Attempts"
+          rules={[
+            { required: true, message: "Please enter max login attempts" },
+          ]}
+        >
+          <Input placeholder="5" />
+        </Form.Item>
 
+        <Form.Item name="requireStrongPasswords" valuePropName="checked">
+          <Switch />
+        </Form.Item>
         <div style={{ marginBottom: 16 }}>
-          <CustomSwitch />
           <span style={{ marginLeft: 8 }}>Require Strong Passwords</span>
         </div>
 
+        <Form.Item name="twoFactorAuth" valuePropName="checked">
+          <Switch />
+        </Form.Item>
         <div style={{ marginBottom: 16 }}>
-          <CustomSwitch />
           <span style={{ marginLeft: 8 }}>Two-Factor Authentication</span>
         </div>
 
@@ -279,23 +359,30 @@ const SettingsPage: React.FC = () => {
 
         <Title level={4}>Access Control</Title>
 
+        <Form.Item name="ipWhitelist" valuePropName="checked">
+          <Switch />
+        </Form.Item>
         <div style={{ marginBottom: 16 }}>
-          <CustomSwitch />
           <span style={{ marginLeft: 8 }}>IP Whitelist</span>
         </div>
 
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="allowedIps" style={{ fontWeight: 500 }}>
-            Allowed IP Addresses
-          </label>
-          <CustomTextarea
-            id="allowedIps"
+        <Form.Item name="allowedIps" label="Allowed IP Addresses">
+          <TextArea
             placeholder="192.168.1.1&#10;10.0.0.1"
             rows={4}
           />
-        </div>
+        </Form.Item>
 
-        <FormActions loading={loading} submitText="Save Security Settings" showCancel={false} />
+        <div style={{ marginTop: 24 }}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+          >
+            Save Security Settings
+          </Button>
+        </div>
       </Form>
     </Card>
   );
@@ -401,10 +488,17 @@ const SettingsPage: React.FC = () => {
     <div>
       <div className="mb-6">
         <Title level={2}>Settings</Title>
-        <Text type="secondary">Configure your application settings and preferences</Text>
+        <Text type="secondary">
+          Configure your application settings and preferences
+        </Text>
       </div>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} size="large" />
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems}
+        size="large"
+      />
     </div>
   );
 };

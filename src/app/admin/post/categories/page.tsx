@@ -18,6 +18,7 @@ import {
   Empty,
   Spin,
   Badge,
+  Table,
 } from "antd";
 import {
   PlusOutlined,
@@ -30,7 +31,6 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { fetchWithToken, postWithToken } from "@/app/api/index";
-import CustomTable from "@/components/Admin/UI/CustomTable";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import {

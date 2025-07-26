@@ -57,7 +57,6 @@ const PostListPage: React.FC = (props: any) => {
   const [sortDesc, setSortDesc] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  const { data: session } = useSession();
   const [keyword, setKeyword] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -70,16 +69,14 @@ const PostListPage: React.FC = (props: any) => {
       itemsPerPage,
     };
 
-    fetchPosts(session?.accessToken, queryParams);
+    fetchPosts(queryParams);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   }
 
   useEffect(() => {
-    if (session?.accessToken) {
-      handleQuery(keyword);
-    }
-  }, [session?.accessToken]);
+    handleQuery(keyword);
+  }, []);
 
   const handleEdit = (post: any) => {
     router.push(`/admin/post/edit/${post.id}`);
