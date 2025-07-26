@@ -12,6 +12,7 @@ import {
   Pagination,
   Table,
   Dropdown,
+  Modal,
 } from "antd";
 import {
   UserOutlined,
@@ -24,7 +25,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch, connect } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
-import { fetchPosts } from "@/store/actions/posts";
+import { fetchPosts, deletePost } from "@/store/actions/posts";
 import { useSession } from "next-auth/react";
 import debounce from "lodash.debounce";
 
@@ -45,7 +46,7 @@ const sortFields = [
 ];
 
 const PostListPage: React.FC = (props: any) => {
-  const { fetchPosts, postList, postTotal, postLoading } = props;
+  const { fetchPosts, deletePost, postList, postTotal, postLoading } = props;
 
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -84,8 +85,24 @@ const PostListPage: React.FC = (props: any) => {
     router.push(`/admin/post/edit/${post.id}`);
   };
 
-  const handleDelete = (post: any) => {
-    message.info("Delete post feature not implemented");
+  const handleDelete = async (post: any) => {
+    Modal.confirm({
+      title: "Delete Post",
+      content: `Are you sure you want to delete "${post.title}"? This action cannot be undone.`,
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deletePost(post.id);
+          message.success("Post deleted successfully");
+          // Refresh the list
+          handleQuery(keyword, pageNumber, pageSize);
+        } catch (error: any) {
+          message.error(error.message || "Failed to delete post");
+        }
+      },
+    });
   };
 
   const handleView = (post: any) => {
@@ -251,6 +268,7 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps = {
   fetchPosts: fetchPosts,
+  deletePost: deletePost,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostListPage);

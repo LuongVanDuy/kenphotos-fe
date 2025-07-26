@@ -43,7 +43,7 @@ import { Tree, Space } from "antd";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import type { DataNode } from "antd/es/tree";
 import { Typography, Tooltip } from "antd";
-import CategoryForm from "@/components/Post/CategoryForm";
+import CategoryForm from "@/components/Admin/Post/CategoryForm";
 
 const { Option } = Select;
 const { Title, Text, Paragraph } = Typography;
@@ -118,10 +118,6 @@ const CategoryPage: React.FC = () => {
                   </div>
                 )}
                 <div className="flex items-center gap-4 mt-1 text-xs text-gray-400">
-                  <span className="flex items-center gap-1">
-                    <CalendarOutlined />
-                    {new Date(cat.createdAt).toLocaleDateString()}
-                  </span>
                   {cat.parentId && (
                     <span className="flex items-center gap-1">
                       <BranchesOutlined />

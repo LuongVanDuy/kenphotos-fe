@@ -10,4 +10,8 @@ export default {
       : "";
     return "posts" + queryString;
   },
+  fetchPost: (id: string) => `posts/${id}`,
+  createPost: () => "posts",
+  updatePost: (id: string) => `posts/${id}`,
+  deletePost: (id: string) => `posts/${id}`,
 };
