@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
-@import url("./custom-antd.css");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('./custom-antd.css');
 
 @tailwind base;
 @tailwind components;
@@ -24,9 +24,50 @@ body {
   background: var(--background);
   font-family: var(--font-poppins), sans-serif;
   line-height: 1.5;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+/* Review.tsx */
+.animate-marqueeUp1 {
+  animation: scroll-up 20s linear infinite;
+}
+
+.animate-marqueeUp2 {
+  animation: scroll-up 40s linear infinite;
+}
+
+.animate-marqueeUp3 {
+  animation: scroll-up 20s linear infinite;
+}
+
+/* Custom scrollbar styles */
+.custom-scrollbar {
+  scrollbar-color: #c0c0c0 transparent;
+  scrollbar-width: thin;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #c0c0c0;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* ReactCompareSliderImage */
