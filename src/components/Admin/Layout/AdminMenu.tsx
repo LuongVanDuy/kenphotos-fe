@@ -10,6 +10,7 @@ import {
   AppstoreOutlined,
   FolderOutlined,
 } from "@ant-design/icons";
+import { signOut } from "next-auth/react";
 import { ReactNode } from "react";
 
 export interface MenuItemConfig {
@@ -167,7 +168,7 @@ export const userMenuConfig = [
     key: "logout",
     icon: <LogoutOutlined />,
     label: "Logout",
-    path: "/",
+    onClick: () => signOut({ callbackUrl: "/auth/login" }),
   },
 ];
 
@@ -229,9 +230,7 @@ export class AdminMenuHelper {
 
   // Tạo breadcrumbs động
   static getBreadcrumbs(pathname: string): BreadcrumbConfig[] {
-    const breadcrumbs: BreadcrumbConfig[] = [
-      { title: "Dashboard", path: "/admin" },
-    ];
+    const breadcrumbs: BreadcrumbConfig[] = [{ title: "Dashboard", path: "/admin" }];
 
     const pathSegments = pathname.split("/").filter(Boolean);
 
@@ -239,9 +238,7 @@ export class AdminMenuHelper {
       const section = pathSegments[1];
 
       // Tìm section trong menu config
-      const sectionConfig = adminMenuConfig.find(
-        (item) => item.key === section
-      );
+      const sectionConfig = adminMenuConfig.find((item) => item.key === section);
       if (sectionConfig) {
         breadcrumbs.push({
           title: sectionConfig.breadcrumbTitle || sectionConfig.label,
@@ -251,9 +248,7 @@ export class AdminMenuHelper {
         // Nếu có action (như list, create)
         if (pathSegments.length > 2) {
           const action = pathSegments[2];
-          const actionConfig = sectionConfig.children?.find((child) =>
-            child.path?.includes(`/${action}`)
-          );
+          const actionConfig = sectionConfig.children?.find((child) => child.path?.includes(`/${action}`));
 
           if (actionConfig) {
             breadcrumbs.push({
@@ -268,18 +263,13 @@ export class AdminMenuHelper {
   }
 
   // Convert config thành Ant Design menu items
-  static convertToAntdMenuItems(
-    items: MenuItemConfig[],
-    handleNavigation: (path: any) => void
-  ): any[] {
+  static convertToAntdMenuItems(items: MenuItemConfig[], handleNavigation: (path: any) => void): any[] {
     return items.map((item) => ({
       key: item.key,
       icon: item.icon,
       label: item.label,
       onClick: item.path ? () => handleNavigation(item.path) : undefined,
-      children: item.children
-        ? this.convertToAntdMenuItems(item.children, handleNavigation)
-        : undefined,
+      children: item.children ? this.convertToAntdMenuItems(item.children, handleNavigation) : undefined,
     }));
   }
 
@@ -287,7 +277,7 @@ export class AdminMenuHelper {
   static convertUserMenuToAntd(handleNavigation: (path: string) => void) {
     return userMenuConfig.map((item) => ({
       ...item,
-      onClick: item.path ? () => handleNavigation(item.path) : undefined,
+      onClick: item.onClick ?? (item.path ? () => handleNavigation(item.path) : undefined),
     }));
   }
 }

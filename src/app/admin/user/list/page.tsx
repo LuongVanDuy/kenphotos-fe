@@ -1,23 +1,52 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Button, Tag, Avatar, Space, message } from "antd";
-import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Tag,
+  Avatar,
+  Space,
+  message,
+  Select,
+  Input,
+  Table,
+  Dropdown,
+  Modal,
+} from "antd";
+import {
+  UserOutlined,
+  PlusOutlined,
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import CustomTable from "@/components/Admin/UI/CustomTable";
-import { CustomShowConfirmModal } from "@/components/Admin/UI/CustomModal";
-import { RoleBadge } from "@/components/Admin/UI/RoleBadge";
-import { StatusBadge } from "@/components/Admin/UI/StatusBadge";
-import { AdminButton } from "@/components/Admin/UI/AdminButton";
-
-import { User } from "@/types";
-import { connect } from "react-redux";
+import { useDispatch, connect } from "react-redux";
+import { AppDispatch } from "@/store/store";
 import { fetchUsers } from "@/store/actions/users";
 import { useSession } from "next-auth/react";
 
+const { Option } = Select;
+
+const sortFields = [
+  { value: "createdTime", label: "Created Time" },
+  { value: "firstName", label: "First Name" },
+  { value: "lastName", label: "Last Name" },
+  { value: "email", label: "Email" },
+  { value: "businessName", label: "Business Name" },
+];
+
 const UserListPage: React.FC = (props: any) => {
   const { fetchUsers, userList, userTotal, userLoading } = props;
+
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<string>("createdTime");
+  const [sortDesc, setSortDesc] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const { data: session } = useSession();
   const [keyword, setKeyword] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
@@ -26,6 +55,8 @@ const UserListPage: React.FC = (props: any) => {
   function handleQuery(keyword: string, page = 1, itemsPerPage = 10) {
     const queryParams = {
       search: keyword,
+      sortBy,
+      sortDesc,
       page,
       itemsPerPage,
     };
@@ -39,15 +70,50 @@ const UserListPage: React.FC = (props: any) => {
     if (session?.accessToken) {
       handleQuery(keyword);
     }
-  }, [session?.accessToken]);
+  }, [session?.accessToken, sortBy, sortDesc]);
+
+  const handleEdit = (user: any) => {
+    router.push(`/admin/user/edit/${user.id}`);
+  };
+
+  const handleDelete = async (user: any) => {
+    Modal.confirm({
+      title: "Delete User",
+      content: `Are you sure you want to delete "${user.firstName} ${user.lastName}"? This action cannot be undone.`,
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          // TODO: Implement actual delete API call
+          await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+          message.success("User deleted successfully");
+          // Refresh the list
+          handleQuery(keyword, pageNumber, pageSize);
+        } catch (error: any) {
+          message.error(error.message || "Failed to delete user");
+        }
+      },
+    });
+  };
+
+  const handleView = (user: any) => {
+    router.push(`/admin/user/${user.id}`);
+  };
 
   const columns = [
     {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      width: 80,
+    },
+    {
       title: "User",
       key: "user",
-      render: (_: any, record: User) => (
+      render: (_: any, record: any) => (
         <Space>
-          <Avatar size="small" icon={<UserOutlined />} src={record.avatar} />
+          <Avatar size="small" icon={<UserOutlined />} />
           <div>
             <div className="font-medium">
               {record.firstName} {record.lastName}
@@ -58,92 +124,128 @@ const UserListPage: React.FC = (props: any) => {
       ),
     },
     {
-      title: "Role",
-      dataIndex: "role",
-      key: "role",
-      render: (role: string) => <RoleBadge role={role} />,
+      title: "Business",
+      key: "business",
+      render: (_: any, record: any) => (
+        <div>
+          <div className="font-medium">{record.businessName}</div>
+          <div className="text-sm text-gray-500">{record.country}</div>
+        </div>
+      ),
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status: number) => {
-        let label: "active" | "deactive" | "rejected" = "rejected";
-        if (status === 1) label = "active";
-        else if (status === 0) label = "deactive";
-        return <StatusBadge status={label} />;
-      },
+      title: "Contact",
+      key: "contact",
+      render: (_: any, record: any) => (
+        <div>
+          <div className="text-sm">{record.phoneNumber}</div>
+          <div className="text-xs text-gray-500">{record.timezone}</div>
+        </div>
+      ),
     },
     {
       title: "Created",
       dataIndex: "createdTime",
       key: "createdTime",
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      render: (date: string) => (
+        <div>
+          <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
+          <div className="text-xs text-gray-500">
+            {new Date(date).toLocaleTimeString()}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 120,
+      render: (_: any, record: any) => (
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "view",
+                label: "View",
+                icon: <EyeOutlined />,
+                onClick: () => handleView(record),
+              },
+              {
+                key: "edit",
+                label: "Edit",
+                icon: <EditOutlined />,
+                onClick: () => handleEdit(record),
+              },
+              {
+                key: "delete",
+                label: "Delete",
+                icon: <DeleteOutlined />,
+                onClick: () => handleDelete(record),
+              },
+            ],
+          }}
+          trigger={["click"]}
+        >
+          <Button type="text" icon={<MoreOutlined />} />
+        </Dropdown>
+      ),
     },
   ];
 
-  const handleEdit = (user: User) => {
-    router.push(`/admin/user/edit/${user.id}`);
-  };
-
-  const handleDelete = (user: User) => {
-    CustomShowConfirmModal({
-      title: "Delete User",
-      content: `Are you sure you want to delete user "${user.firstName}"? This action cannot be undone.`,
-      onConfirm: async () => {
-        try {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-
-          message.success("User deleted successfully");
-        } catch (error) {
-          message.error("Failed to delete user");
-        }
-      },
-      type: "error",
-      okText: "Delete",
-      cancelText: "Cancel",
-    });
-  };
-
-  const handleView = (user: User) => {
-    router.push(`/admin/user/${user.id}`);
-  };
-
   return (
-    <div className="fade-in">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2" style={{ color: "#1F2937" }}>
-            Users
-          </h1>
-          <p className="text-lg" style={{ color: "#4B5563" }}>
-            Manage user accounts and permissions
-          </p>
+    <div>
+      <h1 className="text-4xl font-bold mb-5">Users</h1>
+
+      <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
+        <div className="flex flex-wrap gap-2 items-center">
+          <Input.Search
+            placeholder="Search users"
+            allowClear
+            onSearch={(value) => {
+              setKeyword(value);
+              setPage(1);
+              handleQuery(value, 1, pageSize);
+            }}
+            style={{ width: 200 }}
+          />
+          <Select value={sortBy} onChange={setSortBy} style={{ width: 150 }}>
+            {sortFields.map((f) => (
+              <Option key={f.value} value={f.value}>
+                {f.label}
+              </Option>
+            ))}
+          </Select>
+          <Select
+            value={sortDesc}
+            onChange={(v) => setSortDesc(v)}
+            style={{ width: 120 }}
+          >
+            <Option value={false}>Ascending</Option>
+            <Option value={true}>Descending</Option>
+          </Select>
         </div>
-        <AdminButton
+        <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => router.push("/admin/user/create")}
-          style={{ height: "48px", fontSize: "16px" }}
         >
-          Add User
-        </AdminButton>
+          Add New User
+        </Button>
       </div>
 
-      <CustomTable
+      <Table
         columns={columns}
-        data={userList}
+        dataSource={userList}
         loading={userLoading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onView={handleView}
-        searchable
-        exportable
-        title="All Users"
+        rowKey="id"
         pagination={{
           current: pageNumber,
           pageSize,
           total: userTotal,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
           onChange: (page, pageSize) => {
             handleQuery(keyword, page, pageSize);
           },

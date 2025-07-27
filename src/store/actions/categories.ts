@@ -4,20 +4,16 @@ import {
   FETCH_CATEGORIES_SUCCESS,
   FETCH_CATEGORIES_FAILURE,
 } from "../actionTypes";
-import { fetchWithToken } from "@/app/api/index";
+import { fetchWithToken, putWithToken, deleteWithToken } from "@/app/api/index";
 import categoriesEndpoint from "../endpoint/categories";
-import { getSession } from "next-auth/react";
 import { postWithToken } from "@/app/api/index";
 
 export const fetchCategories = (option: any) => {
   return async (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_CATEGORIES });
     try {
-      const session = await getSession();
-      const accessToken = session?.accessToken;
-      if (!accessToken) throw new Error("No access token");
       const endpoint = categoriesEndpoint.fetchCategories(option);
-      const response = await fetchWithToken(endpoint, accessToken);
+      const response = await fetchWithToken(endpoint);
       dispatch({
         type: FETCH_CATEGORIES_SUCCESS,
         payload: { data: response.data, total: response.total },
@@ -31,17 +27,48 @@ export const fetchCategories = (option: any) => {
   };
 };
 
-export const createPostCategory = (data: {
-  name: string;
-  slug: string;
-  description: string;
-  parentId: number;
-}) => {
-  return async () => {
-    const { getSession } = await import("next-auth/react");
-    const session = await getSession();
-    const accessToken = session?.accessToken;
-    if (!accessToken) throw new Error("No access token");
-    return postWithToken("/v1/tour/categories", accessToken, data);
+export const createCategory = (payload: any) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      await postWithToken(categoriesEndpoint.createCategory(), payload);
+    } catch (error: any) {
+      throw new Error(error?.message || "Unknown error");
+    }
+  };
+};
+
+export const fetchCategoryDetail = (id: number) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      const response = await fetchWithToken(
+        categoriesEndpoint.fetchCategory(String(id))
+      );
+      return response;
+    } catch (error: any) {
+      throw new Error(error?.message || "Unknown error");
+    }
+  };
+};
+
+export const updateCategory = (id: number, payload: any) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      await putWithToken(
+        categoriesEndpoint.updateCategory(String(id)),
+        payload
+      );
+    } catch (error: any) {
+      throw new Error(error?.message || "Unknown error");
+    }
+  };
+};
+
+export const deleteCategory = (id: number) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      await deleteWithToken(categoriesEndpoint.deleteCategory(String(id)));
+    } catch (error: any) {
+      throw new Error(error?.message || "Unknown error");
+    }
   };
 };

@@ -1,142 +1,384 @@
 "use client";
 
-import React, { useState } from "react";
-import { Form, Card, message, Button } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import {
+  Form,
+  Input,
+  Select,
+  Button,
+  message,
+  Image,
+  Spin,
+  Alert,
+  Typography,
+  Card,
+  Row,
+  Col,
+  Switch,
+  DatePicker,
+  Upload,
+} from "antd";
+import {
+  UserOutlined,
+  UploadOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { CustomInput } from "@/components/Admin/UI/CustomInput";
-import { CustomSelect } from "@/components/Admin/UI/CustomSelect";
-import { CustomSwitch } from "@/components/Admin/UI/CustomSwitch";
-import FormActions from "@/components/Admin/UI/FormActions";
-import UploadField from "@/components/Admin/UI/UploadField";
-import { createUser } from "@/store/actions/users";
-import { connect } from "react-redux";
+import { useDispatch, useSelector, connect } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { createUser, updateUser } from "@/store/actions/users";
+import { getImageUrl } from "@/utils";
+import { useSession } from "next-auth/react";
 
-const CreateUserPage: React.FC = (props: any) => {
-  const { createUser } = props;
-  const router = useRouter();
-  const [form] = Form.useForm();
+const { Title } = Typography;
+const { Option } = Select;
+
+// Types
+interface UserFormValues {
+  email: string;
+  password?: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  businessName: string;
+  country: string;
+  timezone: string;
+  postalCode: string;
+  businessWebsite: string;
+}
+
+// UserForm component
+const UserForm: React.FC<{
+  mode?: "create" | "edit";
+  initialValues?: Partial<UserFormValues>;
+  onSuccess?: () => void;
+  userId?: number;
+  createUser?: any;
+  updateUser?: any;
+}> = ({
+  mode = "create",
+  initialValues,
+  onSuccess,
+  userId,
+  createUser,
+  updateUser,
+}) => {
+  const [form] = Form.useForm<UserFormValues>();
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
-  const roleOptions = [
-    { value: "admin", label: "Administrator" },
-    { value: "editor", label: "Editor" },
-    { value: "user", label: "User" },
+  useEffect(() => {
+    if (initialValues) {
+      form.setFieldsValue({
+        email: initialValues?.email || "",
+        password: initialValues?.password || "",
+        firstName: initialValues?.firstName || "",
+        lastName: initialValues?.lastName || "",
+        phoneNumber: initialValues?.phoneNumber || "",
+        businessName: initialValues?.businessName || "",
+        country: initialValues?.country || "",
+        timezone: initialValues?.timezone || "",
+        postalCode: initialValues?.postalCode || "",
+        businessWebsite: initialValues?.businessWebsite || "",
+      });
+    }
+  }, [initialValues, form]);
+
+  const countryOptions = [
+    { value: "US", label: "United States" },
+    { value: "CA", label: "Canada" },
+    { value: "UK", label: "United Kingdom" },
+    { value: "AU", label: "Australia" },
+    { value: "DE", label: "Germany" },
+    { value: "FR", label: "France" },
+    { value: "JP", label: "Japan" },
+    { value: "CN", label: "China" },
+    { value: "IN", label: "India" },
+    { value: "BR", label: "Brazil" },
   ];
 
-  const statusOptions = [
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-    { value: "pending", label: "Pending" },
+  const timezoneOptions = [
+    { value: "UTC", label: "UTC" },
+    { value: "America/New_York", label: "Eastern Time (ET)" },
+    { value: "America/Chicago", label: "Central Time (CT)" },
+    { value: "America/Denver", label: "Mountain Time (MT)" },
+    { value: "America/Los_Angeles", label: "Pacific Time (PT)" },
+    { value: "Europe/London", label: "London (GMT)" },
+    { value: "Europe/Paris", label: "Paris (CET)" },
+    { value: "Asia/Tokyo", label: "Tokyo (JST)" },
+    { value: "Asia/Shanghai", label: "Shanghai (CST)" },
+    { value: "Australia/Sydney", label: "Sydney (AEDT)" },
   ];
 
-  const handleSubmit = async (values: any) => {
-    const dateOfBirthValue = values.dateOfBirth ? new Date(values.dateOfBirth) : null;
+  const onFinish = async (values: UserFormValues) => {
+    setLoading(true);
 
-    const payload = {
-      ...values,
-      avatar: values.avatar,
-      dateOfBirth: dateOfBirthValue,
-    };
+    try {
+      const payload = {
+        email: values.email,
+        password: values.password,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phoneNumber: values.phoneNumber,
+        businessName: values.businessName,
+        country: values.country,
+        timezone: values.timezone,
+        postalCode: values.postalCode,
+        businessWebsite: values.businessWebsite,
+      };
 
-    // createUser(session?.user.accessToken, payload, () => onSuccess("Thêm người dùng thành công"), onFailure);
-  };
+      if (mode === "edit" && userId && updateUser) {
+        await updateUser(userId, payload);
+      } else if (createUser) {
+        await createUser(payload);
+      }
+      message.success(
+        mode === "edit"
+          ? "User updated successfully!"
+          : "User created successfully!"
+      );
 
-  const handleCancel = () => {
-    router.push("/admin/user/list");
+      form.resetFields();
+      if (onSuccess) onSuccess();
+      router.push("/admin/user/list");
+    } catch (error) {
+      console.error("Submit error:", error);
+      message.error(
+        mode === "edit" ? "Failed to update user" : "Failed to create user"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div>
-      <div className="mb-6">
-        <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => router.back()} className="mb-4">
-          Back to Users
-        </Button>
-        <h1 className="text-2xl font-bold">Create New User</h1>
-        <p className="text-gray-600">Add a new user to the system</p>
-      </div>
-
-      <Card>
+    <>
+      <div>
+        <div className="flex items-center justify-between mb-7">
+          <div className="flex items-center space-x-4">
+            <Title level={4} className="!mb-0">
+              {mode === "edit" ? "Edit User" : "Add New User"}
+            </Title>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              onClick={() => form.submit()}
+            >
+              {mode === "edit" ? "Update" : "Create User"}
+            </Button>
+          </div>
+        </div>
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleSubmit}
+          onFinish={onFinish}
           initialValues={{
-            role: "user",
-            status: "active",
-            emailNotifications: true,
+            email: initialValues?.email || "",
+            password: initialValues?.password || "",
+            firstName: initialValues?.firstName || "",
+            lastName: initialValues?.lastName || "",
+            phoneNumber: initialValues?.phoneNumber || "",
+            businessName: initialValues?.businessName || "",
+            country: initialValues?.country || "",
+            timezone: initialValues?.timezone || "",
+            postalCode: initialValues?.postalCode || "",
+            businessWebsite: initialValues?.businessWebsite || "",
           }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <div style={{ marginBottom: 16 }}>
-                <label htmlFor="name" style={{ fontWeight: 500 }}>
-                  Full Name
-                </label>
-                <CustomInput id="name" placeholder="Enter full name" />
-                <div style={{ color: "#888", fontSize: 12 }}>The user's display name</div>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <label htmlFor="email" style={{ fontWeight: 500 }}>
-                  Email Address
-                </label>
-                <CustomInput id="email" placeholder="Enter email address" type="text" />
-                <div style={{ color: "#888", fontSize: 12 }}>This will be used for login and notifications</div>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <label htmlFor="password" style={{ fontWeight: 500 }}>
-                  Password
-                </label>
-                <CustomInput id="password" placeholder="Enter password" type="password" />
-                <div style={{ color: "#888", fontSize: 12 }}>Set a secure password for the user</div>
-              </div>
-            </div>
-            <div>
-              <div style={{ marginBottom: 16 }}>
-                <label htmlFor="role" style={{ fontWeight: 500 }}>
-                  Role
-                </label>
-                <CustomSelect options={roleOptions} style={{ width: "100%" }} />
-                <div style={{ color: "#888", fontSize: 12 }}>Assign a role to the user</div>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <label htmlFor="status" style={{ fontWeight: 500 }}>
-                  Status
-                </label>
-                <CustomSelect options={statusOptions} style={{ width: "100%" }} />
-                <div style={{ color: "#888", fontSize: 12 }}>Set the user's account status</div>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <CustomSwitch />
-                <span style={{ marginLeft: 8 }}>Email Notifications</span>
-                <div style={{ color: "#888", fontSize: 12 }}>Enable email notifications for this user</div>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <UploadField
-                  name="avatar"
-                  label="Avatar"
-                  description="Upload a profile picture"
-                  accept="image/*"
-                  listType="picture-card"
-                  maxCount={1}
-                />
-              </div>
-            </div>
-          </div>
+          <div className="flex gap-8">
+            {/* Main Content Area */}
+            <div className="flex-1">
+              <div className="space-y-6">
+                {/* Personal Information */}
+                <Card title="Personal Information" className="mb-6">
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        name="firstName"
+                        label="First Name"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter first name",
+                          },
+                        ]}
+                      >
+                        <Input placeholder="Enter first name" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        name="lastName"
+                        label="Last Name"
+                        rules={[
+                          { required: true, message: "Please enter last name" },
+                        ]}
+                      >
+                        <Input placeholder="Enter last name" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        name="email"
+                        label="Email"
+                        rules={[
+                          { required: true, message: "Please enter email" },
+                          {
+                            type: "email",
+                            message: "Please enter valid email",
+                          },
+                        ]}
+                      >
+                        <Input placeholder="Enter email address" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        name="phoneNumber"
+                        label="Phone Number"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter phone number",
+                          },
+                        ]}
+                      >
+                        <Input placeholder="Enter phone number" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  {mode === "create" && (
+                    <Form.Item
+                      name="password"
+                      label="Password"
+                      rules={[
+                        { required: true, message: "Please enter password" },
+                        {
+                          min: 6,
+                          message: "Password must be at least 6 characters",
+                        },
+                      ]}
+                    >
+                      <Input.Password placeholder="Enter password" />
+                    </Form.Item>
+                  )}
+                </Card>
 
-          <div className="mt-8 pt-6 border-t">
-            <FormActions loading={loading} onCancel={handleCancel} submitText="Create User" cancelText="Cancel" />
+                {/* Business Information */}
+                <Card title="Business Information" className="mb-6">
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        name="businessName"
+                        label="Business Name"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter business name",
+                          },
+                        ]}
+                      >
+                        <Input placeholder="Enter business name" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        name="businessWebsite"
+                        label="Business Website"
+                        rules={[
+                          {
+                            required: false,
+                            message: "Please enter business website",
+                          },
+                          { type: "url", message: "Please enter valid URL" },
+                        ]}
+                      >
+                        <Input placeholder="https://example.com" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        name="country"
+                        label="Country"
+                        rules={[
+                          { required: true, message: "Please select country" },
+                        ]}
+                      >
+                        <Select placeholder="Select country">
+                          {countryOptions.map((option) => (
+                            <Option key={option.value} value={option.value}>
+                              {option.label}
+                            </Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        name="postalCode"
+                        label="Postal Code"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter postal code",
+                          },
+                        ]}
+                      >
+                        <Input placeholder="Enter postal code" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Form.Item
+                    name="timezone"
+                    label="Timezone"
+                    rules={[
+                      { required: true, message: "Please select timezone" },
+                    ]}
+                  >
+                    <Select placeholder="Select timezone">
+                      {timezoneOptions.map((option) => (
+                        <Option key={option.value} value={option.value}>
+                          {option.label}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Card>
+              </div>
+            </div>
           </div>
         </Form>
-      </Card>
-    </div>
+      </div>
+    </>
   );
 };
 
-const mapStateToProps = (state: any) => ({});
+// Main page component
+const CreateUserPage: React.FC = (props: any) => {
+  const { createUser, updateUser } = props;
+  const router = useRouter();
+  return (
+    <UserForm
+      mode="create"
+      onSuccess={() => router.push("/admin/user/list")}
+      createUser={createUser}
+      updateUser={updateUser}
+    />
+  );
+};
 
 const mapDispatchToProps = {
   createUser: createUser,
+  updateUser: updateUser,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateUserPage);
+export { UserForm };
+export default connect(null, mapDispatchToProps)(CreateUserPage);

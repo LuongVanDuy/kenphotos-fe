@@ -1,7 +1,22 @@
 "use client";
 
 import React from "react";
-import { Card, Row, Col, Statistic, Table, Tag, Avatar, List, Button, Space, Progress, Typography, Divider } from "antd";
+import {
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Table,
+  Tag,
+  Avatar,
+  List,
+  Button,
+  Space,
+  Progress,
+  Typography,
+  Divider,
+  Badge,
+} from "antd";
 import {
   UserOutlined,
   FileTextOutlined,
@@ -15,9 +30,6 @@ import {
   TeamOutlined,
 } from "@ant-design/icons";
 import { DashboardStats, User, Post, Media } from "@/types";
-import { AdminCard } from "@/components/Admin/UI/AdminCard";
-import { AdminButton } from "@/components/Admin/UI/AdminButton";
-import { StatusBadge } from "@/components/Admin/UI/StatusBadge";
 
 const { Title, Text } = Typography;
 
@@ -154,7 +166,19 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => <Tag color={status === "published" ? "green" : status === "draft" ? "orange" : "red"}>{status.toUpperCase()}</Tag>,
+      render: (status: string) => (
+        <Tag
+          color={
+            status === "published"
+              ? "green"
+              : status === "draft"
+              ? "orange"
+              : "red"
+          }
+        >
+          {status.toUpperCase()}
+        </Tag>
+      ),
     },
     {
       title: "Created",
@@ -205,10 +229,18 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               <span className="hidden sm:inline">Last 30 days</span>
               <span className="sm:hidden">30 days</span>
             </Button>
-            <AdminButton type="primary" icon={<EyeOutlined />} colorScheme="primary" style={{ height: "40px" }} className="admin-touch-target">
+            <Button
+              icon={<EyeOutlined />}
+              style={{
+                borderRadius: 12,
+                height: "40px",
+                border: `1px solid #d9d9d9`,
+              }}
+              className="admin-touch-target"
+            >
               <span className="hidden sm:inline">View Analytics</span>
               <span className="sm:hidden">Analytics</span>
-            </AdminButton>
+            </Button>
           </div>
         </div>
       </div>
@@ -217,7 +249,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       <Row gutter={[16, 16]} className="mb-8 admin-card-grid">
         {statisticCards.map((card, index) => (
           <Col xs={24} sm={12} lg={6} key={index}>
-            <AdminCard
+            <Card
               hoverable
               style={{
                 background: `linear-gradient(135deg, ${card.bgColor}, ${card.bgColor}90)`,
@@ -255,9 +287,13 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                   </div>
                   <div className="flex items-center">
                     {card.trend.isPositive ? (
-                      <ArrowUpOutlined style={{ color: "#52c41a", fontSize: "14px" }} />
+                      <ArrowUpOutlined
+                        style={{ color: "#52c41a", fontSize: "14px" }}
+                      />
                     ) : (
-                      <ArrowDownOutlined style={{ color: "#ff4d4f", fontSize: "14px" }} />
+                      <ArrowDownOutlined
+                        style={{ color: "#ff4d4f", fontSize: "14px" }}
+                      />
                     )}
                     <span
                       className="text-sm font-medium ml-1"
@@ -271,10 +307,16 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                 </div>
 
                 <div>
-                  <div className="text-3xl font-bold mb-1" style={{ color: "#595959" }}>
+                  <div
+                    className="text-3xl font-bold mb-1"
+                    style={{ color: "#595959" }}
+                  >
                     {card.value.toLocaleString()}
                   </div>
-                  <div className="text-sm font-medium mb-1" style={{ color: "#595959" }}>
+                  <div
+                    className="text-sm font-medium mb-1"
+                    style={{ color: "#595959" }}
+                  >
                     {card.title}
                   </div>
                   <div className="text-xs" style={{ color: "#595959" }}>
@@ -282,7 +324,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                   </div>
                 </div>
               </div>
-            </AdminCard>
+            </Card>
           </Col>
         ))}
       </Row>
@@ -291,7 +333,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       <Row gutter={[16, 16]} className="admin-responsive-grid">
         {/* Recent Posts */}
         <Col xs={24} lg={16}>
-          <AdminCard
+          <Card
             title={
               <div className="flex items-center justify-between">
                 <div>
@@ -315,9 +357,17 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                     Latest published content
                   </Text>
                 </div>
-                <AdminButton type="primary" icon={<PlusOutlined />} size="small" colorScheme="primary">
+                <Button
+                  icon={<PlusOutlined />}
+                  style={{
+                    borderRadius: 12,
+                    height: "40px",
+                    border: `1px solid #d9d9d9`,
+                  }}
+                  className="admin-touch-target"
+                >
                   Add New
-                </AdminButton>
+                </Button>
               </div>
             }
             style={{ height: "fit-content" }}
@@ -332,14 +382,14 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                 borderRadius: 12,
               }}
             />
-          </AdminCard>
+          </Card>
         </Col>
 
         {/* Quick Actions & Recent Activity */}
         <Col xs={24} lg={8}>
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
             {/* Quick Actions */}
-            <AdminCard
+            <Card
               title={
                 <Text
                   style={{
@@ -352,21 +402,38 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                 </Text>
               }
             >
-              <Space direction="vertical" style={{ width: "100%" }} size="middle">
-                <AdminButton type="primary" block icon={<PlusOutlined />} colorScheme="primary" style={{ height: "48px" }}>
+              <Space
+                direction="vertical"
+                style={{ width: "100%" }}
+                size="middle"
+              >
+                <Button
+                  type="primary"
+                  block
+                  icon={<PlusOutlined />}
+                  style={{ height: "48px" }}
+                >
                   Create New Post
-                </AdminButton>
-                <AdminButton block icon={<PlusOutlined />} colorScheme="neutral" style={{ height: "48px" }}>
+                </Button>
+                <Button
+                  block
+                  icon={<PlusOutlined />}
+                  style={{ height: "48px" }}
+                >
                   Upload Media
-                </AdminButton>
-                <AdminButton block icon={<UserOutlined />} colorScheme="neutral" style={{ height: "48px" }}>
+                </Button>
+                <Button
+                  block
+                  icon={<UserOutlined />}
+                  style={{ height: "48px" }}
+                >
                   Add User
-                </AdminButton>
+                </Button>
               </Space>
-            </AdminCard>
+            </Card>
 
             {/* Recent Users */}
-            <AdminCard
+            <Card
               title={
                 <Text
                   style={{
@@ -392,17 +459,23 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                           }}
                         />
                       }
-                      title={<Text style={{ fontWeight: 500, color: "#595959" }}>{user.name}</Text>}
-                      description={<Text style={{ color: "#595959" }}>{user.email}</Text>}
+                      title={
+                        <Text style={{ fontWeight: 500, color: "#595959" }}>
+                          {user.name}
+                        </Text>
+                      }
+                      description={
+                        <Text style={{ color: "#595959" }}>{user.email}</Text>
+                      }
                     />
-                    <StatusBadge status={user.status as any} />
+                    <Badge status={user.status as any} />
                   </List.Item>
                 )}
               />
-            </AdminCard>
+            </Card>
 
             {/* Storage Usage */}
-            <AdminCard
+            <Card
               title={
                 <Text
                   style={{
@@ -418,20 +491,34 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-2">
-                    <Text style={{ fontWeight: 500, color: "#595959" }}>Media Files</Text>
+                    <Text style={{ fontWeight: 500, color: "#595959" }}>
+                      Media Files
+                    </Text>
                     <Text style={{ color: "#595959" }}>2.4 GB / 10 GB</Text>
                   </div>
-                  <Progress percent={24} size="small" strokeColor="#1677ff" trailColor="#d9d9d9" />
+                  <Progress
+                    percent={24}
+                    size="small"
+                    strokeColor="#1677ff"
+                    trailColor="#d9d9d9"
+                  />
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
-                    <Text style={{ fontWeight: 500, color: "#595959" }}>Database</Text>
+                    <Text style={{ fontWeight: 500, color: "#595959" }}>
+                      Database
+                    </Text>
                     <Text style={{ color: "#595959" }}>156 MB / 1 GB</Text>
                   </div>
-                  <Progress percent={15} size="small" strokeColor="#52c41a" trailColor="#d9d9d9" />
+                  <Progress
+                    percent={15}
+                    size="small"
+                    strokeColor="#52c41a"
+                    trailColor="#d9d9d9"
+                  />
                 </div>
               </div>
-            </AdminCard>
+            </Card>
           </Space>
         </Col>
       </Row>

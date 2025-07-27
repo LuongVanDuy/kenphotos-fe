@@ -1,9 +1,4 @@
-import {
-  fetchWithToken,
-  postWithToken,
-  deleteWithToken,
-  putWithToken,
-} from "@/app/api";
+import { fetchWithToken, postWithTokenFormData } from "@/app/api";
 import {
   FETCH_MEDIA,
   FETCH_MEDIA_SUCCESS,
@@ -36,46 +31,36 @@ export const fetchMedia = (accessToken: any, option: any) => {
   };
 };
 
-export const uploadMedia = (accessToken: any, formData: FormData) => {
+export const uploadMedia = (
+  accessToken: any,
+  formData: FormData,
+  onSuccess: (response: any) => void,
+  onFailure: (error: string) => void
+) => {
   return async (dispatch: AppDispatch) => {
     dispatch({ type: UPLOAD_MEDIA });
 
     try {
-      const response = await fetch(
-        `${process.env.apiUrl}/${media.uploadMedia()}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: formData,
-        }
+      const response = await postWithTokenFormData(
+        media.uploadMedia(),
+        formData,
+        null
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        const errorMessage =
-          errorData?.message || `HTTP error! status: ${response.status}`;
-        throw new Error(errorMessage);
+      if (response) {
+        dispatch({
+          type: UPLOAD_MEDIA_SUCCESS,
+          payload: { data: response },
+        });
+        onSuccess(response);
       }
-
-      const data = await response.json();
-
-      dispatch({
-        type: UPLOAD_MEDIA_SUCCESS,
-        payload: { data },
-      });
-
-      return data;
     } catch (error: any) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error.message || "Upload failed";
       dispatch({
         type: UPLOAD_MEDIA_FAILURE,
         payload: { error: errorMessage },
       });
-      throw error;
+      onFailure(errorMessage);
     }
   };
 };
-

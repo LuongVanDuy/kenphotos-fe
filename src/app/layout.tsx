@@ -10,7 +10,6 @@ const poppins = Poppins({
 });
 
 import "../../public/css/globals.css";
-import StyledComponentsRegistry from "@/components/Layout/Styled";
 
 export default function RootLayout({
   children,
@@ -20,9 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.variable}>
       <body>
-        <StyledComponentsRegistry>
-          <LayoutProvider>{children}</LayoutProvider>
-        </StyledComponentsRegistry>
+        <LayoutProvider>{children}</LayoutProvider>
       </body>
     </html>
   );

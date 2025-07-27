@@ -8,6 +8,10 @@ export default {
             .map(([k, v]) => [k, typeof v === "boolean" ? String(v) : v])
         ).toString()
       : "";
-    return "tour/categories" + queryString;
+    return "post/categories" + queryString;
   },
+  fetchCategory: (id: string) => `post/categories/${id}`,
+  createCategory: () => "post/categories",
+  updateCategory: (id: string) => `post/categories/${id}`,
+  deleteCategory: (id: string) => `post/categories/${id}`,
 };

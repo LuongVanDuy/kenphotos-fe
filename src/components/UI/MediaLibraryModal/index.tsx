@@ -1,0 +1,327 @@
+import React, { useState, useEffect } from "react";
+import {
+  Modal,
+  Tabs,
+  Upload,
+  Button,
+  Input,
+  Select,
+  Image,
+  Card,
+  Typography,
+  Spin,
+  message,
+} from "antd";
+import {
+  UploadOutlined,
+  FileImageOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
+import { connect } from "react-redux";
+import { fetchMedia, uploadMedia } from "@/store/actions/media";
+import { useSession } from "next-auth/react";
+import { Media } from "@/types";
+import { getImageUrl } from "@/utils";
+
+const { Search } = Input;
+const { Option } = Select;
+const { Text } = Typography;
+
+interface MediaLibraryModalProps {
+  isOpen: boolean;
+  onCancel: () => void;
+  onSelect: (media: Media) => void;
+  fetchMedia: (token: string, params: any) => Promise<void>;
+  uploadMedia: (
+    token: string,
+    formData: FormData,
+    onSuccess: (response: any) => void,
+    onFailure: (error: string) => void
+  ) => Promise<void>;
+  mediaList: Media[];
+  mediaTotal: number;
+  mediaLoading: boolean;
+  title?: string;
+  accept?: string;
+}
+
+const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
+  isOpen,
+  onCancel,
+  onSelect,
+  fetchMedia,
+  uploadMedia,
+  mediaList,
+  mediaTotal,
+  mediaLoading,
+  title = "Media Library",
+  accept = "image/*",
+}) => {
+  const { data: session } = useSession();
+  const [activeTab, setActiveTab] = useState("library");
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [statusFilter, setStatusFilter] = useState<number | undefined>(
+    undefined
+  );
+  const [sortBy, setSortBy] = useState("createdTime");
+  const [sortDesc, setSortDesc] = useState(true);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [uploading, setUploading] = useState(false);
+
+  // Query function
+  const handleQuery = async (keyword: string, page = 1, itemsPerPage = 20) => {
+    if (!session?.accessToken) return;
+
+    const queryParams: any = {
+      search: keyword,
+      page,
+      itemsPerPage,
+      sortBy,
+      sortDesc,
+    };
+
+    if (statusFilter !== undefined) {
+      queryParams.status = statusFilter;
+    }
+
+    await fetchMedia(session.accessToken, queryParams);
+    setPageNumber(page);
+    setPageSize(itemsPerPage);
+  };
+
+  useEffect(() => {
+    if (session?.accessToken && isOpen) {
+      handleQuery(searchKeyword);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.accessToken, sortBy, sortDesc, statusFilter, isOpen]);
+
+  // Handle search
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+    handleQuery(value, 1, pageSize);
+  };
+
+  // Handle upload
+  const handleUpload = async (file: File) => {
+    if (!session?.accessToken) {
+      message.error("Authentication required");
+      return;
+    }
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    await uploadMedia(
+      session.accessToken,
+      formData,
+      (response) => {
+        message.success("File uploaded successfully");
+        onSelect({
+          ...response,
+          slug: response.url,
+        });
+        onCancel();
+        setUploading(false);
+      },
+      (error) => {
+        message.error(`Upload failed: ${error}`);
+        setUploading(false);
+      }
+    );
+  };
+
+  // Get file icon based on extension
+  const getFileIcon = (filename: string) => {
+    const ext = filename?.split(".")?.pop()?.toLowerCase();
+    switch (ext) {
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+      case "webp":
+      case "svg":
+        return <FileImageOutlined className="text-blue-500" />;
+      default:
+        return <FileTextOutlined className="text-gray-500" />;
+    }
+  };
+
+  // Check if file is image
+  const isImageFile = (filename: string) => {
+    return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(filename);
+  };
+
+  // Media Library Tab
+  const MediaLibraryTab = () => (
+    <div className="space-y-4">
+      {/* Search and Filters */}
+      <div className="flex gap-4 items-center">
+        <Search
+          placeholder="Search media..."
+          allowClear
+          style={{ width: 300 }}
+          onSearch={handleSearch}
+          defaultValue={searchKeyword}
+        />
+        <Select
+          defaultValue="all"
+          style={{ width: 120 }}
+          onChange={(value) =>
+            setStatusFilter(value === "all" ? undefined : Number(value))
+          }
+        >
+          <Option value="all">All Types</Option>
+          <Option value="1">Images</Option>
+          <Option value="2">Documents</Option>
+          <Option value="3">Videos</Option>
+        </Select>
+      </div>
+
+      {/* Media Grid */}
+      <div className="border rounded-lg p-4 bg-gray-50">
+        <Spin spinning={mediaLoading}>
+          <div className="grid grid-cols-5 gap-4 max-h-96 overflow-y-auto">
+            {mediaList.map((item: Media) => (
+              <Card
+                key={item.id}
+                hoverable
+                className="cursor-pointer"
+                onClick={() => onSelect(item)}
+                bodyStyle={{ padding: 8 }}
+              >
+                <div className="relative">
+                  {isImageFile(item.name) ? (
+                    <Image
+                      alt={item.name}
+                      src={getImageUrl(item.slug)}
+                      preview={false}
+                      className="w-full !h-28 object-cover rounded"
+                    />
+                  ) : (
+                    <div className="w-full !h-28 flex items-center justify-center bg-gray-100 rounded">
+                      <div className="text-2xl text-gray-400">
+                        {getFileIcon(item.name)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Spin>
+      </div>
+
+      {/* Pagination */}
+      {mediaTotal > pageSize && (
+        <div className="flex justify-center">
+          <Button.Group>
+            <Button
+              disabled={pageNumber === 1}
+              onClick={() =>
+                handleQuery(searchKeyword, pageNumber - 1, pageSize)
+              }
+            >
+              Previous
+            </Button>
+            <Button
+              disabled={pageNumber * pageSize >= mediaTotal}
+              onClick={() =>
+                handleQuery(searchKeyword, pageNumber + 1, pageSize)
+              }
+            >
+              Next
+            </Button>
+          </Button.Group>
+        </div>
+      )}
+    </div>
+  );
+
+  // Upload Tab
+  const UploadTab = () => (
+    <div className="space-y-4">
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+        <Upload
+          accept={accept}
+          beforeUpload={(file) => {
+            handleUpload(file);
+            return false;
+          }}
+          showUploadList={false}
+          disabled={uploading}
+        >
+          <div className="space-y-4">
+            <UploadOutlined className="text-4xl text-gray-400" />
+            <div>
+              <Text className="text-lg font-medium">Click to upload</Text>
+              <br />
+              <Text className="text-sm text-gray-500">
+                or drag and drop files here
+              </Text>
+            </div>
+            {uploading && <Spin />}
+          </div>
+        </Upload>
+      </div>
+
+      <div className="text-center">
+        <Text className="text-sm text-gray-500">
+          Supported formats: JPG, PNG, GIF, WebP, SVG
+        </Text>
+      </div>
+    </div>
+  );
+
+  const tabItems = [
+    {
+      key: "library",
+      label: "Media Library",
+      children: <MediaLibraryTab />,
+    },
+    {
+      key: "upload",
+      label: "Upload Files",
+      children: <UploadTab />,
+    },
+  ];
+
+  return (
+    <Modal
+      title={title}
+      open={isOpen}
+      onCancel={onCancel}
+      width={1200}
+      footer={null}
+      centered
+      destroyOnClose
+    >
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems}
+        className="mt-4"
+      />
+    </Modal>
+  );
+};
+
+const mapStateToProps = (state: any) => ({
+  mediaList: state.media.list,
+  mediaTotal: state.media.total,
+  mediaLoading: state.media.loading,
+});
+
+const mapDispatchToProps = {
+  fetchMedia: (token: string, params: any) => fetchMedia(token, params),
+  uploadMedia: (
+    token: string,
+    formData: FormData,
+    onSuccess: (response: any) => void,
+    onFailure: (error: string) => void
+  ) => uploadMedia(token, formData, onSuccess, onFailure),
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MediaLibraryModal);

@@ -3,10 +3,6 @@ import { Card, Image, Button, Tooltip, Typography } from "antd";
 import {
   EyeOutlined,
   FileImageOutlined,
-  FilePdfOutlined,
-  FileWordOutlined,
-  FileExcelOutlined,
-  FileZipOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
 import { Media } from "@/types";
@@ -58,7 +54,7 @@ const MediaItem: React.FC<MediaItemProps> = ({ item, onPreview }) => {
           alt={item.name}
           src={getImageUrl(item)}
           preview={false}
-          className="w-full h-full object-cover"
+          className="!w-full !h-full object-cover"
           onClick={() => onPreview(item)}
         />
       ) : (
