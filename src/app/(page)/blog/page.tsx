@@ -9,6 +9,7 @@ type Blog = {
   date: string
   image: string
   slug: string
+  categories: string[]
 }
 
 const blogs: Blog[] = [
@@ -18,6 +19,7 @@ const blogs: Blog[] = [
     date: 'Feb 26, 2025',
     image: '/images/blog-2.jpg',
     slug: 'best-real-estate-video-apps',
+    categories: ['Video', 'Real Estate'],
   },
   {
     id: 2,
@@ -25,6 +27,7 @@ const blogs: Blog[] = [
     date: 'Feb 26, 2025',
     image: '/images/blog-1.jpg',
     slug: 'free-furniture-staging-app',
+    categories: ['Video', 'Real Estate'],
   },
   {
     id: 3,
@@ -32,6 +35,7 @@ const blogs: Blog[] = [
     date: 'Feb 26, 2025',
     image: '/images/blog-3.jpg',
     slug: 'real-estate-photography-tips',
+    categories: ['Video', 'Real Estate'],
   },
   {
     id: 4,
@@ -39,6 +43,7 @@ const blogs: Blog[] = [
     date: 'Mar 12, 2025',
     image: '/images/blog-4.jpg',
     slug: 'mobile-app-ui-ux-trends-2025',
+    categories: ['Video', 'Real Estate'],
   },
   {
     id: 5,
@@ -46,6 +51,7 @@ const blogs: Blog[] = [
     date: 'Mar 25, 2025',
     image: '/images/blog-3.jpg',
     slug: 'top-real-estate-marketing-strategies',
+    categories: ['Video', 'Real Estate'],
   },
   {
     id: 6,
@@ -53,6 +59,7 @@ const blogs: Blog[] = [
     date: 'Apr 5, 2025',
     image: '/images/blog-2.jpg',
     slug: 'how-to-take-better-interior-photos',
+    categories: ['Video', 'Real Estate'],
   },
   {
     id: 7,
@@ -60,6 +67,7 @@ const blogs: Blog[] = [
     date: 'Apr 18, 2025',
     image: '/images/blog-1.jpg',
     slug: 'staging-techniques-that-sell',
+    categories: ['Video', 'Real Estate'],
   },
   {
     id: 8,
@@ -67,6 +75,7 @@ const blogs: Blog[] = [
     date: 'Apr 28, 2025',
     image: '/images/blog-2.jpg',
     slug: 'video-tours-vs-3d-tours',
+    categories: ['Video', 'Real Estate'],
   },
   {
     id: 9,
@@ -74,6 +83,7 @@ const blogs: Blog[] = [
     date: 'May 3, 2025',
     image: '/images/blog-3.jpg',
     slug: 'lighting-tips-for-real-estate',
+    categories: ['Video', 'Real Estate'],
   },
   {
     id: 10,
@@ -81,6 +91,7 @@ const blogs: Blog[] = [
     date: 'Apr 18, 2025',
     image: '/images/blog-4.jpg',
     slug: 'staging-techniques-that-sell-2',
+    categories: ['Video', 'Real Estate'],
   },
 ]
 
@@ -92,17 +103,58 @@ const Skeleton = ({ span = 1 }: { span?: number }) => (
   />
 )
 
+// const BlogCard = ({ blog }: { blog: Blog }) => (
+//   <div className='flex flex-col'>
+//     <Link href={`/blog/${blog.slug}`}>
+//       <div className='w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50'>
+//         <img
+//           src={blog.image}
+//           alt={blog.title}
+//           className='w-full h-full object-cover transition-transform duration-300 hover:scale-105'
+//         />
+//         <div className='absolute top-4 left-4 flex flex-wrap gap-2'>
+//           {blog.categories.map((cat, index) => (
+//             <span
+//               key={index}
+//               className='bg-white/80 backdrop-blur-sm text-gray-800 text-xs font-medium px-3 py-1 rounded-full shadow-sm'
+//             >
+//               {cat}
+//             </span>
+//           ))}
+//         </div>
+//       </div>
+//     </Link>
+//     <Link href={`/blog/${blog.slug}`}>
+//       <h3 className='mt-3 text-xl font-semibold hover:text-[#00A3FF] cursor-pointer transition'>
+//         {blog.title}
+//       </h3>
+//     </Link>
+//     <p className='text-sm text-gray-500 mt-1'>{blog.date}</p>
+//   </div>
+// )
+
 const BlogCard = ({ blog }: { blog: Blog }) => (
   <div className='flex flex-col'>
     <Link href={`/blog/${blog.slug}`}>
-      <div className='w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50'>
+      <div className='w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 relative'>
         <img
           src={blog.image}
           alt={blog.title}
           className='w-full h-full object-cover transition-transform duration-300 hover:scale-105'
         />
+        <div className='absolute top-4 left-4 flex flex-wrap gap-2'>
+          {blog.categories.map((cat, index) => (
+            <span
+              key={index}
+              className='bg-[rgba(0,0,0,0.25)] text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm'
+            >
+              {cat}
+            </span>
+          ))}
+        </div>
       </div>
     </Link>
+
     <Link href={`/blog/${blog.slug}`}>
       <h3 className='mt-3 text-xl font-semibold hover:text-[#00A3FF] cursor-pointer transition'>
         {blog.title}
@@ -212,20 +264,48 @@ const BlogPage = () => {
 
   return (
     <div className='max-w-content px-4 py-[50px] mx-auto'>
-      <h2 className='text-center text-[42px] uppercase'>Blog</h2>
-      <p className='text-center text-[14px] md:text-[18px] w-full md:w-[60%] mx-auto mb-10'>
-        Kenphotos.com’s team and other experts offer their best advice, insights, and how-to’s.
-      </p>
+      <div className='text-start mb-20'>
+        <p className='text-[24px] text-gray-400 font-medium mb-4'>Our blog</p>
+        <h2 className='text-[32px] md:text-[48px] leading-tight font-[500] text-[#0D0D0D]'>
+          This is where we tell stories.
+          <br />
+          Most of them are about design
+        </h2>
+      </div>
 
-      <div className='w-full flex flex-col md:flex-row items-end justify-center md:justify-start gap-2 mb-10'>
-        <input
-          type='text'
-          placeholder='Search...'
-          className='w-full md:w-[300px] border border-black px-3 py-2 rounded text-base'
-        />
-        <button className='w-[30%] md:w-auto bg-[#00A3FF] text-white px-4 py-2 rounded text-base'>
-          Apply filter
-        </button>
+      <div className='flex flex-col md:flex-row items-center justify-between'>
+        <div className='flex flex-wrap justify-center items-center gap-6 mb-12 text-sm text-gray-500'>
+          <button className='hover:text-black transition'>Recents</button>
+          <button className='hover:text-black transition'>Design</button>
+          <button className='hover:text-black transition'>Development</button>
+          <button className='hover:text-black transition'>Management</button>
+          <button className='hover:text-black transition'>Marketing</button>
+        </div>
+
+        <div className='w-full md:w-auto mb-12'>
+          <div className='relative w-full md:w-[300px] mx-auto md:mx-0'>
+            <span className='absolute inset-y-0 left-0 flex items-center pl-3'>
+              <svg
+                className='w-5 h-5 text-gray-400'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z'
+                />
+              </svg>
+            </span>
+            <input
+              type='text'
+              placeholder='Search...'
+              className='w-full pl-10 pr-4 py-3 rounded-full border border-gray-200 text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A3FF]'
+            />
+          </div>
+        </div>
       </div>
 
       {/* Render blog blocks */}

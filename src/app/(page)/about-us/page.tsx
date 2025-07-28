@@ -39,22 +39,33 @@ const AboutPage = () => {
     <>
       <div className='min-h-[350px] bg-black'>
         <div className='max-w-content mx-auto'>
-          <div className='p-4 md:p-[35px] text-center h-full'>
-            <h1 className='text-3xl md:text-[53px] text-[#6EC9FA] mb-4 md:mb-[20px] font-semibold'>
-              ABOUT TRUE COLOR
+          <div className='px-4 md:px-12 py-16 text-white text-left'>
+            <p className='text-[24px] text-gray-400 font-medium mb-4'>About us</p>
+            <h1 className='text-[32px] md:text-[48px] leading-tight font-[500] mb-6'>
+              We are True Color. A digital
+              <br className='hidden md:block' />
+              design and editing company
             </h1>
-            <p className='text-white text-base md:text-[21px] mb-3 md:mb-[15px]'>
-              With over 10 years of experience in the field, we understand that accurate color
-              representation is crucial for many brokers and investors. We place special emphasis on
-              realistic colors, ensuring that our editing techniques bring out the most accurate
-              portrayal of reality.
+            <p className='max-w-3xl text-base md:text-lg text-gray-300 mb-12'>
+              We help our clients build their brand identity, and design, develop, launch, and
+              support their digital products. Working with startups and real estate businesses from
+              all over the world.
             </p>
-            <p className='text-white text-base md:text-[21px]'>
-              Other companies typically require upfront payment. We are confident in our quality and
-              ensure your satisfaction, we work based on reputation and trust with customers, we are
-              willing to edit your photos first, you pay later via VISA or Paypal. After you receive
-              the edited photos and are satisfied with the results, we will then send you an invoice
-            </p>
+
+            <div className='grid grid-cols-3 gap-4 max-w-md'>
+              <div className='text-left'>
+                <p className='text-3xl md:text-4xl font-semibold text-white'>150+</p>
+                <p className='text-sm text-gray-400 mt-1'>team members</p>
+              </div>
+              <div className='text-left'>
+                <p className='text-3xl md:text-4xl font-semibold text-white'>500+</p>
+                <p className='text-sm text-gray-400 mt-1'>completed projects</p>
+              </div>
+              <div className='text-left'>
+                <p className='text-3xl md:text-4xl font-semibold text-white'>10</p>
+                <p className='text-sm text-gray-400 mt-1'>years in business</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
