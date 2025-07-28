@@ -1,28 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  Select,
-  Button,
-  message,
-  Image,
-  Spin,
-  Alert,
-  Typography,
-  Card,
-  Row,
-  Col,
-  Switch,
-  DatePicker,
-  Upload,
-} from "antd";
-import {
-  UserOutlined,
-  UploadOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { Form, Input, Select, Button, message, Image, Spin, Alert, Typography, Card, Row, Col, Switch, DatePicker, Upload } from "antd";
+import { UserOutlined, UploadOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector, connect } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
@@ -55,14 +35,7 @@ const UserForm: React.FC<{
   userId?: number;
   createUser?: any;
   updateUser?: any;
-}> = ({
-  mode = "create",
-  initialValues,
-  onSuccess,
-  userId,
-  createUser,
-  updateUser,
-}) => {
+}> = ({ mode = "create", initialValues, onSuccess, userId, createUser, updateUser }) => {
   const [form] = Form.useForm<UserFormValues>();
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
@@ -114,42 +87,57 @@ const UserForm: React.FC<{
   const onFinish = async (values: UserFormValues) => {
     setLoading(true);
 
-    try {
-      const payload = {
-        email: values.email,
-        password: values.password,
-        firstName: values.firstName,
-        lastName: values.lastName,
-        phoneNumber: values.phoneNumber,
-        businessName: values.businessName,
-        country: values.country,
-        timezone: values.timezone,
-        postalCode: values.postalCode,
-        businessWebsite: values.businessWebsite,
-      };
+    const payload = {
+      email: values.email,
+      password: values.password,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      phoneNumber: values.phoneNumber,
+      businessName: values.businessName,
+      country: values.country,
+      timezone: values.timezone,
+      postalCode: values.postalCode,
+      businessWebsite: values.businessWebsite,
+    };
 
-      if (mode === "edit" && userId && updateUser) {
-        await updateUser(userId, payload);
-      } else if (createUser) {
-        await createUser(payload);
-      }
-      message.success(
-        mode === "edit"
-          ? "User updated successfully!"
-          : "User created successfully!"
-      );
+    createUser(payload, console.log(1), console.log(2));
 
-      form.resetFields();
-      if (onSuccess) onSuccess();
-      router.push("/admin/user/list");
-    } catch (error) {
-      console.error("Submit error:", error);
-      message.error(
-        mode === "edit" ? "Failed to update user" : "Failed to create user"
-      );
-    } finally {
-      setLoading(false);
-    }
+    // try {
+    //   const payload = {
+    //     email: values.email,
+    //     password: values.password,
+    //     firstName: values.firstName,
+    //     lastName: values.lastName,
+    //     phoneNumber: values.phoneNumber,
+    //     businessName: values.businessName,
+    //     country: values.country,
+    //     timezone: values.timezone,
+    //     postalCode: values.postalCode,
+    //     businessWebsite: values.businessWebsite,
+    //   };
+
+    //   if (mode === "edit" && userId && updateUser) {
+    //     await updateUser(userId, payload);
+    //   } else if (createUser) {
+    //     await createUser(payload);
+    //   }
+    //   message.success(
+    //     mode === "edit"
+    //       ? "User updated successfully!"
+    //       : "User created successfully!"
+    //   );
+
+    //   form.resetFields();
+    //   if (onSuccess) onSuccess();
+    //   router.push("/admin/user/list");
+    // } catch (error) {
+    //   console.error("Submit error:", error);
+    //   message.error(
+    //     mode === "edit" ? "Failed to update user" : "Failed to create user"
+    //   );
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
@@ -162,12 +150,7 @@ const UserForm: React.FC<{
             </Title>
           </div>
           <div className="flex items-center space-x-2">
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              onClick={() => form.submit()}
-            >
+            <Button type="primary" htmlType="submit" loading={loading} onClick={() => form.submit()}>
               {mode === "edit" ? "Update" : "Create User"}
             </Button>
           </div>
@@ -211,13 +194,7 @@ const UserForm: React.FC<{
                       </Form.Item>
                     </Col>
                     <Col span={12}>
-                      <Form.Item
-                        name="lastName"
-                        label="Last Name"
-                        rules={[
-                          { required: true, message: "Please enter last name" },
-                        ]}
-                      >
+                      <Form.Item name="lastName" label="Last Name" rules={[{ required: true, message: "Please enter last name" }]}>
                         <Input placeholder="Enter last name" />
                       </Form.Item>
                     </Col>
@@ -305,13 +282,7 @@ const UserForm: React.FC<{
                   </Row>
                   <Row gutter={16}>
                     <Col span={12}>
-                      <Form.Item
-                        name="country"
-                        label="Country"
-                        rules={[
-                          { required: true, message: "Please select country" },
-                        ]}
-                      >
+                      <Form.Item name="country" label="Country" rules={[{ required: true, message: "Please select country" }]}>
                         <Select placeholder="Select country">
                           {countryOptions.map((option) => (
                             <Option key={option.value} value={option.value}>
@@ -336,13 +307,7 @@ const UserForm: React.FC<{
                       </Form.Item>
                     </Col>
                   </Row>
-                  <Form.Item
-                    name="timezone"
-                    label="Timezone"
-                    rules={[
-                      { required: true, message: "Please select timezone" },
-                    ]}
-                  >
+                  <Form.Item name="timezone" label="Timezone" rules={[{ required: true, message: "Please select timezone" }]}>
                     <Select placeholder="Select timezone">
                       {timezoneOptions.map((option) => (
                         <Option key={option.value} value={option.value}>
@@ -365,14 +330,7 @@ const UserForm: React.FC<{
 const CreateUserPage: React.FC = (props: any) => {
   const { createUser, updateUser } = props;
   const router = useRouter();
-  return (
-    <UserForm
-      mode="create"
-      onSuccess={() => router.push("/admin/user/list")}
-      createUser={createUser}
-      updateUser={updateUser}
-    />
-  );
+  return <UserForm mode="create" onSuccess={() => router.push("/admin/user/list")} createUser={createUser} updateUser={updateUser} />;
 };
 
 const mapDispatchToProps = {

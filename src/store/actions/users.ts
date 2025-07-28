@@ -1,9 +1,4 @@
-import {
-  fetchWithToken,
-  postWithToken,
-  putWithToken,
-  deleteWithToken,
-} from "@/app/api";
+import { fetchWithToken, postWithToken, putWithToken, deleteWithToken } from "@/app/api";
 import {
   FETCH_USER,
   FETCH_USER_FAILURE,
@@ -37,11 +32,7 @@ export const fetchUsers = (accessToken: any, option: any) => {
   };
 };
 
-export const createUser = (
-  payload: any,
-  onSuccess: () => void,
-  onFailure: (error: string) => void
-) => {
+export const createUser = (payload: any, onSuccess: () => void, onFailure: (error: string) => void) => {
   return (dispatch: AppDispatch) => {
     postWithToken(userEndpoint.createUser(), payload)
       .then((response) => {
@@ -50,8 +41,7 @@ export const createUser = (
         }
       })
       .catch((error) => {
-        const errorMessage =
-          error && error.message ? error.message : "Unknown error";
+        const errorMessage = error && error.message ? error.message : "Unknown error";
         onFailure(errorMessage);
       });
   };
@@ -77,28 +67,35 @@ export const fetchUser = (id: number) => {
   };
 };
 
-export const updateUser = (id: number, payload: any) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch({ type: UPDATE_USER });
-    try {
-      const response = await putWithToken(
-        userEndpoint.updateUser(String(id)),
-        payload
-      );
-      dispatch({
-        type: UPDATE_USER_SUCCESS,
-        payload: { data: response },
-      });
-      return response;
-    } catch (error: any) {
-      dispatch({
-        type: UPDATE_USER_FAILURE,
-        payload: { error: error?.message || "Unknown error" },
-      });
-      throw new Error(error?.message || "Unknown error");
-    }
-  };
-};
+// export const updateUser = (accessToken: string | any, payload: any, onSuccess: () => void, onFailure: (error: string) => void) => {
+//   return (dispatch: AppDispatch) => {
+//     putWithToken(users.updateUser(payload.id), accessToken, payload.data)
+//       .then((response) => {
+//         if (response) {
+//           onSuccess();
+//         }
+//       })
+//       .catch((error) => {
+//         const errorMessage = error && error.message ? error.message : "Unknown error";
+//         onFailure(errorMessage);
+//       });
+//   };
+// };
+
+// export const deleteUser = (accessToken: string | any, payload: any, onSuccess: () => void, onFailure: (error: string) => void) => {
+//   return (dispatch: AppDispatch) => {
+//     deleteWithToken(users.deleteUser(payload), accessToken)
+//       .then((response) => {
+//         if (response) {
+//           onSuccess();
+//         }
+//       })
+//       .catch((error) => {
+//         const errorMessage = error && error.message ? error.message : "Unknown error";
+//         onFailure(errorMessage);
+//       });
+//   };
+// };
 
 export const deleteUser = (id: number) => {
   return async (dispatch: AppDispatch) => {
