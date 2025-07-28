@@ -1,43 +1,32 @@
 import { AppDispatch } from "../store";
-import {
-  FETCH_CATEGORIES,
-  FETCH_CATEGORIES_SUCCESS,
-  FETCH_CATEGORIES_FAILURE,
-} from "../actionTypes";
+import { FETCH_CATEGORIES, FETCH_CATEGORIES_SUCCESS, FETCH_CATEGORIES_FAILURE } from "../actionTypes";
 import { fetchWithToken, putWithToken, deleteWithToken } from "@/app/api/index";
 import categoriesEndpoint from "../endpoint/categories";
 import { postWithToken } from "@/app/api/index";
 
 export const fetchCategories = (option: any) => {
-  return async (dispatch: AppDispatch) => {
+  return (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_CATEGORIES });
-    try {
-      const endpoint = categoriesEndpoint.fetchCategories(option);
-      const response = await fetchWithToken(endpoint);
-      dispatch({
-        type: FETCH_CATEGORIES_SUCCESS,
-        payload: { data: response.data, total: response.total },
+    fetchWithToken(categoriesEndpoint.fetchCategories(option))
+      .then((response) => {
+        dispatch({
+          type: FETCH_CATEGORIES_SUCCESS,
+          payload: { data: response },
+        });
+      })
+      .catch((error) => {
+        dispatch({
+          type: FETCH_CATEGORIES_FAILURE,
+          payload: { error: error.message },
+        });
       });
-    } catch (error: any) {
-      dispatch({
-        type: FETCH_CATEGORIES_FAILURE,
-        payload: { error: error?.message || "Unknown error" },
-      });
-    }
   };
 };
 
-export const createCategory = (
-  payload: any,
-  onSuccess?: (response: any) => void,
-  onFailure?: (error: string) => void
-) => {
+export const createCategory = (payload: any, onSuccess?: (response: any) => void, onFailure?: (error: string) => void) => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await postWithToken(
-        categoriesEndpoint.createCategory(),
-        payload
-      );
+      const response = await postWithToken(categoriesEndpoint.createCategory(), payload);
       if (onSuccess) onSuccess(response);
       return response;
     } catch (error: any) {
@@ -48,16 +37,10 @@ export const createCategory = (
   };
 };
 
-export const fetchCategoryDetail = (
-  id: number,
-  onSuccess?: (response: any) => void,
-  onFailure?: (error: string) => void
-) => {
+export const fetchCategoryDetail = (id: number, onSuccess?: (response: any) => void, onFailure?: (error: string) => void) => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await fetchWithToken(
-        categoriesEndpoint.fetchCategory(String(id))
-      );
+      const response = await fetchWithToken(categoriesEndpoint.fetchCategory(String(id)));
       if (onSuccess) onSuccess(response);
       return response;
     } catch (error: any) {
@@ -68,18 +51,10 @@ export const fetchCategoryDetail = (
   };
 };
 
-export const updateCategory = (
-  id: number,
-  payload: any,
-  onSuccess?: (response: any) => void,
-  onFailure?: (error: string) => void
-) => {
+export const updateCategory = (id: number, payload: any, onSuccess?: (response: any) => void, onFailure?: (error: string) => void) => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await putWithToken(
-        categoriesEndpoint.updateCategory(String(id)),
-        payload
-      );
+      const response = await putWithToken(categoriesEndpoint.updateCategory(String(id)), payload);
       if (onSuccess) onSuccess(response);
       return response;
     } catch (error: any) {

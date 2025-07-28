@@ -1,25 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Image,
-  Button,
-  Tag,
-  Input,
-  Select,
-  Modal,
-  Typography,
-  Table,
-} from "antd";
-import {
-  AppstoreOutlined,
-  UnorderedListOutlined,
-  UploadOutlined,
-  SortAscendingOutlined,
-  SortDescendingOutlined,
-} from "@ant-design/icons";
+import { Image, Button, Tag, Input, Select, Modal, Typography, Table } from "antd";
+import { AppstoreOutlined, UnorderedListOutlined, UploadOutlined, SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { CustomShowConfirmModal } from "@/components/Admin/UI/CustomModal";
 import { Media } from "@/types";
 import { connect } from "react-redux";
 import { fetchMedia } from "@/store/actions/media";
@@ -41,9 +25,7 @@ const MediaListPage: React.FC = (props: any) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState<number | undefined>(
-    undefined
-  );
+  const [statusFilter, setStatusFilter] = useState<number | undefined>(undefined);
   const [sortBy, setSortBy] = useState("createdTime");
   const [sortDesc, setSortDesc] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
@@ -99,9 +81,7 @@ const MediaListPage: React.FC = (props: any) => {
       setPreviewVisible(true);
     } else {
       // For non-image files, use the full URL if it's a relative path
-      const fileUrl = mediaItem.slug.startsWith("http")
-        ? mediaItem.slug
-        : imageUrl;
+      const fileUrl = mediaItem.slug.startsWith("http") ? mediaItem.slug : imageUrl;
       window.open(fileUrl, "_blank");
     }
   };
@@ -152,8 +132,7 @@ const MediaListPage: React.FC = (props: any) => {
         <div>
           <div className="font-medium">{text}</div>
           <div className="text-sm text-gray-500">
-            Uploaded by {record.uploadedBy.firstName}{" "}
-            {record.uploadedBy.lastName}
+            Uploaded by {record.uploadedBy.firstName} {record.uploadedBy.lastName}
           </div>
         </div>
       ),
@@ -183,16 +162,9 @@ const MediaListPage: React.FC = (props: any) => {
             <Title level={2} className="mb-1">
               Media Library
             </Title>
-            <Text className="text-gray-600">
-              Manage your media files and assets
-            </Text>
+            <Text className="text-gray-600">Manage your media files and assets</Text>
           </div>
-          <Button
-            type="primary"
-            icon={<UploadOutlined />}
-            onClick={() => router.push("/admin/media/create")}
-            size="large"
-          >
+          <Button type="primary" icon={<UploadOutlined />} onClick={() => router.push("/admin/media/create")} size="large">
             Add New
           </Button>
         </div>
@@ -212,9 +184,7 @@ const MediaListPage: React.FC = (props: any) => {
             <Select
               defaultValue="all"
               className="w-[120px] !h-[40px]"
-              onChange={(value) =>
-                setStatusFilter(value === "all" ? undefined : Number(value))
-              }
+              onChange={(value) => setStatusFilter(value === "all" ? undefined : Number(value))}
             >
               <Option value="all">All Types</Option>
               <Option value="1">Images</Option>
@@ -223,9 +193,7 @@ const MediaListPage: React.FC = (props: any) => {
             </Select>
             <Button.Group>
               <Button
-                type={
-                  sortBy === "createdTime" && sortDesc ? "primary" : "default"
-                }
+                type={sortBy === "createdTime" && sortDesc ? "primary" : "default"}
                 icon={<SortDescendingOutlined />}
                 onClick={() => handleSort("createdTime")}
                 size="small"
@@ -233,9 +201,7 @@ const MediaListPage: React.FC = (props: any) => {
                 Newest
               </Button>
               <Button
-                type={
-                  sortBy === "createdTime" && !sortDesc ? "primary" : "default"
-                }
+                type={sortBy === "createdTime" && !sortDesc ? "primary" : "default"}
                 icon={<SortAscendingOutlined />}
                 onClick={() => handleSort("createdTime")}
                 size="small"
@@ -247,16 +213,8 @@ const MediaListPage: React.FC = (props: any) => {
 
           <div className="media-filters-right">
             <Button.Group>
-              <Button
-                type={viewMode === "grid" ? "primary" : "default"}
-                icon={<AppstoreOutlined />}
-                onClick={() => setViewMode("grid")}
-              />
-              <Button
-                type={viewMode === "list" ? "primary" : "default"}
-                icon={<UnorderedListOutlined />}
-                onClick={() => setViewMode("list")}
-              />
+              <Button type={viewMode === "grid" ? "primary" : "default"} icon={<AppstoreOutlined />} onClick={() => setViewMode("grid")} />
+              <Button type={viewMode === "list" ? "primary" : "default"} icon={<UnorderedListOutlined />} onClick={() => setViewMode("list")} />
             </Button.Group>
           </div>
         </div>
@@ -282,14 +240,7 @@ const MediaListPage: React.FC = (props: any) => {
       )}
 
       {/* Image Preview Modal */}
-      <Modal
-        open={previewVisible}
-        title="Image Preview"
-        footer={null}
-        onCancel={() => setPreviewVisible(false)}
-        width="30%"
-        style={{ top: 50 }}
-      >
+      <Modal open={previewVisible} title="Image Preview" footer={null} onCancel={() => setPreviewVisible(false)} width="30%" style={{ top: 50 }}>
         <Image alt="preview" style={{ width: "100%" }} src={previewImage} />
       </Modal>
     </div>

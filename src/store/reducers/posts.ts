@@ -12,9 +12,12 @@ import {
   UPDATE_POST,
   UPDATE_POST_SUCCESS,
   UPDATE_POST_FAILURE,
-  DELETE_POST,
-  DELETE_POST_SUCCESS,
-  DELETE_POST_FAILURE,
+  FETCH_PUBLIC_POSTS,
+  FETCH_PUBLIC_POSTS_SUCCESS,
+  FETCH_PUBLIC_POSTS_FAILURE,
+  FETCH_PUBLIC_POST,
+  FETCH_PUBLIC_POST_SUCCESS,
+  FETCH_PUBLIC_POST_FAILURE,
 } from "../actionTypes";
 
 const initialState: StateType = {
@@ -22,7 +25,9 @@ const initialState: StateType = {
   error: false,
   message: "",
   detail: {},
+  detailPublic: {},
   list: [],
+  listPublic: [],
 };
 
 const postsReducer = (state = initialState, action: ActionType) => {
@@ -45,7 +50,7 @@ const postsReducer = (state = initialState, action: ActionType) => {
         ...state,
         loading: false,
         error: true,
-        list: [],
+        listPublic: [],
       };
     case FETCH_POST:
       return {
@@ -65,6 +70,45 @@ const postsReducer = (state = initialState, action: ActionType) => {
         loading: false,
         error: true,
         detail: {},
+      };
+    case FETCH_PUBLIC_POSTS:
+      return {
+        ...state,
+        loading: true,
+      };
+    case FETCH_PUBLIC_POSTS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        listPublic: action.payload.data.data,
+        totalPublic: action.payload.data.total,
+        error: false,
+      };
+    case FETCH_PUBLIC_POSTS_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: true,
+        listPublic: [],
+      };
+    case FETCH_PUBLIC_POST:
+      return {
+        ...state,
+        loading: true,
+      };
+    case FETCH_PUBLIC_POST_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        detailPublic: action.payload.data,
+        error: false,
+      };
+    case FETCH_PUBLIC_POST_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: true,
+        detailPublic: {},
       };
     case CREATE_POST:
       return {
@@ -98,26 +142,6 @@ const postsReducer = (state = initialState, action: ActionType) => {
         message: "Post updated successfully",
       };
     case UPDATE_POST_FAILURE:
-      return {
-        ...state,
-        loading: false,
-        error: true,
-        message: action.payload.error,
-      };
-    case DELETE_POST:
-      return {
-        ...state,
-        loading: true,
-      };
-    case DELETE_POST_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        error: false,
-        message: "Post deleted successfully",
-        list: state.list.filter((post: any) => post.id !== action.payload.id),
-      };
-    case DELETE_POST_FAILURE:
       return {
         ...state,
         loading: false,

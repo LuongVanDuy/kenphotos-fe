@@ -12,14 +12,14 @@ import {
   UPDATE_POST,
   UPDATE_POST_SUCCESS,
   UPDATE_POST_FAILURE,
-  DELETE_POST,
-  DELETE_POST_SUCCESS,
-  DELETE_POST_FAILURE,
   FETCH_PUBLIC_POSTS,
   FETCH_PUBLIC_POSTS_SUCCESS,
   FETCH_PUBLIC_POSTS_FAILURE,
+  FETCH_PUBLIC_POST,
+  FETCH_PUBLIC_POST_SUCCESS,
+  FETCH_PUBLIC_POST_FAILURE,
 } from "../actionTypes";
-import { fetchWithToken, putWithToken, deleteWithToken, fetchNoToken } from "@/app/api/index";
+import { fetchWithToken, putWithToken, deleteWithToken, fetchNoToken, patchWithToken } from "@/app/api/index";
 import postsEndpoint from "../endpoint/posts";
 import { postWithToken } from "@/app/api/index";
 
@@ -42,59 +42,41 @@ export const fetchPosts = (option: any) => {
   };
 };
 
+export const createPost = (payload: any, onSuccess: () => void, onFailure: (error: string) => void) => {
+  return (dispatch: AppDispatch) => {
+    postWithToken(postsEndpoint.createPost(), payload)
+      .then((response) => {
+        if (response) {
+          onSuccess();
+        }
+      })
+      .catch((error) => {
+        const errorMessage = error && error.message ? error.message : "Unknown error";
+        onFailure(errorMessage);
+      });
+  };
+};
+
 export const fetchPost = (id: number) => {
-  return async (dispatch: AppDispatch) => {
+  return (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_POST });
-    try {
-      const response = await fetchWithToken(postsEndpoint.fetchPost(String(id)));
-      dispatch({
-        type: FETCH_POST_SUCCESS,
-        payload: { data: response },
+    fetchWithToken(postsEndpoint.fetchPost(id))
+      .then((response) => {
+        dispatch({
+          type: FETCH_POST_SUCCESS,
+          payload: { data: response },
+        });
+      })
+      .catch((error) => {
+        dispatch({
+          type: FETCH_POST_FAILURE,
+          payload: { error: error.message },
+        });
       });
-      return { payload: { data: response } };
-    } catch (error: any) {
-      dispatch({
-        type: FETCH_POST_FAILURE,
-        payload: { error: error?.message || "Unknown error" },
-      });
-      throw new Error(error?.message || "Unknown error");
-    }
   };
 };
 
-export const createPost = (
-  payload: any,
-  onSuccess?: (response: any) => void,
-  onFailure?: (error: string) => void
-) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch({ type: CREATE_POST });
-    try {
-      const response = await postWithToken(postsEndpoint.createPost(), payload);
-      dispatch({
-        type: CREATE_POST_SUCCESS,
-        payload: { data: response },
-      });
-      if (onSuccess) onSuccess(response);
-      return response;
-    } catch (error: any) {
-      const errorMessage = error?.message || "Unknown error";
-      dispatch({
-        type: CREATE_POST_FAILURE,
-        payload: { error: errorMessage },
-      });
-      if (onFailure) onFailure(errorMessage);
-      throw new Error(errorMessage);
-    }
-  };
-};
-
-export const updatePost = (
-  id: number,
-  payload: any,
-  onSuccess?: (response: any) => void,
-  onFailure?: (error: string) => void
-) => {
+export const updatePost = (id: number, payload: any, onSuccess?: (response: any) => void, onFailure?: (error: string) => void) => {
   return async (dispatch: AppDispatch) => {
     dispatch({ type: UPDATE_POST });
     try {
@@ -117,22 +99,18 @@ export const updatePost = (
   };
 };
 
-export const deletePost = (id: number) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch({ type: DELETE_POST });
-    try {
-      await deleteWithToken(postsEndpoint.deletePost(String(id)));
-      dispatch({
-        type: DELETE_POST_SUCCESS,
-        payload: { id },
+export const deletePost = (payload: any, onSuccess: () => void, onFailure: (error: string) => void) => {
+  return (dispatch: AppDispatch) => {
+    patchWithToken(postsEndpoint.deletePost(), payload)
+      .then((response) => {
+        if (response) {
+          onSuccess();
+        }
+      })
+      .catch((error) => {
+        const errorMessage = error && error.message ? error.message : "Unknown error";
+        onFailure(errorMessage);
       });
-    } catch (error: any) {
-      dispatch({
-        type: DELETE_POST_FAILURE,
-        payload: { error: error?.message || "Unknown error" },
-      });
-      throw new Error(error?.message || "Unknown error");
-    }
   };
 };
 
@@ -150,6 +128,25 @@ export const fetchPublicPosts = (option: any) => {
       .catch((error) => {
         dispatch({
           type: FETCH_PUBLIC_POSTS_FAILURE,
+          payload: { error: error.message },
+        });
+      });
+  };
+};
+
+export const fetchPublicPost = (id: string) => {
+  return (dispatch: AppDispatch) => {
+    dispatch({ type: FETCH_PUBLIC_POST });
+    fetchNoToken(postsEndpoint.fetchPublicPost(id))
+      .then((response) => {
+        dispatch({
+          type: FETCH_PUBLIC_POST_SUCCESS,
+          payload: { data: response },
+        });
+      })
+      .catch((error) => {
+        dispatch({
+          type: FETCH_PUBLIC_POST_FAILURE,
           payload: { error: error.message },
         });
       });

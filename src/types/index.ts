@@ -19,6 +19,9 @@ export type StateType = {
   uploadLoading?: boolean;
   uploadError?: boolean;
   uploadMessage?: string;
+  listPublic?: any[];
+  totalPublic?: number;
+  detailPublic?: any;
 };
 
 // Admin Dashboard Types
@@ -47,6 +50,23 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
+}
+
+export interface PostFormData {
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  status: number;
+  thumbnail?: string;
+  categoryIds: number[];
+  categories?: Array<{
+    category: {
+      id: number;
+      name: string;
+      slug: string;
+    };
+  }>;
 }
 
 export interface Media {

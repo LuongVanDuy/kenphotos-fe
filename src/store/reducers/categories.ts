@@ -1,9 +1,6 @@
 import { ActionType, StateType } from "@/types";
-import {
-  FETCH_CATEGORIES,
-  FETCH_CATEGORIES_SUCCESS,
-  FETCH_CATEGORIES_FAILURE,
-} from "../actionTypes";
+
+import { FETCH_CATEGORIES, FETCH_CATEGORIES_FAILURE, FETCH_CATEGORIES_SUCCESS } from "../actionTypes";
 
 const initialState: StateType = {
   loading: true,
@@ -11,7 +8,6 @@ const initialState: StateType = {
   message: "",
   detail: {},
   list: [],
-  total: 0,
 };
 
 const categoriesReducer = (state = initialState, action: ActionType) => {
@@ -25,8 +21,8 @@ const categoriesReducer = (state = initialState, action: ActionType) => {
       return {
         ...state,
         loading: false,
-        list: action.payload.data,
-        total: action.payload.total,
+        list: action.payload.data.data,
+        total: action.payload.data.total,
         error: false,
       };
     case FETCH_CATEGORIES_FAILURE:
