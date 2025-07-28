@@ -15,8 +15,11 @@ import {
   DELETE_POST,
   DELETE_POST_SUCCESS,
   DELETE_POST_FAILURE,
+  FETCH_PUBLIC_POSTS,
+  FETCH_PUBLIC_POSTS_SUCCESS,
+  FETCH_PUBLIC_POSTS_FAILURE,
 } from "../actionTypes";
-import { fetchWithToken, putWithToken, deleteWithToken } from "@/app/api/index";
+import { fetchWithToken, putWithToken, deleteWithToken, fetchNoToken } from "@/app/api/index";
 import postsEndpoint from "../endpoint/posts";
 import { postWithToken } from "@/app/api/index";
 
@@ -43,9 +46,7 @@ export const fetchPost = (id: number) => {
   return async (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_POST });
     try {
-      const response = await fetchWithToken(
-        postsEndpoint.fetchPost(String(id))
-      );
+      const response = await fetchWithToken(postsEndpoint.fetchPost(String(id)));
       dispatch({
         type: FETCH_POST_SUCCESS,
         payload: { data: response },
@@ -85,10 +86,7 @@ export const updatePost = (id: number, payload: any) => {
   return async (dispatch: AppDispatch) => {
     dispatch({ type: UPDATE_POST });
     try {
-      const response = await putWithToken(
-        postsEndpoint.updatePost(String(id)),
-        payload
-      );
+      const response = await putWithToken(postsEndpoint.updatePost(String(id)), payload);
       dispatch({
         type: UPDATE_POST_SUCCESS,
         payload: { data: response },
@@ -120,5 +118,25 @@ export const deletePost = (id: number) => {
       });
       throw new Error(error?.message || "Unknown error");
     }
+  };
+};
+
+//
+export const fetchPublicPosts = (option: any) => {
+  return (dispatch: AppDispatch) => {
+    dispatch({ type: FETCH_PUBLIC_POSTS });
+    fetchNoToken(postsEndpoint.fetchPublicPosts(option))
+      .then((response) => {
+        dispatch({
+          type: FETCH_PUBLIC_POSTS_SUCCESS,
+          payload: { data: response },
+        });
+      })
+      .catch((error) => {
+        dispatch({
+          type: FETCH_PUBLIC_POSTS_FAILURE,
+          payload: { error: error.message },
+        });
+      });
   };
 };
