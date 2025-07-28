@@ -31,9 +31,8 @@ interface MediaLibraryModalProps {
   isOpen: boolean;
   onCancel: () => void;
   onSelect: (media: Media) => void;
-  fetchMedia: (token: string, params: any) => Promise<void>;
+  fetchMedia: (params: any) => Promise<void>;
   uploadMedia: (
-    token: string,
     formData: FormData,
     onSuccess: (response: any) => void,
     onFailure: (error: string) => void
@@ -57,7 +56,6 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
   title = "Media Library",
   accept = "image/*",
 }) => {
-  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState("library");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [statusFilter, setStatusFilter] = useState<number | undefined>(
@@ -71,8 +69,6 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
 
   // Query function
   const handleQuery = async (keyword: string, page = 1, itemsPerPage = 20) => {
-    if (!session?.accessToken) return;
-
     const queryParams: any = {
       search: keyword,
       page,
@@ -85,17 +81,17 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
       queryParams.status = statusFilter;
     }
 
-    await fetchMedia(session.accessToken, queryParams);
+    await fetchMedia(queryParams);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   };
 
   useEffect(() => {
-    if (session?.accessToken && isOpen) {
+    if (isOpen) {
       handleQuery(searchKeyword);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.accessToken, sortBy, sortDesc, statusFilter, isOpen]);
+  }, [sortBy, sortDesc, statusFilter, isOpen]);
 
   // Handle search
   const handleSearch = (value: string) => {
@@ -105,17 +101,11 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
 
   // Handle upload
   const handleUpload = async (file: File) => {
-    if (!session?.accessToken) {
-      message.error("Authentication required");
-      return;
-    }
-
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
 
     await uploadMedia(
-      session.accessToken,
       formData,
       (response) => {
         message.success("File uploaded successfully");
@@ -315,13 +305,12 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = {
-  fetchMedia: (token: string, params: any) => fetchMedia(token, params),
+  fetchMedia: (params: any) => fetchMedia(params),
   uploadMedia: (
-    token: string,
     formData: FormData,
     onSuccess: (response: any) => void,
     onFailure: (error: string) => void
-  ) => uploadMedia(token, formData, onSuccess, onFailure),
+  ) => uploadMedia(formData, onSuccess, onFailure),
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MediaLibraryModal);

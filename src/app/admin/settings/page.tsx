@@ -15,6 +15,7 @@ import {
   Select,
   Switch,
   Upload,
+  Image,
 } from "antd";
 import {
   SaveOutlined,
@@ -25,6 +26,9 @@ import {
   DatabaseOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
+import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
+import { Media } from "@/types";
+import { getImageUrl } from "@/utils";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -35,6 +39,8 @@ const SettingsPage: React.FC = () => {
   const [securityForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
+  const [isModalMediaOpen, setIsModalMediaOpen] = useState(false);
+  const [selectedSiteIcon, setSelectedSiteIcon] = useState<Media | null>(null);
 
   const timezoneOptions = [
     { value: "UTC", label: "UTC" },
@@ -72,6 +78,16 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleMediaSelect = (media: Media) => {
+    setSelectedSiteIcon(media);
+    generalForm.setFieldsValue({ siteIcon: media });
+  };
+
+  const handleRemoveSiteIcon = () => {
+    setSelectedSiteIcon(null);
+    generalForm.setFieldsValue({ siteIcon: undefined });
+  };
+
   const generalSettings = (
     <Card>
       <Form
@@ -89,6 +105,62 @@ const SettingsPage: React.FC = () => {
       >
         <Title level={4}>Site Information</Title>
 
+        <Title level={4}>Site Icon</Title>
+        <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
+          The Site Icon is what you see in browser tabs, bookmark bars, and
+          within the mobile app
+        </Text>
+
+        <Form.Item name="siteIcon" label="Site Icon">
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div
+              style={{
+                width: 80,
+                height: 80,
+                border: "1px solid #d9d9d9",
+                borderRadius: 8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#fafafa",
+                overflow: "hidden",
+              }}
+            >
+              {selectedSiteIcon ? (
+                <Image
+                  src={getImageUrl(selectedSiteIcon.slug)}
+                  alt={selectedSiteIcon.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  preview={false}
+                />
+              ) : (
+                <UploadOutlined style={{ fontSize: 24, color: "#999" }} />
+              )}
+            </div>
+            <div style={{ flex: 1 }}>
+              <Button
+                type="default"
+                style={{ marginBottom: 8 }}
+                onClick={() => setIsModalMediaOpen(true)}
+              >
+                Change Site Icon
+              </Button>
+              <br />
+              <Button
+                type="text"
+                danger
+                size="small"
+                onClick={handleRemoveSiteIcon}
+                disabled={!selectedSiteIcon}
+              >
+                Remove Site Icon
+              </Button>
+            </div>
+          </div>
+        </Form.Item>
+
+        <Divider />
+
         <Form.Item
           name="siteName"
           label="Site Name"
@@ -103,28 +175,6 @@ const SettingsPage: React.FC = () => {
           rules={[{ required: true, message: "Please enter site description" }]}
         >
           <TextArea placeholder="Enter site description" rows={3} />
-        </Form.Item>
-
-        <Form.Item
-          name="siteUrl"
-          label="Site URL"
-          rules={[{ required: true, message: "Please enter site URL" }]}
-        >
-          <Input placeholder="https://example.com" />
-        </Form.Item>
-
-        <Form.Item name="siteLogo" label="Site Logo">
-          <Upload
-            name="logo"
-            listType="picture-card"
-            maxCount={1}
-            beforeUpload={() => false}
-          >
-            <div>
-              <UploadOutlined />
-              <div style={{ marginTop: 8 }}>Upload</div>
-            </div>
-          </Upload>
         </Form.Item>
 
         <Divider />
@@ -299,164 +349,6 @@ const SettingsPage: React.FC = () => {
     </Card>
   );
 
-  const securitySettings = (
-    <Card>
-      <Form
-        form={securityForm}
-        layout="vertical"
-        onFinish={(values) => handleSaveSettings(values, "security")}
-        initialValues={{
-          sessionTimeout: 24,
-          maxLoginAttempts: 5,
-          requireStrongPasswords: true,
-          twoFactorAuth: false,
-          ipWhitelist: false,
-        }}
-      >
-        <Alert
-          message="Security Settings"
-          description="Configure security policies and authentication settings."
-          type="warning"
-          showIcon
-          className="mb-6"
-        />
-
-        <Title level={4}>Authentication</Title>
-
-        <Form.Item
-          name="sessionTimeout"
-          label="Session Timeout (hours)"
-          rules={[{ required: true, message: "Please enter session timeout" }]}
-        >
-          <Input placeholder="24" />
-        </Form.Item>
-
-        <Form.Item
-          name="maxLoginAttempts"
-          label="Max Login Attempts"
-          rules={[
-            { required: true, message: "Please enter max login attempts" },
-          ]}
-        >
-          <Input placeholder="5" />
-        </Form.Item>
-
-        <Form.Item name="requireStrongPasswords" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-        <div style={{ marginBottom: 16 }}>
-          <span style={{ marginLeft: 8 }}>Require Strong Passwords</span>
-        </div>
-
-        <Form.Item name="twoFactorAuth" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-        <div style={{ marginBottom: 16 }}>
-          <span style={{ marginLeft: 8 }}>Two-Factor Authentication</span>
-        </div>
-
-        <Divider />
-
-        <Title level={4}>Access Control</Title>
-
-        <Form.Item name="ipWhitelist" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-        <div style={{ marginBottom: 16 }}>
-          <span style={{ marginLeft: 8 }}>IP Whitelist</span>
-        </div>
-
-        <Form.Item name="allowedIps" label="Allowed IP Addresses">
-          <TextArea
-            placeholder="192.168.1.1&#10;10.0.0.1"
-            rows={4}
-          />
-        </Form.Item>
-
-        <div style={{ marginTop: 24 }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            icon={<SaveOutlined />}
-          >
-            Save Security Settings
-          </Button>
-        </div>
-      </Form>
-    </Card>
-  );
-
-  const systemInfo = (
-    <Card>
-      <Title level={4}>System Information</Title>
-
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card size="small">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">v1.0.0</div>
-              <div className="text-sm text-gray-500">Application Version</div>
-            </div>
-          </Card>
-
-          <Card size="small">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">Online</div>
-              <div className="text-sm text-gray-500">System Status</div>
-            </div>
-          </Card>
-
-          <Card size="small">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">2.4 GB</div>
-              <div className="text-sm text-gray-500">Storage Used</div>
-            </div>
-          </Card>
-
-          <Card size="small">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">1,234</div>
-              <div className="text-sm text-gray-500">Total Users</div>
-            </div>
-          </Card>
-        </div>
-
-        <Divider />
-
-        <div>
-          <Title level={5}>Environment Information</Title>
-          <div className="space-y-2 text-sm">
-            <div>
-              <strong>Node.js:</strong> v18.17.0
-            </div>
-            <div>
-              <strong>Next.js:</strong> v14.2.30
-            </div>
-            <div>
-              <strong>React:</strong> v18.0.0
-            </div>
-            <div>
-              <strong>Database:</strong> PostgreSQL 15.0
-            </div>
-            <div>
-              <strong>Server:</strong> Vercel
-            </div>
-          </div>
-        </div>
-
-        <Divider />
-
-        <Space>
-          <Button type="primary" icon={<DatabaseOutlined />}>
-            Backup Database
-          </Button>
-          <Button icon={<SettingOutlined />}>Clear Cache</Button>
-        </Space>
-      </div>
-    </Card>
-  );
-
   const tabItems = [
     {
       key: "general",
@@ -469,18 +361,6 @@ const SettingsPage: React.FC = () => {
       label: "Email",
       icon: <MailOutlined />,
       children: emailSettings,
-    },
-    {
-      key: "security",
-      label: "Security",
-      icon: <SecurityScanOutlined />,
-      children: securitySettings,
-    },
-    {
-      key: "system",
-      label: "System",
-      icon: <DatabaseOutlined />,
-      children: systemInfo,
     },
   ];
 
@@ -498,6 +378,13 @@ const SettingsPage: React.FC = () => {
         onChange={setActiveTab}
         items={tabItems}
         size="large"
+      />
+
+      <MediaLibraryModal
+        isOpen={isModalMediaOpen}
+        onCancel={() => setIsModalMediaOpen(false)}
+        onSelect={handleMediaSelect}
+        accept="image/*"
       />
     </div>
   );

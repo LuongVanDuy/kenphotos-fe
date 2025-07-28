@@ -110,31 +110,24 @@ export const adminMenuConfig: MenuItemConfig[] = [
     ],
   },
   {
-    key: "gallery",
+    key: "service",
     icon: <AppstoreOutlined />,
-    label: "Gallery",
-    breadcrumbTitle: "Gallery",
+    label: "Services",
+    breadcrumbTitle: "Services",
     children: [
       {
-        key: "gallery-albums",
-        icon: <FolderOutlined />,
-        label: "Albums",
-        path: "/admin/gallery/albums",
-        breadcrumbTitle: "Albums",
+        key: "service-list",
+        icon: <UnorderedListOutlined />,
+        label: "All Services",
+        path: "/admin/service/list",
+        breadcrumbTitle: "List",
       },
       {
-        key: "gallery-photos",
-        icon: <PictureOutlined />,
-        label: "Photos",
-        path: "/admin/gallery/photos",
-        breadcrumbTitle: "Photos",
-      },
-      {
-        key: "gallery-create",
+        key: "service-create",
         icon: <PlusOutlined />,
-        label: "Create Album",
-        path: "/admin/gallery/create",
-        breadcrumbTitle: "Create Album",
+        label: "Add New",
+        path: "/admin/service/create",
+        breadcrumbTitle: "Create New",
       },
     ],
   },
@@ -224,13 +217,15 @@ export class AdminMenuHelper {
     if (pathname.startsWith("/admin/post")) return ["post"];
     if (pathname.startsWith("/admin/media")) return ["media"];
     if (pathname.startsWith("/admin/user")) return ["user"];
-    if (pathname.startsWith("/admin/gallery")) return ["gallery"];
+    if (pathname.startsWith("/admin/service")) return ["service"];
     return [];
   }
 
   // Tạo breadcrumbs động
   static getBreadcrumbs(pathname: string): BreadcrumbConfig[] {
-    const breadcrumbs: BreadcrumbConfig[] = [{ title: "Dashboard", path: "/admin" }];
+    const breadcrumbs: BreadcrumbConfig[] = [
+      { title: "Dashboard", path: "/admin" },
+    ];
 
     const pathSegments = pathname.split("/").filter(Boolean);
 
@@ -238,7 +233,9 @@ export class AdminMenuHelper {
       const section = pathSegments[1];
 
       // Tìm section trong menu config
-      const sectionConfig = adminMenuConfig.find((item) => item.key === section);
+      const sectionConfig = adminMenuConfig.find(
+        (item) => item.key === section
+      );
       if (sectionConfig) {
         breadcrumbs.push({
           title: sectionConfig.breadcrumbTitle || sectionConfig.label,
@@ -248,7 +245,9 @@ export class AdminMenuHelper {
         // Nếu có action (như list, create)
         if (pathSegments.length > 2) {
           const action = pathSegments[2];
-          const actionConfig = sectionConfig.children?.find((child) => child.path?.includes(`/${action}`));
+          const actionConfig = sectionConfig.children?.find((child) =>
+            child.path?.includes(`/${action}`)
+          );
 
           if (actionConfig) {
             breadcrumbs.push({
@@ -263,13 +262,18 @@ export class AdminMenuHelper {
   }
 
   // Convert config thành Ant Design menu items
-  static convertToAntdMenuItems(items: MenuItemConfig[], handleNavigation: (path: any) => void): any[] {
+  static convertToAntdMenuItems(
+    items: MenuItemConfig[],
+    handleNavigation: (path: any) => void
+  ): any[] {
     return items.map((item) => ({
       key: item.key,
       icon: item.icon,
       label: item.label,
       onClick: item.path ? () => handleNavigation(item.path) : undefined,
-      children: item.children ? this.convertToAntdMenuItems(item.children, handleNavigation) : undefined,
+      children: item.children
+        ? this.convertToAntdMenuItems(item.children, handleNavigation)
+        : undefined,
     }));
   }
 
@@ -277,7 +281,9 @@ export class AdminMenuHelper {
   static convertUserMenuToAntd(handleNavigation: (path: string) => void) {
     return userMenuConfig.map((item) => ({
       ...item,
-      onClick: item.onClick ?? (item.path ? () => handleNavigation(item.path) : undefined),
+      onClick:
+        item.onClick ??
+        (item.path ? () => handleNavigation(item.path) : undefined),
     }));
   }
 }

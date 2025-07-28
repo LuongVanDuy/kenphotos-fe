@@ -61,7 +61,11 @@ export const fetchPost = (id: number) => {
   };
 };
 
-export const createPost = (payload: any) => {
+export const createPost = (
+  payload: any,
+  onSuccess?: (response: any) => void,
+  onFailure?: (error: string) => void
+) => {
   return async (dispatch: AppDispatch) => {
     dispatch({ type: CREATE_POST });
     try {
@@ -70,18 +74,26 @@ export const createPost = (payload: any) => {
         type: CREATE_POST_SUCCESS,
         payload: { data: response },
       });
+      if (onSuccess) onSuccess(response);
       return response;
     } catch (error: any) {
+      const errorMessage = error?.message || "Unknown error";
       dispatch({
         type: CREATE_POST_FAILURE,
-        payload: { error: error?.message || "Unknown error" },
+        payload: { error: errorMessage },
       });
-      throw new Error(error?.message || "Unknown error");
+      if (onFailure) onFailure(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 };
 
-export const updatePost = (id: number, payload: any) => {
+export const updatePost = (
+  id: number,
+  payload: any,
+  onSuccess?: (response: any) => void,
+  onFailure?: (error: string) => void
+) => {
   return async (dispatch: AppDispatch) => {
     dispatch({ type: UPDATE_POST });
     try {
@@ -93,13 +105,16 @@ export const updatePost = (id: number, payload: any) => {
         type: UPDATE_POST_SUCCESS,
         payload: { data: response },
       });
+      if (onSuccess) onSuccess(response);
       return response;
     } catch (error: any) {
+      const errorMessage = error?.message || "Unknown error";
       dispatch({
         type: UPDATE_POST_FAILURE,
-        payload: { error: error?.message || "Unknown error" },
+        payload: { error: errorMessage },
       });
-      throw new Error(error?.message || "Unknown error");
+      if (onFailure) onFailure(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 };

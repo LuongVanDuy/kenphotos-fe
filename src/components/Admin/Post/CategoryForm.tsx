@@ -75,13 +75,12 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
     }
   }, [open, mode, editingId]);
 
-  const fetchCategoryData = async () => {
+  const fetchCategoryData = () => {
     if (!editingId) return;
 
     setLoadingDetail(true);
-    try {
-      const response = await dispatch(fetchCategoryDetail(editingId) as any);
 
+    const handleSuccess = (response: any) => {
       const categoryData = response;
       setEditingCategory(categoryData);
 
@@ -91,39 +90,41 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         description: categoryData.description,
         parentId: categoryData.parentId || undefined,
       });
-    } catch (err: any) {
-      message.error(err.message || "Failed to load category details");
-      setOpen(false);
-    } finally {
       setLoadingDetail(false);
-    }
+    };
+
+    const handleFailure = (error: string) => {
+      message.error(error || "Failed to load category details");
+      setOpen(false);
+      setLoadingDetail(false);
+    };
+
+    dispatch(
+      fetchCategoryDetail(editingId, handleSuccess, handleFailure) as any
+    );
   };
 
-  const handleSubmit = async (values: CategoryFormValues) => {
+  const handleSubmit = (values: CategoryFormValues) => {
     setLoading(true);
-    try {
-      // Prepare payload - only include parentId if it has a value
-      const payload: any = {
-        name: values.name,
-        slug: values.slug,
-        description: values.description,
-      };
 
-      // Only add parentId if it has a value and is not 0
-      if (values.parentId && values.parentId > 0) {
-        payload.parentId = values.parentId;
-      }
+    // Prepare payload - only include parentId if it has a value
+    const payload: any = {
+      name: values.name,
+      slug: values.slug,
+      description: values.description,
+    };
 
-      if (mode === "edit" && editingCategory) {
-        // Update category
-        await dispatch(updateCategory(editingCategory.id, payload) as any);
-        message.success("Category updated successfully");
-      } else {
-        // Create category
-        await dispatch(createCategory(payload) as any);
-        message.success("Category created successfully");
-      }
+    // Only add parentId if it has a value and is not 0
+    if (values.parentId && values.parentId > 0) {
+      payload.parentId = values.parentId;
+    }
 
+    const handleSuccess = (response: any) => {
+      message.success(
+        mode === "edit"
+          ? "Category updated successfully"
+          : "Category created successfully"
+      );
       setOpen(false);
       form.resetFields();
       setEditingCategory(null);
@@ -132,10 +133,27 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       if (onSuccess) {
         onSuccess();
       }
-    } catch (err: any) {
-      message.error(err.message || `Failed to ${mode} category`);
-    } finally {
       setLoading(false);
+    };
+
+    const handleFailure = (error: string) => {
+      message.error(error || `Failed to ${mode} category`);
+      setLoading(false);
+    };
+
+    if (mode === "edit" && editingCategory) {
+      // Update category
+      dispatch(
+        updateCategory(
+          editingCategory.id,
+          payload,
+          handleSuccess,
+          handleFailure
+        ) as any
+      );
+    } else {
+      // Create category
+      dispatch(createCategory(payload, handleSuccess, handleFailure) as any);
     }
   };
 

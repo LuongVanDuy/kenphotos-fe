@@ -217,25 +217,19 @@ const PostForm: React.FC<{
   const onFinish = async (values: PostFormValues) => {
     setLoading(true);
 
-    try {
-      const payload = {
-        title: values.title,
-        content: values.content,
-        excerpt: values.excerpt,
-        slug: values.slug,
-        status: values.status,
-        thumbnail: values.thumbnail || selectedImage?.slug || "",
-        categoryIds: Array.isArray(values.categoryIds)
-          ? values.categoryIds.map(Number)
-          : [],
-      };
+    const payload = {
+      title: values.title,
+      content: values.content,
+      excerpt: values.excerpt,
+      slug: values.slug,
+      status: values.status,
+      thumbnail: values.thumbnail || selectedImage?.slug || "",
+      categoryIds: Array.isArray(values.categoryIds)
+        ? values.categoryIds.map(Number)
+        : [],
+    };
 
-
-      if (mode === "edit" && postId && updatePost) {
-        await updatePost(postId, payload);
-      } else if (createPost) {
-        await createPost(payload);
-      }
+    const handleSuccess = (response: any) => {
       message.success(
         mode === "edit"
           ? "Post updated successfully!"
@@ -245,13 +239,21 @@ const PostForm: React.FC<{
       setSelectedImage(null);
       if (onSuccess) onSuccess();
       router.push("/admin/post/list");
-    } catch (error) {
+      setLoading(false);
+    };
+
+    const handleFailure = (error: string) => {
       console.error("Submit error:", error);
       message.error(
         mode === "edit" ? "Failed to update post" : "Failed to create post"
       );
-    } finally {
       setLoading(false);
+    };
+
+    if (mode === "edit" && postId && updatePost) {
+      updatePost(postId, payload, handleSuccess, handleFailure);
+    } else if (createPost) {
+      createPost(payload, handleSuccess, handleFailure);
     }
   };
 
