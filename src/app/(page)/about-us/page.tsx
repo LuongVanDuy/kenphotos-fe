@@ -58,6 +58,118 @@ const AboutPage = () => {
           </div>
         </div>
       </div>
+      {/* Phần mới thêm vào */}
+      <div className='max-w-content px-4 py-8 md:py-[50px] mx-auto'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-[160px]'>
+          {/* Cột trái */}
+          <div className='space-y-20'>
+            <div>
+              <div className='w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50'>
+                <Image
+                  src='/images/view-5.jpg'
+                  alt='VPN design'
+                  width={600}
+                  height={400}
+                  className='w-full h-full object-cover transition-transform duration-300 hover:scale-105'
+                />
+              </div>
+              <h3 className='mt-6 text-xl font-semibold text-[#0D0D0D]'>
+                Cyber VPN Mobile App Design Concept
+              </h3>
+              <p className='text-gray-600 mt-2'>
+                Built a VPN mobile app design with a touch of cyberpunk and sci-fi styles. Dark
+                aesthetics reduce eye strain, while users enjoy fast internet connections.
+              </p>
+              <ul className='mt-3 list-disc list-inside text-gray-700 text-sm'>
+                <li>5 main screens for mobile app</li>
+                <li>Promotional landing page</li>
+                <li>Presentation-ready animation</li>
+                <li>Development-ready assets</li>
+              </ul>
+            </div>
+
+            <div>
+              <div className='w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50'>
+                <Image
+                  src='/images/view-2.jpg'
+                  alt='Coin Prime UI'
+                  width={600}
+                  height={400}
+                  className='w-full h-full object-cover transition-transform duration-300 hover:scale-105'
+                />
+              </div>
+              <h3 className='mt-6 text-xl font-semibold text-[#0D0D0D]'>
+                Crypto Coin Trade Platform UI
+              </h3>
+              <p className='text-gray-600 mt-2'>
+                UI concept for a modern crypto trading platform with simplified trading UX and
+                dashboard analytics.
+              </p>
+              <ul className='mt-3 list-disc list-inside text-gray-700 text-sm'>
+                <li>Clean dashboard UI</li>
+                <li>Multiple user roles</li>
+                <li>Real-time trading simulation</li>
+                <li>Exportable trading reports</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Cột phải với offset */}
+
+          <div className=' space-y-20 pt-[220px]'>
+            <div>
+              <div className='w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50'>
+                <Image
+                  src='/images/view-3.jpg'
+                  alt='Crypto Exchange'
+                  width={440}
+                  height={440}
+                  className='w-full h-full object-cover transition-transform duration-300 hover:scale-105'
+                />
+              </div>
+              <h3 className='mt-6 text-xl font-semibold text-[#0D0D0D]'>
+                Cryptocurrency Exchange Website & Mobile App
+              </h3>
+              <p className='text-gray-600 mt-2'>
+                Designed a cryptocurrency exchange mobile app and its promo landing page for
+                improved marketing strategies.
+              </p>
+              <ul className='mt-3 list-disc list-inside text-gray-700 text-sm'>
+                <li>5 main screens for mobile app</li>
+                <li>Promotional landing page</li>
+                <li>Presentation-ready animation</li>
+                <li>Development-ready assets</li>
+              </ul>
+            </div>
+
+            <div>
+              <div className='w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50'>
+                <Image
+                  src='/images/view-3.jpg'
+                  alt='Crypto Exchange'
+                  width={440}
+                  height={440}
+                  className='w-full h-full object-cover transition-transform duration-300 hover:scale-105'
+                />
+              </div>
+              <h3 className='mt-6 text-xl font-semibold text-[#0D0D0D]'>
+                Cryptocurrency Exchange Website & Mobile App
+              </h3>
+              <p className='text-gray-600 mt-2'>
+                Designed a cryptocurrency exchange mobile app and its promo landing page for
+                improved marketing strategies.
+              </p>
+              <ul className='mt-3 list-disc list-inside text-gray-700 text-sm'>
+                <li>5 main screens for mobile app</li>
+                <li>Promotional landing page</li>
+                <li>Presentation-ready animation</li>
+                <li>Development-ready assets</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className='max-w-content px-4 py-8 md:py-[50px] mx-auto'>
         <h2 className='text-center text-3xl md:text-[54px] text-[#6EC9FA] font-semibold mb-6 md:mb-10'>
           Our Story
