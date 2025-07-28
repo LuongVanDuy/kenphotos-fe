@@ -1,110 +1,227 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Card, Tabs, Form, message, Divider, Typography, Button, Input, Select, Upload } from "antd";
-import { SaveOutlined, GlobalOutlined, MailOutlined, UploadOutlined } from "@ant-design/icons";
-import { connect } from "react-redux";
-import { fetchSetting, upsertSetting } from "@/store/actions/settings";
+import React, { useState } from "react";
+import {
+  Card,
+  Tabs,
+  Form,
+  message,
+  Divider,
+  Typography,
+  Space,
+  Button,
+  Alert,
+  Input,
+  Select,
+  Switch,
+  Upload,
+  Image,
+} from "antd";
+import {
+  SaveOutlined,
+  SettingOutlined,
+  GlobalOutlined,
+  MailOutlined,
+  SecurityScanOutlined,
+  DatabaseOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
+import { Media } from "@/types";
+import { getImageUrl } from "@/utils";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-const SettingsPage: React.FC = (props: any) => {
-  const { fetchSetting, upsertSetting, settingData, settingLoading } = props;
-
+const SettingsPage: React.FC = () => {
   const [generalForm] = Form.useForm();
   const [emailForm] = Form.useForm();
+  const [securityForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
-  const [formField, setFormField] = useState<any | undefined>();
+  const [isModalMediaOpen, setIsModalMediaOpen] = useState(false);
+  const [selectedSiteIcon, setSelectedSiteIcon] = useState<Media | null>(null);
 
-  useEffect(() => {
-    fetchSetting(activeTab);
-  }, [activeTab]);
+  const timezoneOptions = [
+    { value: "UTC", label: "UTC" },
+    { value: "America/New_York", label: "Eastern Time (ET)" },
+    { value: "America/Chicago", label: "Central Time (CT)" },
+    { value: "America/Denver", label: "Mountain Time (MT)" },
+    { value: "America/Los_Angeles", label: "Pacific Time (PT)" },
+    { value: "Europe/London", label: "London (GMT)" },
+    { value: "Europe/Paris", label: "Paris (CET)" },
+    { value: "Asia/Tokyo", label: "Tokyo (JST)" },
+    { value: "Asia/Shanghai", label: "Shanghai (CST)" },
+  ];
 
-  useEffect(() => {
-    if (settingData) {
-      setFormField(settingData);
-    }
-  }, [settingData]);
-
-  useEffect(() => {
-    if (formField && Object.keys(formField).length) {
-      if (activeTab === "general") {
-        generalForm.setFieldsValue({
-          siteName: formField.siteName,
-          siteDescription: formField.siteDescription,
-          siteUrl: formField.siteUrl,
-        });
-      } else {
-        emailForm.setFieldsValue({
-          SMTP_HOST: formField.SMTP_HOST,
-          SMTP_PORT: formField.SMTP_PORT,
-          SMTP_SECURITY: formField.SMTP_SECURITY,
-          SMTP_USERNAME: formField.SMTP_USERNAME,
-          SMTP_PASSWORD: formField.SMTP_PASSWORD,
-          FROM_EMAIL: formField.FROM_EMAIL,
-          FROM_NAME: formField.FROM_NAME,
-        });
-      }
-    }
-  }, [formField]);
-
-  const onSuccess = () => {
-    message.success("Upsert successful!");
-    setLoading(false);
-  };
-
-  const onFailure = (error: any) => {
-    message.error(`Upsert failed: ${error}`);
-    setLoading(false);
-  };
+  const languageOptions = [
+    { value: "en", label: "English" },
+    { value: "es", label: "Spanish" },
+    { value: "fr", label: "French" },
+    { value: "de", label: "German" },
+    { value: "zh", label: "Chinese" },
+    { value: "ja", label: "Japanese" },
+  ];
 
   const handleSaveSettings = async (values: any, formType: string) => {
     setLoading(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    const settingsArray = Object.entries(values).map(([key, value]) => ({
-      key,
-      value,
-    }));
+      console.log(`Saving ${formType} settings:`, values);
+      message.success(`${formType} settings saved successfully!`);
+    } catch (error) {
+      message.error(`Failed to save ${formType} settings`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const payload = {
-      namespace: formType,
-      data: {
-        settings: settingsArray,
-      },
-    };
+  const handleMediaSelect = (media: Media) => {
+    setSelectedSiteIcon(media);
+    generalForm.setFieldsValue({ siteIcon: media });
+  };
 
-    upsertSetting(payload, onSuccess, onFailure);
+  const handleRemoveSiteIcon = () => {
+    setSelectedSiteIcon(null);
+    generalForm.setFieldsValue({ siteIcon: undefined });
   };
 
   const generalSettings = (
-    <Card loading={settingLoading}>
-      <Form form={generalForm} layout="vertical" onFinish={(values) => handleSaveSettings(values, "general")}>
+    <Card>
+      <Form
+        form={generalForm}
+        layout="vertical"
+        onFinish={(values) => handleSaveSettings(values, "general")}
+        initialValues={{
+          siteName: "My Admin Panel",
+          siteDescription: "A comprehensive admin dashboard",
+          timezone: "UTC",
+          language: "en",
+          maintenanceMode: false,
+          allowRegistration: true,
+        }}
+      >
         <Title level={4}>Site Information</Title>
 
-        <Form.Item name="siteName" label="Site Name" rules={[{ required: true, message: "Please enter site name" }]}>
+        <Title level={4}>Site Icon</Title>
+        <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
+          The Site Icon is what you see in browser tabs, bookmark bars, and
+          within the mobile app
+        </Text>
+
+        <Form.Item name="siteIcon" label="Site Icon">
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div
+              style={{
+                width: 80,
+                height: 80,
+                border: "1px solid #d9d9d9",
+                borderRadius: 8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#fafafa",
+                overflow: "hidden",
+              }}
+            >
+              {selectedSiteIcon ? (
+                <Image
+                  src={getImageUrl(selectedSiteIcon.slug)}
+                  alt={selectedSiteIcon.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  preview={false}
+                />
+              ) : (
+                <UploadOutlined style={{ fontSize: 24, color: "#999" }} />
+              )}
+            </div>
+            <div style={{ flex: 1 }}>
+              <Button
+                type="default"
+                style={{ marginBottom: 8 }}
+                onClick={() => setIsModalMediaOpen(true)}
+              >
+                Change Site Icon
+              </Button>
+              <br />
+              <Button
+                type="text"
+                danger
+                size="small"
+                onClick={handleRemoveSiteIcon}
+                disabled={!selectedSiteIcon}
+              >
+                Remove Site Icon
+              </Button>
+            </div>
+          </div>
+        </Form.Item>
+
+        <Divider />
+
+        <Form.Item
+          name="siteName"
+          label="Site Name"
+          rules={[{ required: true, message: "Please enter site name" }]}
+        >
           <Input placeholder="Enter site name" />
         </Form.Item>
 
-        <Form.Item name="siteDescription" label="Site Description" rules={[{ required: true, message: "Please enter site description" }]}>
+        <Form.Item
+          name="siteDescription"
+          label="Site Description"
+          rules={[{ required: true, message: "Please enter site description" }]}
+        >
           <TextArea placeholder="Enter site description" rows={3} />
         </Form.Item>
 
-        <Form.Item name="siteUrl" label="Site URL" rules={[{ required: true, message: "Please enter site URL" }]}>
-          <Input placeholder="https://example.com" />
+        <Divider />
+
+        <Title level={4}>Localization</Title>
+
+        <Form.Item
+          name="timezone"
+          label="Timezone"
+          rules={[{ required: true, message: "Please select timezone" }]}
+        >
+          <Select options={timezoneOptions} style={{ width: "100%" }} />
         </Form.Item>
 
-        {/* <Form.Item name="siteLogo" label="Site Logo">
-          <Upload name="logo" listType="picture-card" maxCount={1} beforeUpload={() => false}>
-            <div>
-              <UploadOutlined />
-              <div style={{ marginTop: 8 }}>Upload</div>
-            </div>
-          </Upload>
-        </Form.Item> */}
+        <Form.Item
+          name="language"
+          label="Language"
+          rules={[{ required: true, message: "Please select language" }]}
+        >
+          <Select options={languageOptions} style={{ width: "100%" }} />
+        </Form.Item>
+
+        <Divider />
+
+        <Title level={4}>Site Settings</Title>
+
+        <Form.Item name="maintenanceMode" valuePropName="checked">
+          <Switch />
+        </Form.Item>
+        <div style={{ marginBottom: 16 }}>
+          <span style={{ marginLeft: 8 }}>Maintenance Mode</span>
+        </div>
+
+        <Form.Item name="allowRegistration" valuePropName="checked">
+          <Switch />
+        </Form.Item>
+        <div style={{ marginBottom: 16 }}>
+          <span style={{ marginLeft: 8 }}>Allow Registration</span>
+        </div>
+
         <div style={{ marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" loading={loading} icon={<SaveOutlined />}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+          >
             Save General Settings
           </Button>
         </div>
@@ -126,17 +243,37 @@ const SettingsPage: React.FC = (props: any) => {
           adminEmail: "admin@example.com",
         }}
       >
+        <Alert
+          message="Email Configuration"
+          description="Configure SMTP settings to enable email notifications and communications."
+          type="info"
+          showIcon
+          className="mb-6"
+        />
+
         <Title level={4}>SMTP Configuration</Title>
 
-        <Form.Item name="SMTP_HOST" label="SMTP Host" rules={[{ required: true, message: "Please enter SMTP host" }]}>
+        <Form.Item
+          name="smtpHost"
+          label="SMTP Host"
+          rules={[{ required: true, message: "Please enter SMTP host" }]}
+        >
           <Input placeholder="smtp.gmail.com" />
         </Form.Item>
 
-        <Form.Item name="SMTP_PORT" label="SMTP Port" rules={[{ required: true, message: "Please enter SMTP port" }]}>
+        <Form.Item
+          name="smtpPort"
+          label="SMTP Port"
+          rules={[{ required: true, message: "Please enter SMTP port" }]}
+        >
           <Input placeholder="587" />
         </Form.Item>
 
-        <Form.Item name="SMTP_SECURITY" label="Security" rules={[{ required: true, message: "Please select security type" }]}>
+        <Form.Item
+          name="smtpSecurity"
+          label="Security"
+          rules={[{ required: true, message: "Please select security type" }]}
+        >
           <Select
             options={[
               { value: "none", label: "None" },
@@ -147,32 +284,64 @@ const SettingsPage: React.FC = (props: any) => {
           />
         </Form.Item>
 
-        <Form.Item name="SMTP_USERNAME" label="SMTP Username" rules={[{ required: true, message: "Please enter SMTP username" }]}>
+        <Form.Item
+          name="smtpUsername"
+          label="SMTP Username"
+          rules={[{ required: true, message: "Please enter SMTP username" }]}
+        >
           <Input placeholder="your-email@gmail.com" />
         </Form.Item>
 
-        <Form.Item name="SMTP_PASSWORD" label="SMTP Password" rules={[{ required: true, message: "Please enter SMTP password" }]}>
+        <Form.Item
+          name="smtpPassword"
+          label="SMTP Password"
+          rules={[{ required: true, message: "Please enter SMTP password" }]}
+        >
           <Input.Password placeholder="Enter password" />
         </Form.Item>
 
         <Divider />
 
         <Title level={4}>Email Settings</Title>
-        {/* 
-        <Form.Item name="ADMIN_EMAIL" label="Admin Email" rules={[{ required: true, message: "Please enter admin email" }]}>
-          <Input placeholder="admin@example.com" />
-        </Form.Item> */}
 
-        <Form.Item name="FROM_EMAIL" label="From Email" rules={[{ required: true, message: "Please enter from email" }]}>
+        <Form.Item
+          name="adminEmail"
+          label="Admin Email"
+          rules={[{ required: true, message: "Please enter admin email" }]}
+        >
+          <Input placeholder="admin@example.com" />
+        </Form.Item>
+
+        <Form.Item
+          name="fromEmail"
+          label="From Email"
+          rules={[{ required: true, message: "Please enter from email" }]}
+        >
           <Input placeholder="noreply@example.com" />
         </Form.Item>
 
-        <Form.Item name="FROM_NAME" label="From Name" rules={[{ required: true, message: "Please enter from name" }]}>
+        <Form.Item
+          name="fromName"
+          label="From Name"
+          rules={[{ required: true, message: "Please enter from name" }]}
+        >
           <Input placeholder="Your Site Name" />
         </Form.Item>
 
+        <Form.Item name="emailNotifications" valuePropName="checked">
+          <Switch />
+        </Form.Item>
+        <div style={{ marginBottom: 16 }}>
+          <span style={{ marginLeft: 8 }}>Enable Email Notifications</span>
+        </div>
+
         <div style={{ marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" loading={loading} icon={<SaveOutlined />}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+          >
             Save Email Settings
           </Button>
         </div>
@@ -199,22 +368,26 @@ const SettingsPage: React.FC = (props: any) => {
     <div>
       <div className="mb-6">
         <Title level={2}>Settings</Title>
-        <Text type="secondary">Configure your application settings and preferences</Text>
+        <Text type="secondary">
+          Configure your application settings and preferences
+        </Text>
       </div>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} size="large" />
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems}
+        size="large"
+      />
+
+      <MediaLibraryModal
+        isOpen={isModalMediaOpen}
+        onCancel={() => setIsModalMediaOpen(false)}
+        onSelect={handleMediaSelect}
+        accept="image/*"
+      />
     </div>
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  settingData: state.settings.detail,
-  settingLoading: state.settings.loading,
-});
-
-const mapDispatchToProps = {
-  fetchSetting: fetchSetting,
-  upsertSetting: upsertSetting,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);
+export default SettingsPage;

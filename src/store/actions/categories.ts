@@ -27,38 +27,65 @@ export const fetchCategories = (option: any) => {
   };
 };
 
-export const createCategory = (payload: any) => {
+export const createCategory = (
+  payload: any,
+  onSuccess?: (response: any) => void,
+  onFailure?: (error: string) => void
+) => {
   return async (dispatch: AppDispatch) => {
     try {
-      await postWithToken(categoriesEndpoint.createCategory(), payload);
+      const response = await postWithToken(
+        categoriesEndpoint.createCategory(),
+        payload
+      );
+      if (onSuccess) onSuccess(response);
+      return response;
     } catch (error: any) {
-      throw new Error(error?.message || "Unknown error");
+      const errorMessage = error?.message || "Unknown error";
+      if (onFailure) onFailure(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 };
 
-export const fetchCategoryDetail = (id: number) => {
+export const fetchCategoryDetail = (
+  id: number,
+  onSuccess?: (response: any) => void,
+  onFailure?: (error: string) => void
+) => {
   return async (dispatch: AppDispatch) => {
     try {
       const response = await fetchWithToken(
         categoriesEndpoint.fetchCategory(String(id))
       );
+      if (onSuccess) onSuccess(response);
       return response;
     } catch (error: any) {
-      throw new Error(error?.message || "Unknown error");
+      const errorMessage = error?.message || "Unknown error";
+      if (onFailure) onFailure(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 };
 
-export const updateCategory = (id: number, payload: any) => {
+export const updateCategory = (
+  id: number,
+  payload: any,
+  onSuccess?: (response: any) => void,
+  onFailure?: (error: string) => void
+) => {
   return async (dispatch: AppDispatch) => {
     try {
-      await putWithToken(
+      const response = await putWithToken(
         categoriesEndpoint.updateCategory(String(id)),
         payload
       );
+      if (onSuccess) onSuccess(response);
+      return response;
     } catch (error: any) {
-      throw new Error(error?.message || "Unknown error");
+      const errorMessage = error?.message || "Unknown error";
+      if (onFailure) onFailure(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 };

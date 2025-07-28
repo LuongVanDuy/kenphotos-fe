@@ -97,30 +97,106 @@ const BlogDetailPage = ({ params }: { params: { slug: string[] } }) => {
         />
       </div>
 
-      <div className='py-16 text-start mb-20'>
-        <h2 className='text-2xl md:text-3xl font-semibold text-[#0D0D0D] mb-4'>
-          Appointment Management / Scheduling
-        </h2>
+      {/* Content */}
+      <div className='relative flex gap-10 mt-16'>
+        {/* Social Icons*/}
+        <div className='hidden lg:flex flex-col gap-6 sticky top-32 h-fit text-gray-400'>
+          <a
+            href='#'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:text-black transition'
+          >
+            <svg className='w-7 h-7' fill='currentColor' viewBox='0 0 24 24'>
+              <path d='M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0022.4.36a9.1 9.1 0 01-2.88 1.1A4.52 4.52 0 0016.5 0c-2.52 0-4.5 2.06-4.5 4.6 0 .36.03.71.1 1.05A12.94 12.94 0 013 1.64a4.52 4.52 0 001.4 6.13A4.48 4.48 0 012 7.08v.06c0 2.2 1.56 4.03 3.64 4.45a4.48 4.48 0 01-2.04.08c.58 1.88 2.27 3.25 4.26 3.3A9.06 9.06 0 012 18.58 12.78 12.78 0 008.29 21c7.55 0 11.68-6.42 11.68-11.99 0-.18-.01-.35-.02-.53A8.36 8.36 0 0023 3z' />
+            </svg>
+          </a>
 
-        <p className='text-gray-700 mb-4'>
-          Even if your app isn’t focused on booking visits, scheduling tends to come up sooner or
-          later, especially in provider-facing tools.
-        </p>
+          <a
+            href='#'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:text-black transition'
+          >
+            <svg className='w-7 h-7' fill='currentColor' viewBox='0 0 24 24'>
+              <path d='M22 12c0-5.522-4.478-10-10-10S2 6.478 2 12c0 5.012 3.662 9.158 8.438 9.878v-6.988H7.898v-2.89h2.54V9.797c0-2.506 1.493-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.463h-1.26c-1.243 0-1.63.772-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.988C18.338 21.158 22 17.012 22 12z' />
+            </svg>
+          </a>
 
-        <p className='text-gray-700 font-medium mb-2'>Must-haves:</p>
-        <ul className='list-disc list-inside text-gray-700 mb-6'>
-          <li>Calendar integration</li>
-          <li>Booking, rescheduling, cancellations</li>
-          <li>Reminders via SMS/email</li>
-          <li>Waitlist management</li>
-          <li>Sync with EHRs or practice systems (if applicable)</li>
-        </ul>
+          <a
+            href='#'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:text-black transition'
+          >
+            <svg className='w-7 h-7' fill='currentColor' viewBox='0 0 24 24'>
+              <path d='M20.447 20.452h-3.554v-5.569c0-1.328-.026-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.94v5.666h-3.554V9h3.414v1.561h.05c.476-.9 1.637-1.852 3.37-1.852 3.599 0 4.264 2.367 4.264 5.444v6.299zM5.337 7.433c-1.144 0-2.07-.928-2.07-2.07 0-1.145.926-2.07 2.07-2.07s2.07.925 2.07 2.07c0 1.142-.926 2.07-2.07 2.07zM6.965 20.452H3.711V9h3.254v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.225.792 24 1.771 24h20.451C23.207 24 24 23.225 24 22.271V1.729C24 .774 23.207 0 22.225 0z' />
+            </svg>
+          </a>
+        </div>
 
-        <p className='text-gray-700'>
-          To make the app even more convenient, add AI-powered search or smart matching, like
-          suggesting the right specialist based on symptoms. This will make the patient’s life much
-          easier.
-        </p>
+        {/* Contents section */}
+        <div className='flex-1 text-start m-auto w-full sm:max-w-[592px] md:max-w-[600px] lg:max-w-[690px] xl:max-w-[792px] mb-24'>
+          <p className='mb-5'>
+            If you’re stuck on a healthcare app idea and completely stuck, believe me, I get it.
+            You’re excited, absolutely, but now confronted with a slate of questions. Where do you
+            start? How do you even know what features are even going to be important? And HIPAA? Can
+            you just Google it, or is it eventually going to bite you back?
+          </p>
+          <h2 className='text-xl font-semibold text-[#0D0D0D] mb-4'>Contents:</h2>
+          <ul className='list-disc list-inside text-[#0D0D0D] text-base space-y-2'>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                Why Invest in Healthcare App Development?
+              </a>
+            </li>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                Types of Healthcare and Medical Apps You Can Build
+              </a>
+            </li>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                How to Build a Healthcare App: Step-by-Step Process
+              </a>
+            </li>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                Must-Have Features of a Modern Medical App
+              </a>
+            </li>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                Key Technologies and Trends in Healthcare
+              </a>
+            </li>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                Compliance and Data Security Requirements
+              </a>
+            </li>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                Healthcare App Development Costs in 2025
+              </a>
+            </li>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                Monetization Models for Medical Apps
+              </a>
+            </li>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                Why Work with a Healthcare App Development Company?
+              </a>
+            </li>
+            <li>
+              <a href='#' className='underline hover:text-[#00A3FF]'>
+                FAQ: How to Create a Medical App
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div>

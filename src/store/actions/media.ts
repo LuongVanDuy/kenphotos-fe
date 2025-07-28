@@ -10,14 +10,11 @@ import {
 import { AppDispatch } from "../store";
 import media from "../endpoint/media";
 
-export const fetchMedia = (accessToken: any, option: any) => {
+export const fetchMedia = (option: any) => {
   return async (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_MEDIA });
     try {
-      const response = await fetchWithToken(
-        media.fetchMedia(option),
-        accessToken
-      );
+      const response = await fetchWithToken(media.fetchMedia(option));
       dispatch({
         type: FETCH_MEDIA_SUCCESS,
         payload: { data: response },
@@ -32,7 +29,6 @@ export const fetchMedia = (accessToken: any, option: any) => {
 };
 
 export const uploadMedia = (
-  accessToken: any,
   formData: FormData,
   onSuccess: (response: any) => void,
   onFailure: (error: string) => void

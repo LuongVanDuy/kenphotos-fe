@@ -26,8 +26,6 @@ import { useRouter } from "next/navigation";
 import { useSelector, useDispatch, connect } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { fetchPosts, deletePost } from "@/store/actions/posts";
-import { useSession } from "next-auth/react";
-import debounce from "lodash.debounce";
 
 const { Option } = Select;
 
