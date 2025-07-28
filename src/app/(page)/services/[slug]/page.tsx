@@ -18,9 +18,9 @@ const ServiceDetail = ({ params }: { params: { slug: string[] } }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(0)
 
   const services = [
-    { beforeImage: '/images/resource-1.jpg', afterImage: '/images/view-1.jpg' },
-    { beforeImage: '/images/resourse-2.jpg', afterImage: '/images/view-1.jpg' },
-    { beforeImage: '/images/resourse-4.jpg', afterImage: '/images/view-1.jpg' },
+    { beforeImage: '/images/view-3.jpg', afterImage: '/images/view-2.jpg' },
+    { beforeImage: '/images/view-4.jpg', afterImage: '/images/view-5.jpg' },
+    { beforeImage: '/images/view-3.jpg', afterImage: '/images/view-2.jpg' },
   ]
 
   const accordionData = [

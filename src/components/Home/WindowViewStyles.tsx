@@ -14,32 +14,32 @@ const services = [
   {
     title: 'HDR/Flash',
     desc: 'Turn winter to summer',
-    beforeImage: '/images/resource-1.jpg',
-    afterImage: '/images/view-1.jpg',
+    beforeImage: '/images/view-5.jpg',
+    afterImage: '/images/view-4.jpg',
   },
   {
     title: 'Strong View/ Window Pull',
     desc: 'Manually blend multiple exposures',
-    beforeImage: '/images/resource-1.jpg',
-    afterImage: '/images/view-1.jpg',
+    beforeImage: '/images/view-3.jpg',
+    afterImage: '/images/view-2.jpg',
   },
   {
     title: 'Medium View',
     desc: 'Add a setting sun to any photo',
-    beforeImage: '/images/resource-1.jpg',
-    afterImage: '/images/view-1.jpg',
+    beforeImage: '/images/view-3.jpg',
+    afterImage: '/images/view-2.jpg',
   },
   {
     title: 'Soft View',
     desc: 'Add digital furniture and decor',
-    beforeImage: '/images/resource-1.jpg',
-    afterImage: '/images/view-1.jpg',
+    beforeImage: '/images/view-3.jpg',
+    afterImage: '/images/view-2.jpg',
   },
   {
     title: 'Blow Out',
     desc: 'Make unwanted items disappear',
-    beforeImage: '/images/resource-1.jpg',
-    afterImage: '/images/view-1.jpg',
+    beforeImage: '/images/view-3.jpg',
+    afterImage: '/images/view-2.jpg',
   },
 ]
 
@@ -99,7 +99,7 @@ const WindowViewStyles: React.FC = () => {
             </div>
 
             {/* Swiper slide */}
-            <div className='w-full  aspect-[6/3] rounded-xl overflow-hidden bg-gray-100 shadow-xl'>
+            <div className='w-full  aspect-[5/2.5] rounded-xl overflow-hidden bg-gray-100 shadow-xl'>
               <Swiper
                 modules={[Navigation]}
                 navigation={false}

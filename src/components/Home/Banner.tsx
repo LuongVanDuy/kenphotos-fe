@@ -14,14 +14,14 @@ const Banner: React.FC = () => {
             <ReactCompareSlider
               itemOne={
                 <ReactCompareSliderImage
-                  src='/images/item1.jpg'
+                  src='/images/view-3.jpg'
                   alt='Before image'
                   style={{ filter: 'grayscale(0.5)' }}
                 />
               }
               itemTwo={
                 <ReactCompareSliderImage
-                  src='/images/resourse-7.jpg'
+                  src='/images/view-2.jpg'
                   alt='After image'
                   style={{ filter: 'brightness(1.2) contrast(1.1)' }}
                 />
