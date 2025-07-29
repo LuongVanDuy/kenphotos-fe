@@ -12,6 +12,8 @@ import {
 } from "@ant-design/icons";
 import { signOut } from "next-auth/react";
 import { ReactNode } from "react";
+import { Modal } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 export interface MenuItemConfig {
   key: string;
@@ -140,28 +142,42 @@ export const adminMenuConfig: MenuItemConfig[] = [
   },
 ];
 
+// Hàm xử lý đăng xuất với xác nhận
+const handleLogout = () => {
+  Modal.confirm({
+    title: "Xác nhận đăng xuất",
+    icon: <ExclamationCircleOutlined />,
+    content: "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?",
+    okText: "Đăng xuất",
+    cancelText: "Hủy",
+    okType: "danger",
+    onOk: async () => {
+      try {
+        // Xóa session và redirect về frontend
+        await signOut({ 
+          redirect: false 
+        });
+        
+        // Redirect thủ công về trang login của frontend
+        const loginUrl = `${window.location.origin}/auth/login`;
+        console.log("Redirecting to:", loginUrl);
+        window.location.href = loginUrl;
+      } catch (error) {
+        console.error("Lỗi đăng xuất:", error);
+        // Fallback: redirect trực tiếp
+        window.location.href = `${window.location.origin}/auth/login`;
+      }
+    },
+  });
+};
+
 // Cấu hình user menu
 export const userMenuConfig = [
   {
-    key: "profile",
-    icon: <UserOutlined />,
-    label: "Profile",
-    path: "/admin/profile",
-  },
-  {
-    key: "settings",
-    icon: <SettingOutlined />,
-    label: "Settings",
-    path: "/admin/settings",
-  },
-  {
-    type: "divider" as const,
-  },
-  {
     key: "logout",
     icon: <LogoutOutlined />,
-    label: "Logout",
-    onClick: () => signOut({ callbackUrl: "/auth/login" }),
+    label: "Đăng xuất",
+    onClick: handleLogout,
   },
 ];
 
@@ -278,12 +294,10 @@ export class AdminMenuHelper {
   }
 
   // Convert user menu config
-  static convertUserMenuToAntd(handleNavigation: (path: string) => void) {
+  static convertUserMenuToAntd(handleNavigation?: (path: string) => void) {
     return userMenuConfig.map((item) => ({
       ...item,
-      onClick:
-        item.onClick ??
-        (item.path ? () => handleNavigation(item.path) : undefined),
+      onClick: item.onClick,
     }));
   }
 }

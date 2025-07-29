@@ -1,7 +1,17 @@
 "use client";
 
 import React from "react";
-import { Layout, Button, Breadcrumb, Badge, Space, Typography, Divider, Avatar, Dropdown } from "antd";
+import {
+  Layout,
+  Button,
+  Breadcrumb,
+  Badge,
+  Space,
+  Typography,
+  Divider,
+  Avatar,
+  Dropdown,
+} from "antd";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -12,7 +22,10 @@ import {
   BellOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { AdminMenuHelper, userMenuConfig } from "@/components/Admin/Layout/AdminMenu";
+import {
+  AdminMenuHelper,
+  userMenuConfig,
+} from "@/components/Admin/Layout/AdminMenu";
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -27,7 +40,15 @@ interface AdminHeaderProps {
   onNavigation: (path: string) => void;
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({ collapsed, onCollapse, isMobile, pathname, darkMode, onDarkModeToggle, onNavigation }) => {
+const AdminHeader: React.FC<AdminHeaderProps> = ({
+  collapsed,
+  onCollapse,
+  isMobile,
+  pathname,
+  darkMode,
+  onDarkModeToggle,
+  onNavigation,
+}) => {
   // Mock user data
   const user = {
     name: "Admin User",
@@ -109,7 +130,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ collapsed, onCollapse, isMobi
       {/* Right Section - Responsive */}
       <Space size={isMobile ? "small" : "middle"}>
         {/* User Profile Dropdown */}
-        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={["click"]}>
+        <Dropdown
+          menu={{ items: userMenuItems }}
+          placement="bottomRight"
+          trigger={["click"]}
+        >
           <div
             className="flex items-center cursor-pointer rounded-lg transition-colors admin-focus admin-touch-target"
             style={{
