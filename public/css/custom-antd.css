@@ -80,7 +80,8 @@
   text-decoration: underline !important;
 }
 
-.ant-input {
+.ant-input,
+.ant-input-number {
   background: #fff !important;
   box-shadow: none !important;
   transition: border 0.2s, box-shadow 0.2s;

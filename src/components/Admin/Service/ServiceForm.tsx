@@ -13,6 +13,7 @@ import {
   Col,
   Upload,
   message,
+  Image,
 } from "antd";
 import {
   PlusOutlined,
@@ -23,6 +24,7 @@ import {
 import CustomQuill from "@/components/UI/CustomQuill";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
 import Title from "antd/es/typography/Title";
+import { getImageUrl } from "@/utils";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -187,10 +189,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   <Form.Item name="images" label="Images">
                     <div>
                       <Button
-                        type="dashed"
+                        type="primary"
+                        size="large"
                         icon={<UploadOutlined />}
                         onClick={() => setIsModalMediaOpen(true)}
-                        style={{ width: "100%", marginBottom: 16 }}
+                        className="w-full"
                       >
                         Add Images
                       </Button>
@@ -199,18 +202,19 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                         <div className="grid grid-cols-3 gap-4">
                           {selectedImages.map((image, index) => (
                             <div key={index} className="relative">
-                              <img
-                                src={image.url || image.slug}
+                              <Image
+                                src={getImageUrl(image.url || image.slug)}
                                 alt={image.title || `Image ${index + 1}`}
-                                className="w-full h-32 object-cover rounded"
+                                className="w-full h-24 object-cover rounded"
                               />
-                              <Button
-                                type="text"
-                                icon={<DeleteOutlined />}
-                                onClick={() => handleRemoveImage(index)}
-                                className="absolute top-1 right-1 bg-white"
-                                size="small"
-                              />
+                              <div className="absolute top-1 right-1">
+                                <Button
+                                  type="text"
+                                  icon={<DeleteOutlined />}
+                                  onClick={() => handleRemoveImage(index)}
+                                  size="small"
+                                />
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -251,10 +255,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                   name={[name, "description"]}
                                   label="Description"
                                 >
-                                  <TextArea
-                                    placeholder="Style description"
-                                    rows={2}
-                                  />
+                                  <Input placeholder="Style description" />
                                 </Form.Item>
                               </Col>
                             </Row>
