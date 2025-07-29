@@ -13,5 +13,7 @@ export default {
   fetchCategory: (id: number) => `post/categories/${id}`,
   createCategory: () => "post/categories",
   updateCategory: (id: number) => `post/categories/${id}`,
-  deleteCategory: (id: number) => `post/categories/${id}`,
+  deleteCategory: () => `post/categories/delete`,
+  restoreCategory: () => `post/categories/restore`,
+  permanentDeleteCategory: () => `post/categories/permanent`,
 };

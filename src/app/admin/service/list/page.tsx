@@ -10,7 +10,9 @@ import {
   Dropdown,
   Modal,
   Input,
+  Checkbox,
   Space,
+  Tooltip,
 } from "antd";
 import {
   PlusOutlined,
@@ -24,11 +26,11 @@ import {
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchPosts,
-  deletePost,
-  restorePost,
-  permanentDeletePost,
-} from "@/store/actions/posts";
+  fetchServices,
+  deleteService,
+  restoreService,
+  permanentDeleteService,
+} from "@/store/actions/services";
 import { useSession } from "next-auth/react";
 import { AppDispatch, RootState } from "@/store/store";
 
@@ -39,25 +41,38 @@ const statusMap: Record<number, { label: string; color: string }> = {
   1: { label: "Published", color: "green" },
   2: { label: "Archived", color: "default" },
 };
-const deleteFlgMap: Record<number, { label: string; color: string }> = {
-  0: { label: "Active", color: "blue" },
-  1: { label: "Deleted", color: "red" },
+
+const typeMap: Record<number, { label: string; color: string }> = {
+  0: { label: "Basic", color: "blue" },
+  1: { label: "Premium", color: "purple" },
+  2: { label: "Enterprise", color: "gold" },
 };
+
 const sortFields = [
   { value: "createdTime", label: "Created Time" },
   { value: "title", label: "Title" },
+  { value: "price", label: "Price" },
+  { value: "rating", label: "Rating" },
 ];
 
-const PostListPage: React.FC = () => {
+const ServiceListPage: React.FC = () => {
   const { data: session } = useSession();
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
   // Get state from Redux store
-  const postList = useSelector((state: RootState) => state.posts.list);
-  const postTotal = useSelector((state: RootState) => state.posts.total);
-  const postLoading = useSelector((state: RootState) => state.posts.loading);
+  const serviceList = useSelector(
+    (state: RootState) => state.services?.list || []
+  );
+  const serviceTotal = useSelector(
+    (state: RootState) => state.services?.total || 0
+  );
+  const serviceLoading = useSelector(
+    (state: RootState) => state.services?.loading || false
+  );
+
   const [status, setStatus] = useState<string>("all");
+  const [type, setType] = useState<string>("all");
   const [deleteFlg, setDeleteFlg] = useState<number>(0); // 0: Active, 1: Deleted
   const [sortBy, setSortBy] = useState<string>("createdTime");
   const [sortDesc, setSortDesc] = useState<boolean>(true);
@@ -65,12 +80,13 @@ const PostListPage: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [selectedPosts, setSelectedPosts] = useState<any[]>([]);
+  const [selectedServices, setSelectedServices] = useState<any[]>([]);
 
   function handleQuery(keyword: string, page = 1, itemsPerPage = 10) {
     const queryParams = {
       search: keyword,
       status: status === "all" ? undefined : parseInt(status),
+      type: type === "all" ? undefined : parseInt(type),
       deleteFlg,
       page,
       itemsPerPage,
@@ -78,7 +94,7 @@ const PostListPage: React.FC = () => {
       sortDesc,
     };
 
-    dispatch(fetchPosts(queryParams, session?.accessToken || "") as any);
+    dispatch(fetchServices(queryParams, session?.accessToken || "") as any);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   }
@@ -89,33 +105,32 @@ const PostListPage: React.FC = () => {
     }
   }, [session?.accessToken, deleteFlg]);
 
-  const handleEdit = (post: any) => {
-    router.push(`/admin/post/edit/${post.id}`);
+  const handleEdit = (service: any) => {
+    router.push(`/admin/service/edit/${service.id}`);
   };
 
   const onSuccess = () => {
     message.success("Operation completed successfully");
     setSelectedRowKeys([]);
-    setSelectedPosts([]);
+    setSelectedServices([]);
     handleQuery(keyword, pageNumber, pageSize);
   };
 
   const onFailure = (error: any) => {
-    message.error(error);
-    message.error(error || "Failed to delete user");
+    message.error(error || "Failed to delete service");
   };
 
-  const handleDelete = (post: any) => {
+  const handleDelete = (service: any) => {
     Modal.confirm({
       title: "Confirm",
-      content: `Are you sure you want to move "${post.title}" to trash?`,
+      content: `Are you sure you want to move "${service.title}" to trash?`,
       okText: "Move to Trash",
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
         dispatch(
-          deletePost(
-            { ids: [post.id] },
+          deleteService(
+            { ids: [service.id] },
             session?.accessToken || "",
             onSuccess,
             onFailure
@@ -125,17 +140,17 @@ const PostListPage: React.FC = () => {
     });
   };
 
-  const handleRestore = (post: any) => {
+  const handleRestore = (service: any) => {
     Modal.confirm({
       title: "Confirm Restore",
-      content: `Are you sure you want to restore "${post.title}"?`,
+      content: `Are you sure you want to restore "${service.title}"?`,
       okText: "Restore",
       okType: "primary",
       cancelText: "Cancel",
       onOk() {
         dispatch(
-          restorePost(
-            { ids: [post.id] },
+          restoreService(
+            { ids: [service.id] },
             session?.accessToken || "",
             onSuccess,
             onFailure
@@ -145,17 +160,17 @@ const PostListPage: React.FC = () => {
     });
   };
 
-  const handlePermanentDelete = (post: any) => {
+  const handlePermanentDelete = (service: any) => {
     Modal.confirm({
       title: "Permanent Delete",
-      content: `Are you sure you want to permanently delete "${post.title}"? This action cannot be undone.`,
+      content: `Are you sure you want to permanently delete "${service.title}"? This action cannot be undone.`,
       okText: "Delete Permanently",
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
         dispatch(
-          permanentDeletePost(
-            { ids: [post.id] },
+          permanentDeleteService(
+            { ids: [service.id] },
             session?.accessToken || "",
             onSuccess,
             onFailure
@@ -166,21 +181,21 @@ const PostListPage: React.FC = () => {
   };
 
   const handleBulkDelete = () => {
-    if (selectedPosts.length === 0) {
-      message.warning("Please select posts to delete");
+    if (selectedServices.length === 0) {
+      message.warning("Please select services to delete");
       return;
     }
 
     Modal.confirm({
       title: "Bulk Delete",
-      content: `Are you sure you want to move ${selectedPosts.length} post(s) to trash?`,
+      content: `Are you sure you want to move ${selectedServices.length} service(s) to trash?`,
       okText: "Move to Trash",
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        const ids = selectedPosts.map((post) => post.id);
+        const ids = selectedServices.map((service) => service.id);
         dispatch(
-          deletePost(
+          deleteService(
             { ids },
             session?.accessToken || "",
             onSuccess,
@@ -192,21 +207,21 @@ const PostListPage: React.FC = () => {
   };
 
   const handleBulkRestore = () => {
-    if (selectedPosts.length === 0) {
-      message.warning("Please select posts to restore");
+    if (selectedServices.length === 0) {
+      message.warning("Please select services to restore");
       return;
     }
 
     Modal.confirm({
       title: "Bulk Restore",
-      content: `Are you sure you want to restore ${selectedPosts.length} post(s)?`,
+      content: `Are you sure you want to restore ${selectedServices.length} service(s)?`,
       okText: "Restore",
       okType: "primary",
       cancelText: "Cancel",
       onOk() {
-        const ids = selectedPosts.map((post) => post.id);
+        const ids = selectedServices.map((service) => service.id);
         dispatch(
-          restorePost(
+          restoreService(
             { ids },
             session?.accessToken || "",
             onSuccess,
@@ -218,21 +233,21 @@ const PostListPage: React.FC = () => {
   };
 
   const handleBulkPermanentDelete = () => {
-    if (selectedPosts.length === 0) {
-      message.warning("Please select posts to delete permanently");
+    if (selectedServices.length === 0) {
+      message.warning("Please select services to delete permanently");
       return;
     }
 
     Modal.confirm({
       title: "Bulk Permanent Delete",
-      content: `Are you sure you want to permanently delete ${selectedPosts.length} post(s)? This action cannot be undone.`,
+      content: `Are you sure you want to permanently delete ${selectedServices.length} service(s)? This action cannot be undone.`,
       okText: "Delete Permanently",
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        const ids = selectedPosts.map((post) => post.id);
+        const ids = selectedServices.map((service) => service.id);
         dispatch(
-          permanentDeletePost(
+          permanentDeleteService(
             { ids },
             session?.accessToken || "",
             onSuccess,
@@ -243,8 +258,8 @@ const PostListPage: React.FC = () => {
     });
   };
 
-  const handleView = (post: any) => {
-    router.push(`/admin/post/${post.id}`);
+  const handleView = (service: any) => {
+    router.push(`/admin/service/${service.id}`);
   };
 
   const columns = [
@@ -261,22 +276,59 @@ const PostListPage: React.FC = () => {
       render: (title: string) => <span className="font-medium">{title}</span>,
     },
     {
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
+      render: (type: number) => (
+        <Tag color={typeMap[type]?.color || "default"}>
+          {typeMap[type]?.label || type}
+        </Tag>
+      ),
+    },
+    {
+      title: "Price",
+      key: "price",
+      render: (record: any) => (
+        <div>
+          {record.discountedPrice > 0 ? (
+            <div>
+              <span className="text-red-600 font-medium">
+                ${record?.discountedPrice}
+              </span>
+              <span className="text-gray-400 line-through ml-2">
+                ${record?.originalPrice}
+              </span>
+            </div>
+          ) : (
+            <span className="font-medium">${record?.originalPrice}</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "Rating",
+      dataIndex: "rating",
+      key: "rating",
+      render: (rating: number) => (
+        <div className="flex items-center">
+          <span className="text-yellow-500">★</span>
+          <span className="ml-1">{rating?.toFixed(1)}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Orders",
+      dataIndex: "orderCount",
+      key: "orderCount",
+      render: (count: number) => <span>{count}</span>,
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
       render: (status: number) => (
         <Tag color={statusMap[status]?.color || "default"}>
           {statusMap[status]?.label || status}
-        </Tag>
-      ),
-    },
-    {
-      title: "Deleted",
-      dataIndex: "deleteFlg",
-      key: "deleteFlg",
-      render: (deleteFlg: number) => (
-        <Tag color={deleteFlgMap[deleteFlg]?.color || "default"}>
-          {deleteFlgMap[deleteFlg]?.label || deleteFlg}
         </Tag>
       ),
     },
@@ -349,13 +401,13 @@ const PostListPage: React.FC = () => {
   return (
     <div>
       <h1 className="text-4xl font-bold mb-5">
-        {deleteFlg === 1 ? "Trash" : "Posts"}
+        {deleteFlg === 1 ? "Trash" : "Services"}
       </h1>
 
       <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
         <div className="flex flex-wrap gap-2 items-center">
           <Input.Search
-            placeholder="Search posts"
+            placeholder="Search services"
             allowClear
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -375,6 +427,16 @@ const PostListPage: React.FC = () => {
             <Option value={0}>Draft</Option>
             <Option value={1}>Published</Option>
             <Option value={2}>Archived</Option>
+          </Select>
+          <Select
+            value={type}
+            onChange={setType}
+            className="w-[120px] !h-[40px]"
+          >
+            <Option value="all">All Types</Option>
+            <Option value={0}>Basic</Option>
+            <Option value={1}>Premium</Option>
+            <Option value={2}>Enterprise</Option>
           </Select>
           <Select
             value={sortBy}
@@ -403,18 +465,18 @@ const PostListPage: React.FC = () => {
                 type="default"
                 icon={<RestOutlined />}
                 onClick={handleBulkRestore}
-                disabled={selectedPosts.length === 0}
+                disabled={selectedServices.length === 0}
               >
-                Restore Selected ({selectedPosts.length})
+                Restore Selected ({selectedServices.length})
               </Button>
               <Button
                 type="primary"
                 danger
                 icon={<DeleteFilled />}
                 onClick={handleBulkPermanentDelete}
-                disabled={selectedPosts.length === 0}
+                disabled={selectedServices.length === 0}
               >
-                Delete Permanently ({selectedPosts.length})
+                Delete Permanently ({selectedServices.length})
               </Button>
             </>
           ) : (
@@ -424,16 +486,16 @@ const PostListPage: React.FC = () => {
                 danger
                 icon={<DeleteOutlined />}
                 onClick={handleBulkDelete}
-                disabled={selectedPosts.length === 0}
+                disabled={selectedServices.length === 0}
               >
-                Move to Trash ({selectedPosts.length})
+                Move to Trash ({selectedServices.length})
               </Button>
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                onClick={() => router.push("/admin/post/create")}
+                onClick={() => router.push("/admin/service/create")}
               >
-                Add New Post
+                Add New Service
               </Button>
             </>
           )}
@@ -448,18 +510,18 @@ const PostListPage: React.FC = () => {
             onClick={() => {
               setDeleteFlg(0);
               setSelectedRowKeys([]);
-              setSelectedPosts([]);
+              setSelectedServices([]);
               handleQuery(keyword, 1, pageSize);
             }}
           >
-            Active Posts
+            Active Services
           </Button>
           <Button
             type={deleteFlg === 1 ? "primary" : "default"}
             onClick={() => {
               setDeleteFlg(1);
               setSelectedRowKeys([]);
-              setSelectedPosts([]);
+              setSelectedServices([]);
               handleQuery(keyword, 1, pageSize);
             }}
           >
@@ -470,20 +532,20 @@ const PostListPage: React.FC = () => {
 
       <Table
         columns={columns}
-        dataSource={postList}
-        loading={postLoading}
+        dataSource={serviceList}
+        loading={serviceLoading}
         rowKey="id"
         rowSelection={{
           selectedRowKeys,
           onChange: (selectedRowKeys, selectedRows) => {
             setSelectedRowKeys(selectedRowKeys);
-            setSelectedPosts(selectedRows);
+            setSelectedServices(selectedRows);
           },
         }}
         pagination={{
           current: pageNumber,
           pageSize,
-          total: postTotal,
+          total: serviceTotal,
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total, range) =>
@@ -497,4 +559,4 @@ const PostListPage: React.FC = () => {
   );
 };
 
-export default PostListPage;
+export default ServiceListPage;

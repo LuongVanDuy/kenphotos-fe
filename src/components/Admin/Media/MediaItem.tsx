@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Image, Button, Tooltip, Typography } from "antd";
+import { Card, Image, Button, Tooltip, Typography, Checkbox } from "antd";
 import {
   EyeOutlined,
   FileImageOutlined,
@@ -11,9 +11,15 @@ const { Text } = Typography;
 
 interface MediaItemProps {
   item: Media;
+  selected?: boolean;
+  onSelect?: (selected: boolean) => void;
 }
 
-const MediaItem: React.FC<MediaItemProps> = ({ item }) => {
+const MediaItem: React.FC<MediaItemProps> = ({
+  item,
+  selected = false,
+  onSelect,
+}) => {
   // Get file icon based on extension
   const getFileIcon = (filename: string) => {
     const ext = filename?.split(".")?.pop()?.toLowerCase();
@@ -47,7 +53,24 @@ const MediaItem: React.FC<MediaItemProps> = ({ item }) => {
   };
 
   return (
-    <div className="media-item w-48 h-48 relative overflow-hidden rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+    <div
+      className={`media-item w-48 h-48 relative overflow-hidden rounded-lg border transition-all ${
+        selected
+          ? "border-blue-500 bg-blue-50 shadow-lg"
+          : "border-gray-200 hover:shadow-lg"
+      }`}
+    >
+      {/* Checkbox for selection */}
+      {onSelect && (
+        <div className="absolute top-2 left-2 z-10">
+          <Checkbox
+            checked={selected}
+            onChange={(e) => onSelect(e.target.checked)}
+            className=" rounded shadow-sm"
+          />
+        </div>
+      )}
+
       {isImageFile(item.name) ? (
         <Image
           alt="preview"

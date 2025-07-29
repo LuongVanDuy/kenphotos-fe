@@ -10,6 +10,8 @@ import {
   Modal,
   Typography,
   Table,
+  message,
+  Space,
 } from "antd";
 import {
   AppstoreOutlined,
@@ -17,11 +19,12 @@ import {
   UploadOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { Media } from "@/types";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchMedia } from "@/store/actions/media";
+import { fetchMedia, deleteMedia } from "@/store/actions/media";
 import { useSession } from "next-auth/react";
 import MediaItem from "@/components/Admin/Media/MediaItem";
 import { getImageUrl } from "@/utils";
@@ -51,6 +54,8 @@ const MediaListPage: React.FC = () => {
   const [sortDesc, setSortDesc] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [selectedMedia, setSelectedMedia] = useState<Media[]>([]);
 
   // Query function
   function handleQuery(keyword: string, page = 1, itemsPerPage = 20) {
@@ -92,13 +97,61 @@ const MediaListPage: React.FC = () => {
     }
   };
 
+  const handleBulkDelete = () => {
+    if (selectedMedia.length === 0) {
+      message.warning("Please select media files to delete");
+      return;
+    }
+
+    Modal.confirm({
+      title: "Delete Media Files",
+      content: `Are you sure you want to delete ${selectedMedia.length} media file(s)? This action cannot be undone.`,
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk() {
+        const slugs = selectedMedia.map((media) => media.slug);
+        dispatch(
+          deleteMedia(
+            slugs,
+            session?.accessToken || "",
+            () => {
+              message.success("Media files deleted successfully");
+              setSelectedRowKeys([]);
+              setSelectedMedia([]);
+              handleQuery(searchKeyword, pageNumber, pageSize);
+            },
+            (error) => message.error(error || "Failed to delete media files")
+          ) as any
+        );
+      },
+    });
+  };
+
   // WordPress-style grid view
   const renderGridView = () => (
     <div className="media-library-content">
       {/* Media Grid */}
       <div className="media-grid">
         {mediaList.map((item: Media) => (
-          <MediaItem key={item.id} item={item} />
+          <MediaItem
+            key={item.id}
+            item={item}
+            selected={selectedRowKeys.includes(item.id)}
+            onSelect={(selected) => {
+              if (selected) {
+                setSelectedRowKeys([...selectedRowKeys, item.id]);
+                setSelectedMedia([...selectedMedia, item]);
+              } else {
+                setSelectedRowKeys(
+                  selectedRowKeys.filter((key) => key !== item.id)
+                );
+                setSelectedMedia(
+                  selectedMedia.filter((media) => media.id !== item.id)
+                );
+              }
+            }}
+          />
         ))}
       </div>
     </div>
@@ -171,14 +224,26 @@ const MediaListPage: React.FC = () => {
               Manage your media files and assets
             </Text>
           </div>
-          <Button
-            type="primary"
-            icon={<UploadOutlined />}
-            onClick={() => router.push("/admin/media/create")}
-            size="large"
-          >
-            Add New
-          </Button>
+          <Space>
+            {selectedMedia.length > 0 && (
+              <Button
+                type="default"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={handleBulkDelete}
+              >
+                Delete Selected ({selectedMedia.length})
+              </Button>
+            )}
+            <Button
+              type="primary"
+              icon={<UploadOutlined />}
+              onClick={() => router.push("/admin/media/create")}
+              size="large"
+            >
+              Add New
+            </Button>
+          </Space>
         </div>
       </div>
 
@@ -254,6 +319,14 @@ const MediaListPage: React.FC = () => {
           columns={tableColumns}
           dataSource={mediaList}
           loading={mediaLoading}
+          rowKey="id"
+          rowSelection={{
+            selectedRowKeys,
+            onChange: (selectedRowKeys, selectedRows) => {
+              setSelectedRowKeys(selectedRowKeys);
+              setSelectedMedia(selectedRows);
+            },
+          }}
           pagination={{
             current: pageNumber,
             pageSize,

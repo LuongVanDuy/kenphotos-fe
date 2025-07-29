@@ -1,17 +1,17 @@
 import { AppDispatch } from "../store";
 import {
-  FETCH_POSTS,
-  FETCH_POSTS_SUCCESS,
-  FETCH_POSTS_FAILURE,
-  FETCH_POST,
-  FETCH_POST_SUCCESS,
-  FETCH_POST_FAILURE,
-  FETCH_PUBLIC_POSTS,
-  FETCH_PUBLIC_POSTS_SUCCESS,
-  FETCH_PUBLIC_POSTS_FAILURE,
-  FETCH_PUBLIC_POST,
-  FETCH_PUBLIC_POST_SUCCESS,
-  FETCH_PUBLIC_POST_FAILURE,
+  FETCH_SERVICES,
+  FETCH_SERVICES_SUCCESS,
+  FETCH_SERVICES_FAILURE,
+  FETCH_SERVICE,
+  FETCH_SERVICE_SUCCESS,
+  FETCH_SERVICE_FAILURE,
+  FETCH_PUBLIC_SERVICES,
+  FETCH_PUBLIC_SERVICES_SUCCESS,
+  FETCH_PUBLIC_SERVICES_FAILURE,
+  FETCH_PUBLIC_SERVICE,
+  FETCH_PUBLIC_SERVICE_SUCCESS,
+  FETCH_PUBLIC_SERVICE_FAILURE,
 } from "../actionTypes";
 import {
   fetchWithToken,
@@ -20,51 +20,52 @@ import {
   fetchNoToken,
   patchWithToken,
 } from "@/app/api/index";
-import postsEndpoint from "../endpoint/posts";
+import servicesEndpoint from "../endpoint/services";
 import { postWithToken } from "@/app/api/index";
 import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
 
-export const fetchPosts = (payload: any, accessToken: string) => {
+// Admin actions
+export const fetchServices = (payload: any, accessToken: string) => {
   return (dispatch: AppDispatch) => {
-    dispatch({ type: FETCH_POSTS });
+    dispatch({ type: FETCH_SERVICES });
 
-    fetchWithToken(postsEndpoint.fetchPosts(payload), accessToken)
+    fetchWithToken(servicesEndpoint.fetchServices(payload), accessToken)
       .then((response) => {
         dispatch({
-          type: FETCH_POSTS_SUCCESS,
+          type: FETCH_SERVICES_SUCCESS,
           payload: { data: response },
         });
       })
       .catch((error) => {
         dispatch({
-          type: FETCH_POSTS_FAILURE,
+          type: FETCH_SERVICES_FAILURE,
           payload: { error: error.message },
         });
       });
   };
 };
 
-export const fetchPost = (payload: number, accessToken: string) => {
+export const fetchService = (payload: number, accessToken: string) => {
   return (dispatch: AppDispatch) => {
-    dispatch({ type: FETCH_POST });
+    dispatch({ type: FETCH_SERVICE });
 
-    fetchWithToken(postsEndpoint.fetchPost(payload), accessToken)
+    fetchWithToken(servicesEndpoint.fetchService(payload), accessToken)
       .then((response) => {
         dispatch({
-          type: FETCH_POST_SUCCESS,
+          type: FETCH_SERVICE_SUCCESS,
           payload: { data: response },
         });
       })
       .catch((error) => {
         dispatch({
-          type: FETCH_POST_FAILURE,
+          type: FETCH_SERVICE_FAILURE,
           payload: { error: error.message },
         });
       });
   };
 };
 
-export const createPost =
+export const createService =
   (
     payload: any,
     accessToken: string,
@@ -73,13 +74,14 @@ export const createPost =
   ) =>
   async () => {
     await asyncActionWrapper(
-      () => postWithToken(postsEndpoint.createPost(), accessToken, payload),
+      () =>
+        postWithToken(servicesEndpoint.createService(), accessToken, payload),
       onSuccess,
       onFailure
     );
   };
 
-export const updatePost =
+export const updateService =
   (
     payload: any,
     accessToken: string,
@@ -90,7 +92,7 @@ export const updatePost =
     await asyncActionWrapper(
       () =>
         putWithToken(
-          postsEndpoint.updatePost(payload.id),
+          servicesEndpoint.updateService(payload.id),
           accessToken,
           payload.data
         ),
@@ -99,7 +101,7 @@ export const updatePost =
     );
   };
 
-export const deletePost =
+export const deleteService =
   (
     payload: any,
     accessToken: string,
@@ -108,13 +110,14 @@ export const deletePost =
   ) =>
   async () => {
     await asyncActionWrapper(
-      () => patchWithToken(postsEndpoint.deletePost(), accessToken, payload),
+      () =>
+        patchWithToken(servicesEndpoint.deleteService(), accessToken, payload),
       onSuccess,
       onFailure
     );
   };
 
-export const restorePost =
+export const restoreService =
   (
     payload: any,
     accessToken: string,
@@ -123,13 +126,14 @@ export const restorePost =
   ) =>
   async () => {
     await asyncActionWrapper(
-      () => patchWithToken(postsEndpoint.restorePost(), accessToken, payload),
+      () =>
+        patchWithToken(servicesEndpoint.restoreService(), accessToken, payload),
       onSuccess,
       onFailure
     );
   };
 
-export const permanentDeletePost =
+export const permanentDeleteService =
   (
     payload: any,
     accessToken: string,
@@ -140,7 +144,7 @@ export const permanentDeletePost =
     await asyncActionWrapper(
       () =>
         deleteWithToken(
-          postsEndpoint.permanentDeletePost(),
+          servicesEndpoint.permanentDeleteService(),
           accessToken,
           payload
         ),
@@ -149,39 +153,39 @@ export const permanentDeletePost =
     );
   };
 
-//
-export const fetchPublicPosts = (option: any) => {
+// Public actions
+export const fetchPublicServices = (option: any) => {
   return (dispatch: AppDispatch) => {
-    dispatch({ type: FETCH_PUBLIC_POSTS });
-    fetchNoToken(postsEndpoint.fetchPublicPosts(option))
+    dispatch({ type: FETCH_PUBLIC_SERVICES });
+    fetchNoToken(servicesEndpoint.fetchPublicServices(option))
       .then((response) => {
         dispatch({
-          type: FETCH_PUBLIC_POSTS_SUCCESS,
+          type: FETCH_PUBLIC_SERVICES_SUCCESS,
           payload: { data: response },
         });
       })
       .catch((error) => {
         dispatch({
-          type: FETCH_PUBLIC_POSTS_FAILURE,
+          type: FETCH_PUBLIC_SERVICES_FAILURE,
           payload: { error: error.message },
         });
       });
   };
 };
 
-export const fetchPublicPost = (id: string) => {
+export const fetchPublicService = (id: string) => {
   return (dispatch: AppDispatch) => {
-    dispatch({ type: FETCH_PUBLIC_POST });
-    fetchNoToken(postsEndpoint.fetchPublicPost(id))
+    dispatch({ type: FETCH_PUBLIC_SERVICE });
+    fetchNoToken(servicesEndpoint.fetchPublicService(id))
       .then((response) => {
         dispatch({
-          type: FETCH_PUBLIC_POST_SUCCESS,
+          type: FETCH_PUBLIC_SERVICE_SUCCESS,
           payload: { data: response },
         });
       })
       .catch((error) => {
         dispatch({
-          type: FETCH_PUBLIC_POST_FAILURE,
+          type: FETCH_PUBLIC_SERVICE_FAILURE,
           payload: { error: error.message },
         });
       });

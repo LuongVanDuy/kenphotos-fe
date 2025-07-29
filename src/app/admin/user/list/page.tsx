@@ -218,7 +218,11 @@ const UserListPage: React.FC = () => {
             }}
             style={{ width: 200 }}
           />
-          <Select value={sortBy} onChange={setSortBy} style={{ width: 150 }}>
+          <Select
+            value={sortBy}
+            onChange={setSortBy}
+            className="w-40 !h-[40px]"
+          >
             {sortFields.map((f) => (
               <Option key={f.value} value={f.value}>
                 {f.label}
@@ -228,7 +232,7 @@ const UserListPage: React.FC = () => {
           <Select
             value={sortDesc}
             onChange={(v) => setSortDesc(v)}
-            style={{ width: 120 }}
+            className="!h-[40px] w-40"
           >
             <Option value={false}>Ascending</Option>
             <Option value={true}>Descending</Option>

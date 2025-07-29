@@ -7,7 +7,12 @@ import {
   FETCH_CATEGORY_SUCCESS,
   FETCH_CATEGORY_FAILURE,
 } from "../actionTypes";
-import { fetchWithToken, putWithToken, deleteWithToken } from "@/app/api/index";
+import {
+  fetchWithToken,
+  putWithToken,
+  deleteWithToken,
+  patchWithToken,
+} from "@/app/api/index";
 import categoriesEndpoint from "../endpoint/categories";
 import { postWithToken } from "@/app/api/index";
 import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
@@ -50,14 +55,102 @@ export const fetchCategory = (payload: number, accessToken: string) => {
   };
 };
 
-export const createCategory = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => postWithToken(categoriesEndpoint.createCategory(), payload, accessToken), onSuccess, onFailure);
-};
+export const createCategory =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        postWithToken(
+          categoriesEndpoint.createCategory(),
+          payload,
+          accessToken
+        ),
+      onSuccess,
+      onFailure
+    );
+  };
 
-export const updateCategory = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => putWithToken(categoriesEndpoint.updateCategory(payload.id), payload.data, accessToken), onSuccess, onFailure);
-};
+export const updateCategory =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        putWithToken(
+          categoriesEndpoint.updateCategory(payload.id),
+          payload.data,
+          accessToken
+        ),
+      onSuccess,
+      onFailure
+    );
+  };
 
-export const deleteCategory = (payload: number, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => deleteWithToken(categoriesEndpoint.deleteCategory(payload), accessToken), onSuccess, onFailure);
-};
+export const deleteCategory =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        patchWithToken(
+          categoriesEndpoint.deleteCategory(),
+          accessToken,
+          payload
+        ),
+      onSuccess,
+      onFailure
+    );
+  };
+
+export const restoreCategory =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        patchWithToken(
+          categoriesEndpoint.restoreCategory(),
+          accessToken,
+          payload
+        ),
+      onSuccess,
+      onFailure
+    );
+  };
+
+export const permanentDeleteCategory =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        deleteWithToken(
+          categoriesEndpoint.permanentDeleteCategory(),
+          accessToken,
+          payload
+        ),
+      onSuccess,
+      onFailure
+    );
+  };

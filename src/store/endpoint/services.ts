@@ -1,5 +1,5 @@
 export default {
-  fetchPosts: (params?: Record<string, any>) => {
+  fetchServices: (params?: Record<string, any>) => {
     const queryString = params
       ? "?" +
         new URLSearchParams(
@@ -8,17 +8,17 @@ export default {
             .map(([k, v]) => [k, typeof v === "boolean" ? String(v) : v])
         ).toString()
       : "";
-    return "posts" + queryString;
+    return "services" + queryString;
   },
-  fetchPost: (id: number) => `posts/${id}`,
-  createPost: () => "posts",
-  updatePost: (id: number) => `posts/${id}`,
-  deletePost: () => `posts/delete`,
-  restorePost: () => `posts/restore`,
-  permanentDeletePost: () => `posts/permanent`,
+  fetchService: (id: number) => `services/${id}`,
+  createService: () => "services",
+  updateService: (id: number) => `services/${id}`,
+  deleteService: () => `services/delete`,
+  restoreService: () => `services/restore`,
+  permanentDeleteService: () => `services/permanent`,
 
-  //
-  fetchPublicPosts: (params?: Record<string, any>) => {
+  // Public endpoints
+  fetchPublicServices: (params?: Record<string, any>) => {
     const queryString = params
       ? "?" +
         new URLSearchParams(
@@ -27,7 +27,7 @@ export default {
             .map(([k, v]) => [k, typeof v === "boolean" ? String(v) : v])
         ).toString()
       : "";
-    return "public/posts" + queryString;
+    return "public/services" + queryString;
   },
-  fetchPublicPost: (slug: string) => `public/posts/${slug}`,
+  fetchPublicService: (slug: string) => `public/services/${slug}`,
 };

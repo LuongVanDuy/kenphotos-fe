@@ -9,7 +9,12 @@ interface UserFormProps {
   loading: boolean;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ form, onFinish, mode, loading }) => {
+const UserForm: React.FC<UserFormProps> = ({
+  form,
+  onFinish,
+  mode,
+  loading,
+}) => {
   const router = useRouter();
 
   const countryOptions = [
@@ -41,7 +46,7 @@ const UserForm: React.FC<UserFormProps> = ({ form, onFinish, mode, loading }) =>
 
   return (
     <>
-      <div className="bg-white min-h-screen">
+      <div className="bg-white ">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <Form form={form} layout="vertical" onFinish={onFinish}>
             <Row gutter={24}>
@@ -77,12 +82,18 @@ const UserForm: React.FC<UserFormProps> = ({ form, onFinish, mode, loading }) =>
                   label={
                     <div>
                       <div>Country</div>
-                      <div className="text-xs text-gray-500 font-normal">Country of your bank. Used by Stripe for payouts.</div>
+                      <div className="text-xs text-gray-500 font-normal">
+                        Country of your bank. Used by Stripe for payouts.
+                      </div>
                     </div>
                   }
                   rules={[{ required: true, message: "Please select country" }]}
                 >
-                  <Select placeholder="Select country" className="h-10" suffixIcon={<span className="text-gray-400">▼</span>}>
+                  <Select
+                    placeholder="Select country"
+                    className="h-10"
+                    suffixIcon={<span className="text-gray-400">▼</span>}
+                  >
                     {countryOptions.map((option) => (
                       <Option key={option.value} value={option.value}>
                         {option.label}
@@ -91,7 +102,13 @@ const UserForm: React.FC<UserFormProps> = ({ form, onFinish, mode, loading }) =>
                   </Select>
                 </Form.Item>
 
-                <Form.Item name="timezone" label="Timezone" rules={[{ required: true, message: "Please select timezone" }]}>
+                <Form.Item
+                  name="timezone"
+                  label="Timezone"
+                  rules={[
+                    { required: true, message: "Please select timezone" },
+                  ]}
+                >
                   <Select placeholder="Select timezone" className="h-10">
                     {timezoneOptions.map((option) => (
                       <Option key={option.value} value={option.value}>
@@ -101,14 +118,27 @@ const UserForm: React.FC<UserFormProps> = ({ form, onFinish, mode, loading }) =>
                   </Select>
                 </Form.Item>
 
-                <Form.Item name="businessWebsite" label="Business Website" rules={[{ type: "url", message: "Please enter valid URL" }]}>
-                  <Input placeholder="https://my-website.com" className="h-10" />
+                <Form.Item
+                  name="businessWebsite"
+                  label="Business Website"
+                  rules={[{ type: "url", message: "Please enter valid URL" }]}
+                >
+                  <Input
+                    placeholder="https://my-website.com"
+                    className="h-10"
+                  />
                 </Form.Item>
               </Col>
 
               {/* Column 2 */}
               <Col span={12}>
-                <Form.Item name="lastName" label="Last Name" rules={[{ required: true, message: "Please enter last name" }]}>
+                <Form.Item
+                  name="lastName"
+                  label="Last Name"
+                  rules={[
+                    { required: true, message: "Please enter last name" },
+                  ]}
+                >
                   <Input placeholder="Enter last name" className="h-10" />
                 </Form.Item>
 
@@ -136,7 +166,11 @@ const UserForm: React.FC<UserFormProps> = ({ form, onFinish, mode, loading }) =>
                     },
                   ]}
                 >
-                  <Input placeholder="Enter phone number" className="h-10" prefix={<span className="text-gray-400">+1</span>} />
+                  <Input
+                    placeholder="Enter phone number"
+                    className="h-10"
+                    prefix={<span className="text-gray-400">+1</span>}
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -172,7 +206,12 @@ const UserForm: React.FC<UserFormProps> = ({ form, onFinish, mode, loading }) =>
 
             {/* Action Buttons */}
             <div className="flex gap-4 mt-8">
-              <Button type="primary" htmlType="submit" loading={loading} className="bg-black border-black hover:bg-gray-800 h-10 px-6">
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                className="bg-black border-black hover:bg-gray-800 h-10 px-6"
+              >
                 Save
               </Button>
               <Button onClick={() => router.back()} className="h-10 px-6">
