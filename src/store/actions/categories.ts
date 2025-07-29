@@ -7,12 +7,7 @@ import {
   FETCH_CATEGORY_SUCCESS,
   FETCH_CATEGORY_FAILURE,
 } from "../actionTypes";
-import {
-  fetchWithToken,
-  putWithToken,
-  deleteWithToken,
-  patchWithToken,
-} from "@/app/api/index";
+import { fetchWithToken, putWithToken, deleteWithToken } from "@/app/api/index";
 import categoriesEndpoint from "../endpoint/categories";
 import { postWithToken } from "@/app/api/index";
 import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
@@ -95,46 +90,6 @@ export const updateCategory =
     );
   };
 
-export const deleteCategory =
-  (
-    payload: any,
-    accessToken: string,
-    onSuccess: () => void,
-    onFailure: (error: string) => void
-  ) =>
-  async () => {
-    await asyncActionWrapper(
-      () =>
-        patchWithToken(
-          categoriesEndpoint.deleteCategory(),
-          accessToken,
-          payload
-        ),
-      onSuccess,
-      onFailure
-    );
-  };
-
-export const restoreCategory =
-  (
-    payload: any,
-    accessToken: string,
-    onSuccess: () => void,
-    onFailure: (error: string) => void
-  ) =>
-  async () => {
-    await asyncActionWrapper(
-      () =>
-        patchWithToken(
-          categoriesEndpoint.restoreCategory(),
-          accessToken,
-          payload
-        ),
-      onSuccess,
-      onFailure
-    );
-  };
-
 export const permanentDeleteCategory =
   (
     payload: any,
@@ -148,7 +103,8 @@ export const permanentDeleteCategory =
         deleteWithToken(
           categoriesEndpoint.permanentDeleteCategory(),
           accessToken,
-          payload
+          payload,
+          null
         ),
       onSuccess,
       onFailure

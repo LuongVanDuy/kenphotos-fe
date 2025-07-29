@@ -1,5 +1,17 @@
-import { fetchWithToken, postWithToken, putWithToken, deleteWithToken } from "@/app/api";
-import { FETCH_USER, FETCH_USER_FAILURE, FETCH_USER_SUCCESS, FETCH_USERS, FETCH_USERS_FAILURE, FETCH_USERS_SUCCESS } from "../actionTypes";
+import {
+  fetchWithToken,
+  postWithToken,
+  putWithToken,
+  deleteWithToken,
+} from "@/app/api";
+import {
+  FETCH_USER,
+  FETCH_USER_FAILURE,
+  FETCH_USER_SUCCESS,
+  FETCH_USERS,
+  FETCH_USERS_FAILURE,
+  FETCH_USERS_SUCCESS,
+} from "../actionTypes";
 import { AppDispatch } from "../store";
 import users from "../endpoint/users";
 import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
@@ -42,14 +54,48 @@ export const fetchUser = (payload: number, accessToken: any) => {
   };
 };
 
-export const createUser = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => postWithToken(users.createUser(), accessToken, payload), onSuccess, onFailure);
-};
+export const createUser =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () => postWithToken(users.createUser(), accessToken, payload),
+      onSuccess,
+      onFailure
+    );
+  };
 
-export const updateUser = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => putWithToken(users.updateUser(payload.id), accessToken, payload.data), onSuccess, onFailure);
-};
+export const updateUser =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        putWithToken(users.updateUser(payload.id), accessToken, payload.data),
+      onSuccess,
+      onFailure
+    );
+  };
 
-export const deleteUser = (id: number, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => deleteWithToken(users.deleteUser(id), accessToken), onSuccess, onFailure);
-};
+export const deleteUser =
+  (
+    id: number,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () => deleteWithToken(users.deleteUser(id), accessToken, null),
+      onSuccess,
+      onFailure
+    );
+  };

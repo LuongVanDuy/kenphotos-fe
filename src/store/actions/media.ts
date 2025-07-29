@@ -59,7 +59,7 @@ export const deleteMedia =
   ) =>
   async () => {
     await asyncActionWrapper(
-      () => deleteWithToken(media.deleteMedia(), accessToken, payload),
+      () => deleteWithToken(media.deleteMedia(), accessToken, payload, null),
       onSuccess,
       onFailure
     );

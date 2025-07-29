@@ -142,7 +142,8 @@ export const permanentDeletePost =
         deleteWithToken(
           postsEndpoint.permanentDeletePost(),
           accessToken,
-          payload
+          payload,
+          null
         ),
       onSuccess,
       onFailure

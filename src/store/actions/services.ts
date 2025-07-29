@@ -146,7 +146,8 @@ export const permanentDeleteService =
         deleteWithToken(
           servicesEndpoint.permanentDeleteService(),
           accessToken,
-          payload
+          payload,
+          null
         ),
       onSuccess,
       onFailure
