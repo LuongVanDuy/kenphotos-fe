@@ -166,7 +166,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       open={open}
       onCancel={() => setOpen(false)}
       footer={null}
-      destroyOnClose
       maskClosable={false}
       centered
       confirmLoading={loadingDetail}
@@ -199,7 +198,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         <Form.Item label="Parent Category" name="parentId">
           <TreeSelect
             style={{ width: "100%" }}
-            dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
             treeData={treeData}
             placeholder="Select parent category (optional)"
             allowClear

@@ -283,7 +283,6 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
       width={1200}
       footer={null}
       centered
-      destroyOnClose
     >
       <Tabs
         activeKey={activeTab}

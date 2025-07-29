@@ -56,8 +56,6 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
 
         // Set max-width cho ql-editor
         (editor as HTMLElement).style.maxWidth = `${availableWidth}px`;
-
-        console.log("Editor max-width set to:", availableWidth, "px");
       }
     } catch (error) {
       console.warn("Error calculating editor max-width:", error);
