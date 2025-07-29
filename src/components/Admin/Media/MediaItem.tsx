@@ -11,10 +11,9 @@ const { Text } = Typography;
 
 interface MediaItemProps {
   item: Media;
-  onPreview: (item: Media) => void;
 }
 
-const MediaItem: React.FC<MediaItemProps> = ({ item, onPreview }) => {
+const MediaItem: React.FC<MediaItemProps> = ({ item }) => {
   // Get file icon based on extension
   const getFileIcon = (filename: string) => {
     const ext = filename?.split(".")?.pop()?.toLowerCase();
@@ -51,11 +50,9 @@ const MediaItem: React.FC<MediaItemProps> = ({ item, onPreview }) => {
     <div className="media-item w-48 h-48 relative overflow-hidden rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
       {isImageFile(item.name) ? (
         <Image
-          alt={item.name}
+          alt="preview"
+          style={{ width: "100%" }}
           src={getImageUrl(item)}
-          preview={false}
-          className="!w-full !h-full object-cover"
-          onClick={() => onPreview(item)}
         />
       ) : (
         <div className="flex items-center justify-center h-full bg-gray-50">
@@ -66,18 +63,6 @@ const MediaItem: React.FC<MediaItemProps> = ({ item, onPreview }) => {
           </div>
         </div>
       )}
-
-      <div className="absolute top-2 right-2 opacity-0 hover:opacity-100 transition-opacity">
-        <Tooltip title="Preview">
-          <Button
-            type="primary"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => onPreview(item)}
-            className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-          />
-        </Tooltip>
-      </div>
     </div>
   );
 };

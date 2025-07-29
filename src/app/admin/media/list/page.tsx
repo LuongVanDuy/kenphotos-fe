@@ -1,31 +1,52 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Image, Button, Tag, Input, Select, Modal, Typography, Table } from "antd";
-import { AppstoreOutlined, UnorderedListOutlined, UploadOutlined, SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons";
+import {
+  Image,
+  Button,
+  Tag,
+  Input,
+  Select,
+  Modal,
+  Typography,
+  Table,
+} from "antd";
+import {
+  AppstoreOutlined,
+  UnorderedListOutlined,
+  UploadOutlined,
+  SortAscendingOutlined,
+  SortDescendingOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { Media } from "@/types";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchMedia } from "@/store/actions/media";
 import { useSession } from "next-auth/react";
 import MediaItem from "@/components/Admin/Media/MediaItem";
 import { getImageUrl } from "@/utils";
+import { AppDispatch, RootState } from "@/store/store";
 
 const { Search } = Input;
 const { Option } = Select;
 const { Text, Title } = Typography;
 
-const MediaListPage: React.FC = (props: any) => {
-  const { fetchMedia, mediaList, mediaTotal, mediaLoading } = props;
+const MediaListPage: React.FC = () => {
   const router = useRouter();
   const { data: session } = useSession();
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Get state from Redux store
+  const mediaList = useSelector((state: RootState) => state.media.list);
+  const mediaTotal = useSelector((state: RootState) => state.media.total);
+  const mediaLoading = useSelector((state: RootState) => state.media.loading);
 
   // State management
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState<number | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<number | undefined>(
+    undefined
+  );
   const [sortBy, setSortBy] = useState("createdTime");
   const [sortDesc, setSortDesc] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
@@ -45,7 +66,7 @@ const MediaListPage: React.FC = (props: any) => {
       queryParams.status = statusFilter;
     }
 
-    fetchMedia(queryParams, session?.accessToken);
+    dispatch(fetchMedia(queryParams, session?.accessToken || "") as any);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   }
@@ -71,27 +92,13 @@ const MediaListPage: React.FC = (props: any) => {
     }
   };
 
-  const handlePreview = (mediaItem: Media) => {
-    // Check if it's an image by file extension
-    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(mediaItem.name);
-    const imageUrl = getImageUrl(mediaItem.slug);
-    if (isImage) {
-      setPreviewImage(imageUrl);
-      setPreviewVisible(true);
-    } else {
-      // For non-image files, use the full URL if it's a relative path
-      const fileUrl = mediaItem.slug.startsWith("http") ? mediaItem.slug : imageUrl;
-      window.open(fileUrl, "_blank");
-    }
-  };
-
   // WordPress-style grid view
   const renderGridView = () => (
     <div className="media-library-content">
       {/* Media Grid */}
       <div className="media-grid">
         {mediaList.map((item: Media) => (
-          <MediaItem key={item.id} item={item} onPreview={handlePreview} />
+          <MediaItem key={item.id} item={item} />
         ))}
       </div>
     </div>
@@ -107,13 +114,11 @@ const MediaListPage: React.FC = (props: any) => {
         <div className="relative">
           {/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(record.name) ? (
             <Image
+              alt="preview"
               width={50}
               height={50}
               src={getImageUrl(record.slug)}
-              alt={record.name}
               className="object-cover rounded"
-              preview={false}
-              onClick={() => handlePreview(record)}
             />
           ) : (
             <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded">
@@ -131,7 +136,8 @@ const MediaListPage: React.FC = (props: any) => {
         <div>
           <div className="font-medium">{text}</div>
           <div className="text-sm text-gray-500">
-            Uploaded by {record.uploadedBy.firstName} {record.uploadedBy.lastName}
+            Uploaded by {record.uploadedBy.firstName}{" "}
+            {record.uploadedBy.lastName}
           </div>
         </div>
       ),
@@ -161,9 +167,16 @@ const MediaListPage: React.FC = (props: any) => {
             <Title level={2} className="mb-1">
               Media Library
             </Title>
-            <Text className="text-gray-600">Manage your media files and assets</Text>
+            <Text className="text-gray-600">
+              Manage your media files and assets
+            </Text>
           </div>
-          <Button type="primary" icon={<UploadOutlined />} onClick={() => router.push("/admin/media/create")} size="large">
+          <Button
+            type="primary"
+            icon={<UploadOutlined />}
+            onClick={() => router.push("/admin/media/create")}
+            size="large"
+          >
             Add New
           </Button>
         </div>
@@ -183,7 +196,9 @@ const MediaListPage: React.FC = (props: any) => {
             <Select
               defaultValue="all"
               className="w-[120px] !h-[40px]"
-              onChange={(value) => setStatusFilter(value === "all" ? undefined : Number(value))}
+              onChange={(value) =>
+                setStatusFilter(value === "all" ? undefined : Number(value))
+              }
             >
               <Option value="all">All Types</Option>
               <Option value="1">Images</Option>
@@ -192,7 +207,9 @@ const MediaListPage: React.FC = (props: any) => {
             </Select>
             <Button.Group>
               <Button
-                type={sortBy === "createdTime" && sortDesc ? "primary" : "default"}
+                type={
+                  sortBy === "createdTime" && sortDesc ? "primary" : "default"
+                }
                 icon={<SortDescendingOutlined />}
                 onClick={() => handleSort("createdTime")}
                 size="small"
@@ -200,7 +217,9 @@ const MediaListPage: React.FC = (props: any) => {
                 Newest
               </Button>
               <Button
-                type={sortBy === "createdTime" && !sortDesc ? "primary" : "default"}
+                type={
+                  sortBy === "createdTime" && !sortDesc ? "primary" : "default"
+                }
                 icon={<SortAscendingOutlined />}
                 onClick={() => handleSort("createdTime")}
                 size="small"
@@ -212,8 +231,16 @@ const MediaListPage: React.FC = (props: any) => {
 
           <div className="media-filters-right">
             <Button.Group>
-              <Button type={viewMode === "grid" ? "primary" : "default"} icon={<AppstoreOutlined />} onClick={() => setViewMode("grid")} />
-              <Button type={viewMode === "list" ? "primary" : "default"} icon={<UnorderedListOutlined />} onClick={() => setViewMode("list")} />
+              <Button
+                type={viewMode === "grid" ? "primary" : "default"}
+                icon={<AppstoreOutlined />}
+                onClick={() => setViewMode("grid")}
+              />
+              <Button
+                type={viewMode === "list" ? "primary" : "default"}
+                icon={<UnorderedListOutlined />}
+                onClick={() => setViewMode("list")}
+              />
             </Button.Group>
           </div>
         </div>
@@ -237,23 +264,8 @@ const MediaListPage: React.FC = (props: any) => {
           }}
         />
       )}
-
-      {/* Image Preview Modal */}
-      <Modal open={previewVisible} title="Image Preview" footer={null} onCancel={() => setPreviewVisible(false)} width="30%" style={{ top: 50 }}>
-        <Image alt="preview" style={{ width: "100%" }} src={previewImage} />
-      </Modal>
     </div>
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  mediaList: state.media.list,
-  mediaTotal: state.media.total,
-  mediaLoading: state.media.loading,
-});
-
-const mapDispatchToProps = {
-  fetchMedia: fetchMedia,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(MediaListPage);
+export default MediaListPage;

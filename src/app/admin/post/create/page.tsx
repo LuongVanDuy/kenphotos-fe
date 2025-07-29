@@ -2,15 +2,16 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 import { createPost } from "@/store/actions/posts";
 import PostForm from "@/components/Admin/Post/PostForm";
 import { Form, message } from "antd";
 import { useSession } from "next-auth/react";
+import { AppDispatch } from "@/store/store";
 
-const CreatePostPage: React.FC = (props: any) => {
-  const { createPost, updateUser } = props;
+const CreatePostPage: React.FC = () => {
   const { data: session } = useSession();
+  const dispatch = useDispatch<AppDispatch>();
 
   const router = useRouter();
   const [form] = Form.useForm();
@@ -28,7 +29,14 @@ const CreatePostPage: React.FC = (props: any) => {
   };
 
   const handleFinish = async (values: any) => {
-    createPost(values, session?.accessToken, onSuccess, onFailure);
+    dispatch(
+      createPost(
+        values,
+        session?.accessToken || "",
+        onSuccess,
+        onFailure
+      ) as any
+    );
   };
 
   const handleDraft = async (values: any) => {
@@ -36,19 +44,25 @@ const CreatePostPage: React.FC = (props: any) => {
       ...values,
       status: 0,
     };
-    createPost(draftValues, session?.accessToken, onSuccess, onFailure);
+    dispatch(
+      createPost(
+        draftValues,
+        session?.accessToken || "",
+        onSuccess,
+        onFailure
+      ) as any
+    );
   };
 
-  return <PostForm form={form} onFinish={handleFinish} onSaveDraft={handleDraft} mode="create" loading={loading} />;
+  return (
+    <PostForm
+      form={form}
+      onFinish={handleFinish}
+      onSaveDraft={handleDraft}
+      mode="create"
+      loading={loading}
+    />
+  );
 };
 
-const mapStateToProps = (state: any) => ({
-  postDetail: state.posts.detail,
-  postLoading: state.posts.loading,
-});
-
-const mapDispatchToProps = {
-  createPost: createPost,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(CreatePostPage);
+export default CreatePostPage;

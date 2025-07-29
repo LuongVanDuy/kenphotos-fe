@@ -1,12 +1,30 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button, Avatar, Space, message, Select, Input, Table, Dropdown, Modal } from "antd";
-import { UserOutlined, PlusOutlined, MoreOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Avatar,
+  Space,
+  message,
+  Select,
+  Input,
+  Table,
+  Dropdown,
+  Modal,
+} from "antd";
+import {
+  UserOutlined,
+  PlusOutlined,
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteUser, fetchUsers } from "@/store/actions/users";
 import { useSession } from "next-auth/react";
+import { AppDispatch, RootState } from "@/store/store";
 
 const { Option } = Select;
 
@@ -18,10 +36,15 @@ const sortFields = [
   { value: "businessName", label: "Business Name" },
 ];
 
-const UserListPage: React.FC = (props: any) => {
-  const { fetchUsers, userList, userTotal, userLoading, deleteUser } = props;
+const UserListPage: React.FC = () => {
   const { data: session } = useSession();
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+
+  // Get state from Redux store
+  const userList = useSelector((state: RootState) => state.users.list);
+  const userTotal = useSelector((state: RootState) => state.users.total);
+  const userLoading = useSelector((state: RootState) => state.users.loading);
   const [sortBy, setSortBy] = useState<string>("createdTime");
   const [sortDesc, setSortDesc] = useState<boolean>(true);
   const [keyword, setKeyword] = useState("");
@@ -37,7 +60,7 @@ const UserListPage: React.FC = (props: any) => {
       itemsPerPage,
     };
 
-    fetchUsers(queryParams, session?.accessToken);
+    dispatch(fetchUsers(queryParams, session?.accessToken || "") as any);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   }
@@ -70,7 +93,14 @@ const UserListPage: React.FC = (props: any) => {
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        deleteUser(user.id, session?.accessToken, onSuccess, onFailure);
+        dispatch(
+          deleteUser(
+            user.id,
+            session?.accessToken || "",
+            onSuccess,
+            onFailure
+          ) as any
+        );
       },
     });
   };
@@ -128,7 +158,9 @@ const UserListPage: React.FC = (props: any) => {
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
+          <div className="text-xs text-gray-500">
+            {new Date(date).toLocaleTimeString()}
+          </div>
         </div>
       ),
     },
@@ -193,12 +225,20 @@ const UserListPage: React.FC = (props: any) => {
               </Option>
             ))}
           </Select>
-          <Select value={sortDesc} onChange={(v) => setSortDesc(v)} style={{ width: 120 }}>
+          <Select
+            value={sortDesc}
+            onChange={(v) => setSortDesc(v)}
+            style={{ width: 120 }}
+          >
             <Option value={false}>Ascending</Option>
             <Option value={true}>Descending</Option>
           </Select>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/user/create")}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => router.push("/admin/user/create")}
+        >
           Add New User
         </Button>
       </div>
@@ -214,7 +254,8 @@ const UserListPage: React.FC = (props: any) => {
           total: userTotal,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
           onChange: (page, pageSize) => {
             handleQuery(keyword, page, pageSize);
           },
@@ -224,15 +265,4 @@ const UserListPage: React.FC = (props: any) => {
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  userList: state.users.list,
-  userTotal: state.users.total,
-  userLoading: state.users.loading,
-});
-
-const mapDispatchToProps = {
-  fetchUsers: fetchUsers,
-  deleteUser: deleteUser,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(UserListPage);
+export default UserListPage;

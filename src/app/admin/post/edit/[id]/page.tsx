@@ -2,15 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchPost, updatePost } from "@/store/actions/posts";
 import PostForm from "@/components/Admin/Post/PostForm";
 import { Form, message } from "antd";
 import { useSession } from "next-auth/react";
+import { AppDispatch, RootState } from "@/store/store";
 
-const EditPostPage: React.FC = (props: any) => {
-  const { fetchPost, postDetail, postLoading, postError, updatePost } = props;
+const EditPostPage: React.FC = () => {
   const { data: session } = useSession();
+  const dispatch = useDispatch<AppDispatch>();
 
   const params = useParams();
   const postId = Number(params.id);
@@ -19,8 +20,13 @@ const EditPostPage: React.FC = (props: any) => {
   const [formField, setFormField] = useState<any | undefined>();
   const [loading, setLoading] = useState(false);
 
+  // Get state from Redux store
+  const postDetail = useSelector((state: RootState) => state.posts.detail);
+  const postLoading = useSelector((state: RootState) => state.posts.loading);
+  const postError = useSelector((state: RootState) => state.posts.error);
+
   const loadData = () => {
-    fetchPost(postId, session?.accessToken);
+    dispatch(fetchPost(postId, session?.accessToken || "") as any);
   };
 
   useEffect(() => {
@@ -67,10 +73,30 @@ const EditPostPage: React.FC = (props: any) => {
         ...values,
       },
     };
-    updatePost(payload, session?.accessToken, onSuccess, onFailure);
+    dispatch(
+      updatePost(
+        payload,
+        session?.accessToken || "",
+        onSuccess,
+        onFailure
+      ) as any
+    );
   };
 
-  const handleDraft = async (values: any) => {};
+  const handleDraft = async (values: any) => {
+    const draftValues = {
+      ...values,
+      status: 0,
+    };
+    dispatch(
+      updatePost(
+        draftValues,
+        session?.accessToken || "",
+        onSuccess,
+        onFailure
+      ) as any
+    );
+  };
 
   if (postLoading) {
     return (
@@ -88,7 +114,10 @@ const EditPostPage: React.FC = (props: any) => {
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
           <p className="text-red-600 mb-4">Post not found</p>
-          <button onClick={() => router.push("/admin/post/list")} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          <button
+            onClick={() => router.push("/admin/post/list")}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
             Back to Posts
           </button>
         </div>
@@ -96,18 +125,16 @@ const EditPostPage: React.FC = (props: any) => {
     );
   }
 
-  return <PostForm form={form} onFinish={handleFinish} onSaveDraft={handleDraft} mode="edit" loading={loading} initialValues={formField} />;
+  return (
+    <PostForm
+      form={form}
+      onFinish={handleFinish}
+      onSaveDraft={handleDraft}
+      mode="edit"
+      loading={loading}
+      initialValues={formField}
+    />
+  );
 };
 
-const mapStateToProps = (state: any) => ({
-  postDetail: state.posts.detail,
-  postLoading: state.posts.loading,
-  postError: state.posts.error,
-});
-
-const mapDispatchToProps = {
-  fetchPost: fetchPost,
-  updatePost: updatePost,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(EditPostPage);
+export default EditPostPage;

@@ -3,12 +3,13 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { Button, Input, Select, Modal, Table, Dropdown } from "antd";
 import { PlusOutlined, FolderOutlined, MoreOutlined } from "@ant-design/icons";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories, fetchCategory } from "@/store/actions/categories";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import { Typography } from "antd";
 import CategoryForm from "@/components/Admin/Post/CategoryForm";
 import { useSession } from "next-auth/react";
+import { AppDispatch, RootState } from "@/store/store";
 
 const { Option } = Select;
 const { Text, Paragraph } = Typography;
@@ -25,9 +26,18 @@ export type TableListItem = {
   action: any;
 };
 
-const CategoryPage: React.FC = (props: any) => {
-  const { fetchCategories, categoryList, categoryLoading, categoryTotal, fetchCategory } = props;
+const CategoryPage: React.FC = () => {
   const { data: session } = useSession();
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Get state from Redux store
+  const categoryList = useSelector((state: RootState) => state.categories.list);
+  const categoryLoading = useSelector(
+    (state: RootState) => state.categories.loading
+  );
+  const categoryTotal = useSelector(
+    (state: RootState) => state.categories.total
+  );
 
   const [sortBy, setSortBy] = useState<string>("name");
   const [sortDesc, setSortDesc] = useState<boolean>(false);
@@ -74,7 +84,8 @@ const CategoryPage: React.FC = (props: any) => {
       render: (text: any) => {
         if (!text) return null;
         const plainText = stripHtml(text);
-        const truncated = plainText.length > 200 ? plainText.slice(0, 200) + "..." : plainText;
+        const truncated =
+          plainText.length > 200 ? plainText.slice(0, 200) + "..." : plainText;
         return <span>{truncated}</span>;
       },
     },
@@ -122,7 +133,7 @@ const CategoryPage: React.FC = (props: any) => {
       itemsPerPage,
     };
 
-    fetchCategories(queryParams, session?.accessToken);
+    dispatch(fetchCategories(queryParams, session?.accessToken || "") as any);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   }
@@ -150,10 +161,14 @@ const CategoryPage: React.FC = (props: any) => {
       content: (
         <div className="mt-4">
           <p className="text-gray-700 mb-2">
-            Are you sure you want to delete the category <strong>"{cat.name}"</strong>?
+            Are you sure you want to delete the category{" "}
+            <strong>"{cat.name}"</strong>?
           </p>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="text-red-700 text-sm">⚠️ This action cannot be undone. All subcategories will also be deleted.</p>
+            <p className="text-red-700 text-sm">
+              ⚠️ This action cannot be undone. All subcategories will also be
+              deleted.
+            </p>
           </div>
         </div>
       ),
@@ -203,14 +218,24 @@ const CategoryPage: React.FC = (props: any) => {
             />
           </div>
           <div className="flex items-center gap-2">
-            <Select value={sortBy} onChange={setSortBy} style={{ width: 150 }} size="large">
+            <Select
+              value={sortBy}
+              onChange={setSortBy}
+              style={{ width: 150 }}
+              size="large"
+            >
               {sortFields.map((f) => (
                 <Option key={f.value} value={f.value}>
                   {f.label}
                 </Option>
               ))}
             </Select>
-            <Select value={sortDesc} onChange={(v) => setSortDesc(v)} style={{ width: 120 }} size="large">
+            <Select
+              value={sortDesc}
+              onChange={(v) => setSortDesc(v)}
+              style={{ width: 120 }}
+              size="large"
+            >
               <Option value={false}>Ascending</Option>
               <Option value={true}>Descending</Option>
             </Select>
@@ -242,7 +267,8 @@ const CategoryPage: React.FC = (props: any) => {
           total: categoryTotal,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
           onChange: (page, pageSize) => {
             handleQuery(keyword, page, pageSize);
           },
@@ -286,26 +312,38 @@ const CategoryPage: React.FC = (props: any) => {
             <div>
               <Text strong>Slug:</Text>
               <Paragraph className="!mb-0">
-                <code className="bg-gray-100 px-2 py-1 rounded">{selectedCategory.slug}</code>
+                <code className="bg-gray-100 px-2 py-1 rounded">
+                  {selectedCategory.slug}
+                </code>
               </Paragraph>
             </div>
             <div>
               <Text strong>Description:</Text>
-              <Paragraph className="!mb-0">{selectedCategory.description || "No description"}</Paragraph>
+              <Paragraph className="!mb-0">
+                {selectedCategory.description || "No description"}
+              </Paragraph>
             </div>
             <div>
               <Text strong>Parent Category:</Text>
               <Paragraph className="!mb-0">
-                {selectedCategory.parentId ? categoryList.find((p: any) => p.id === selectedCategory.parentId)?.name || "Unknown" : "Root Category"}
+                {selectedCategory.parentId
+                  ? categoryList.find(
+                      (p: any) => p.id === selectedCategory.parentId
+                    )?.name || "Unknown"
+                  : "Root Category"}
               </Paragraph>
             </div>
             <div>
               <Text strong>Created:</Text>
-              <Paragraph className="!mb-0">{new Date(selectedCategory.createdAt).toLocaleString()}</Paragraph>
+              <Paragraph className="!mb-0">
+                {new Date(selectedCategory.createdAt).toLocaleString()}
+              </Paragraph>
             </div>
             <div>
               <Text strong>Last Updated:</Text>
-              <Paragraph className="!mb-0">{new Date(selectedCategory.updatedAt).toLocaleString()}</Paragraph>
+              <Paragraph className="!mb-0">
+                {new Date(selectedCategory.updatedAt).toLocaleString()}
+              </Paragraph>
             </div>
           </div>
         </Modal>
@@ -324,15 +362,4 @@ const CategoryPage: React.FC = (props: any) => {
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  categoryList: state.categories.list,
-  categoryTotal: state.categories.total,
-  categoryLoading: state.categories.loading,
-});
-
-const mapDispatchToProps = {
-  fetchCategories: fetchCategories,
-  fetchCategory: fetchCategory,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryPage);
+export default CategoryPage;
