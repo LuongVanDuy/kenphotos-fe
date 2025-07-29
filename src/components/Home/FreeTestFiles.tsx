@@ -1,17 +1,18 @@
 'use client'
+
 import Image from 'next/image'
 import React from 'react'
 
 const FreeTestFiles: React.FC = () => {
   return (
-    <section className='bg-[#D4EFFF] py-16' aria-labelledby='free-test-heading'>
+    <section className='bg-gray py-8 md:py-24' aria-labelledby='free-test-heading'>
       <div className='max-w-content mx-auto px-4'>
         {/* Main Heading */}
         <header className='text-center mb-12'>
-          <h4 className='mb-0 text-[#2DC5FF] font-manrope text-[20px] md:text-[44px] font-bold uppercase not-italic no-underline leading-[1.1em] tracking-[0px] [word-spacing:0px] [text-stroke-color:#000] [stroke:#000]'>
+          <h4 className='mb-0 text-[#000] font-manrope text-[20px] md:text-[44px] font-bold uppercase not-italic no-underline leading-[1.1em] tracking-[0px] [word-spacing:0px] [text-stroke-color:#000] [stroke:#000]'>
             NOW, PLEASE SEND ME SOME FREE TEST FILES HERE
           </h4>
-          <p className='text-[#2DC5FF] font-[400] text-[15px] md:text-[22px] not-italic no-underline normal-case tracking-[0px] [word-spacing:0px] font-manrope'>
+          <p className='text-[#000] font-[400] text-[15px] md:text-[22px] not-italic no-underline normal-case tracking-[0px] [word-spacing:0px] font-manrope'>
             A thousand words of advertising are not equal to one action. I am happy to edit and
             enhance three photos for you for free. You do not need to register for an account
           </p>
@@ -43,7 +44,7 @@ const FreeTestFiles: React.FC = () => {
                     id='name'
                     name='name'
                     required
-                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                    className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
                     placeholder='Your name'
                   />
                 </div>
@@ -53,7 +54,7 @@ const FreeTestFiles: React.FC = () => {
                     id='email'
                     name='email'
                     required
-                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md  focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                    className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
                     placeholder='Your email'
                   />
                 </div>
@@ -66,7 +67,7 @@ const FreeTestFiles: React.FC = () => {
                     type='tel'
                     id='phone'
                     name='phone'
-                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md  focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                    className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
                     placeholder='Your number'
                   />
                 </div>
@@ -75,7 +76,7 @@ const FreeTestFiles: React.FC = () => {
                     type='text'
                     id='city'
                     name='city'
-                    className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md  focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                    className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
                     placeholder='Your city'
                   />
                 </div>
@@ -88,7 +89,7 @@ const FreeTestFiles: React.FC = () => {
                   id='photoLink'
                   name='photoLink'
                   required
-                  className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent'
+                  className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
                   placeholder='Link to your photos(Dropbox, Google Drive, Wetransfer etc...'
                 />
               </div>
@@ -100,7 +101,7 @@ const FreeTestFiles: React.FC = () => {
                   name='request'
                   rows={4}
                   required
-                  className='w-full px-4 py-3 border-[2px] border-[#01CDFF] rounded-md focus:outline-none focus:ring-2 focus:ring-[#00A1F8] focus:border-transparent resize-vertical'
+                  className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-vertical'
                   placeholder="Request or what you want. (We will send you the tested image
                   within 24 hours, if you don't see our email in your main
                   mailbox, you able check at update  or spam)"
@@ -112,7 +113,7 @@ const FreeTestFiles: React.FC = () => {
                 <div className='flex items-center space-x-4'>
                   <button
                     type='button'
-                    className='px-6 py-3 bg-[#00A1F8] text-white rounded-lg hover:bg-[#0088D4] transition-colors'
+                    className='px-4 py-2 bg-[#0F101A]  text-white rounded-lg  transition-colors'
                   >
                     [Chọn tệp]
                   </button>
@@ -124,7 +125,7 @@ const FreeTestFiles: React.FC = () => {
               <div className='flex justify-center'>
                 <button
                   type='submit'
-                  className='px-[45px] py-[10px] text-white hover:to-[#00A1F8] transition-all rounded-[12px] transform hover:scale-105 bg-[#2DC5FF] font-bold'
+                  className='px-[45px] py-[10px] text-white  transition-all rounded-[12px] transform hover:scale-105 bg-[#0F101A] font-bold'
                 >
                   Send
                 </button>

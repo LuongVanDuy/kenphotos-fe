@@ -85,7 +85,7 @@ const Services: React.FC = () => {
   ]
 
   return (
-    <section className='bg-[#D4EFFF] py-16'>
+    <section className='bg-gray py-16'>
       <div className='max-w-content mx-auto p-[10px] text-center'>
         <div className='py-[10px]'>
           <h2

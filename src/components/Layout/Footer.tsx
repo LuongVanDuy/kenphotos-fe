@@ -13,7 +13,7 @@ import Link from 'next/link'
 
 const Footer: React.FC = () => {
   return (
-    <footer className='bg-[#1C244B] text-white pt-[20px]'>
+    <footer className='bg-[#151515] text-white pt-[20px]'>
       <div className='mx-auto p-[20px]'>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[395px] pt-[10px]'>
           <div className='space-y-4 mx-auto text-center'>
@@ -27,7 +27,7 @@ const Footer: React.FC = () => {
                 priority
               />
             </Link>
-            <h3 className='text-[#00A1F8] text-[25px] md:text-[33px] font-[500]'>
+            <h3 className='text-[#fff] text-[25px] md:text-[33px] font-[500]'>
               True Color - True Value
             </h3>
             <p className='text-[15px]'>
@@ -50,10 +50,10 @@ const Footer: React.FC = () => {
           </div>
           <div className='space-y-4'>
             <div className='flex flex-col gap-[24px]'>
-              <h6 className='text-center text-[16px] md:text-[22px] font-semibold capitalize not-italic no-underline leading-[1.2em] tracking-[0px] text-[#00A1F8]'>
+              <h6 className='text-center text-[16px] md:text-[22px] font-semibold capitalize not-italic no-underline leading-[1.2em] tracking-[0px] text-[#fff]'>
                 Get In Touch
               </h6>
-              <h6 className='text-center text-[16px] md:text-[22px] font-semibold capitalize not-italic no-underline leading-[1.2em] tracking-[0px] text-[#00A1F8]'>
+              <h6 className='text-center text-[16px] md:text-[22px] font-semibold capitalize not-italic no-underline leading-[1.2em] tracking-[0px] text-[#fff]'>
                 TRUE COLOR COMPANY LIMITED
               </h6>
               <ul className='space-y-2 text-[16px]'>
