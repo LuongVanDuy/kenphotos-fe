@@ -45,7 +45,7 @@ const MediaListPage: React.FC = (props: any) => {
       queryParams.status = statusFilter;
     }
 
-    fetchMedia(session?.accessToken, queryParams);
+    fetchMedia(queryParams, session?.accessToken);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   }
@@ -56,7 +56,6 @@ const MediaListPage: React.FC = (props: any) => {
     }
   }, [session?.accessToken, sortBy, sortDesc, statusFilter]);
 
-  // Handle search
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
     handleQuery(value, 1, pageSize);

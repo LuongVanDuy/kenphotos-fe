@@ -2,11 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Form, Input, TreeSelect, Button, message, Modal } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useDispatch } from "react-redux";
-import {
-  createCategory,
-  updateCategory,
-  fetchCategoryDetail,
-} from "@/store/actions/categories";
+import { createCategory, updateCategory } from "@/store/actions/categories";
 import { AppDispatch } from "@/store/store";
 
 export interface CategoryFormValues {
@@ -33,12 +29,10 @@ interface CategoryFormProps {
   setOpen: (open: boolean) => void;
   onSuccess?: () => void;
   editingId?: number | null;
+  fetchCategory?: any;
 }
 
-function buildTree(
-  flat: Category[],
-  parentId: number | null = null
-): DataNode[] {
+function buildTree(flat: Category[], parentId: number | null = null): DataNode[] {
   return flat
     .filter((cat) => (cat.parentId ?? null) === parentId)
     .map((cat) => ({
@@ -49,14 +43,7 @@ function buildTree(
     }));
 }
 
-const CategoryForm: React.FC<CategoryFormProps> = ({
-  categories,
-  mode = "create",
-  open,
-  setOpen,
-  onSuccess,
-  editingId,
-}) => {
+const CategoryForm: React.FC<CategoryFormProps> = ({ categories, mode = "create", open, setOpen, onSuccess, editingId, fetchCategory }) => {
   const [form] = Form.useForm();
   const treeData = buildTree(categories);
   const dispatch = useDispatch<AppDispatch>();
@@ -64,12 +51,10 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  // Fetch category detail when in edit mode
   useEffect(() => {
     if (open && mode === "edit" && editingId) {
       fetchCategoryData();
     } else if (open && mode === "create") {
-      // Reset form for create mode
       form.resetFields();
       setEditingCategory(null);
     }
@@ -99,9 +84,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       setLoadingDetail(false);
     };
 
-    dispatch(
-      fetchCategoryDetail(editingId, handleSuccess, handleFailure) as any
-    );
+    fetchCategory(editingId, handleSuccess, handleFailure);
   };
 
   const handleSubmit = (values: CategoryFormValues) => {
@@ -120,11 +103,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
     }
 
     const handleSuccess = (response: any) => {
-      message.success(
-        mode === "edit"
-          ? "Category updated successfully"
-          : "Category created successfully"
-      );
+      message.success(mode === "edit" ? "Category updated successfully" : "Category created successfully");
       setOpen(false);
       form.resetFields();
       setEditingCategory(null);
@@ -141,20 +120,13 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       setLoading(false);
     };
 
-    if (mode === "edit" && editingCategory) {
-      // Update category
-      dispatch(
-        updateCategory(
-          editingCategory.id,
-          payload,
-          handleSuccess,
-          handleFailure
-        ) as any
-      );
-    } else {
-      // Create category
-      dispatch(createCategory(payload, handleSuccess, handleFailure) as any);
-    }
+    // if (mode === "edit" && editingCategory) {
+    //   // Update category
+    //   dispatch(updateCategory(editingCategory.id, payload, handleSuccess, handleFailure) as any);
+    // } else {
+    //   // Create category
+    //   dispatch(createCategory(payload, handleSuccess, handleFailure) as any);
+    // }
   };
 
   return (
@@ -169,27 +141,15 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       confirmLoading={loadingDetail}
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[{ required: true, message: "Name is required" }]}
-        >
+        <Form.Item label="Name" name="name" rules={[{ required: true, message: "Name is required" }]}>
           <Input placeholder="Enter category name" />
         </Form.Item>
 
-        <Form.Item
-          label="Slug"
-          name="slug"
-          rules={[{ required: true, message: "Slug is required" }]}
-        >
+        <Form.Item label="Slug" name="slug" rules={[{ required: true, message: "Slug is required" }]}>
           <Input placeholder="Enter category slug" />
         </Form.Item>
 
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[{ required: true, message: "Description is required" }]}
-        >
+        <Form.Item label="Description" name="description" rules={[{ required: true, message: "Description is required" }]}>
           <Input.TextArea placeholder="Enter category description" rows={3} />
         </Form.Item>
 

@@ -6,12 +6,6 @@ import {
   FETCH_POST,
   FETCH_POST_SUCCESS,
   FETCH_POST_FAILURE,
-  CREATE_POST,
-  CREATE_POST_SUCCESS,
-  CREATE_POST_FAILURE,
-  UPDATE_POST,
-  UPDATE_POST_SUCCESS,
-  UPDATE_POST_FAILURE,
   FETCH_PUBLIC_POSTS,
   FETCH_PUBLIC_POSTS_SUCCESS,
   FETCH_PUBLIC_POSTS_FAILURE,
@@ -22,11 +16,13 @@ import {
 import { fetchWithToken, putWithToken, deleteWithToken, fetchNoToken, patchWithToken } from "@/app/api/index";
 import postsEndpoint from "../endpoint/posts";
 import { postWithToken } from "@/app/api/index";
+import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
 
-export const fetchPosts = (option: any) => {
+export const fetchPosts = (payload: any, accessToken: string) => {
   return (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_POSTS });
-    fetchWithToken(postsEndpoint.fetchPosts(option))
+
+    fetchWithToken(postsEndpoint.fetchPosts(payload), accessToken)
       .then((response) => {
         dispatch({
           type: FETCH_POSTS_SUCCESS,
@@ -42,25 +38,11 @@ export const fetchPosts = (option: any) => {
   };
 };
 
-export const createPost = (payload: any, onSuccess: () => void, onFailure: (error: string) => void) => {
-  return (dispatch: AppDispatch) => {
-    postWithToken(postsEndpoint.createPost(), payload)
-      .then((response) => {
-        if (response) {
-          onSuccess();
-        }
-      })
-      .catch((error) => {
-        const errorMessage = error && error.message ? error.message : "Unknown error";
-        onFailure(errorMessage);
-      });
-  };
-};
-
-export const fetchPost = (id: number) => {
+export const fetchPost = (payload: number, accessToken: string) => {
   return (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_POST });
-    fetchWithToken(postsEndpoint.fetchPost(id))
+
+    fetchWithToken(postsEndpoint.fetchPost(payload), accessToken)
       .then((response) => {
         dispatch({
           type: FETCH_POST_SUCCESS,
@@ -76,42 +58,16 @@ export const fetchPost = (id: number) => {
   };
 };
 
-export const updatePost = (id: number, payload: any, onSuccess?: (response: any) => void, onFailure?: (error: string) => void) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch({ type: UPDATE_POST });
-    try {
-      const response = await putWithToken(postsEndpoint.updatePost(String(id)), payload);
-      dispatch({
-        type: UPDATE_POST_SUCCESS,
-        payload: { data: response },
-      });
-      if (onSuccess) onSuccess(response);
-      return response;
-    } catch (error: any) {
-      const errorMessage = error?.message || "Unknown error";
-      dispatch({
-        type: UPDATE_POST_FAILURE,
-        payload: { error: errorMessage },
-      });
-      if (onFailure) onFailure(errorMessage);
-      throw new Error(errorMessage);
-    }
-  };
+export const createPost = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
+  await asyncActionWrapper(() => postWithToken(postsEndpoint.createPost(), accessToken, payload), onSuccess, onFailure);
 };
 
-export const deletePost = (payload: any, onSuccess: () => void, onFailure: (error: string) => void) => {
-  return (dispatch: AppDispatch) => {
-    patchWithToken(postsEndpoint.deletePost(), payload)
-      .then((response) => {
-        if (response) {
-          onSuccess();
-        }
-      })
-      .catch((error) => {
-        const errorMessage = error && error.message ? error.message : "Unknown error";
-        onFailure(errorMessage);
-      });
-  };
+export const updatePost = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
+  await asyncActionWrapper(() => putWithToken(postsEndpoint.updatePost(payload.id), accessToken, payload.data), onSuccess, onFailure);
+};
+
+export const deletePost = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
+  await asyncActionWrapper(() => patchWithToken(postsEndpoint.deletePost(), accessToken, payload), onSuccess, onFailure);
 };
 
 //

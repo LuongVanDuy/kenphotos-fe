@@ -1,22 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  Modal,
-  Tabs,
-  Upload,
-  Button,
-  Input,
-  Select,
-  Image,
-  Card,
-  Typography,
-  Spin,
-  message,
-} from "antd";
-import {
-  UploadOutlined,
-  FileImageOutlined,
-  FileTextOutlined,
-} from "@ant-design/icons";
+import { Modal, Tabs, Upload, Button, Input, Select, Image, Card, Typography, Spin, message } from "antd";
+import { UploadOutlined, FileImageOutlined, FileTextOutlined } from "@ant-design/icons";
 import { connect } from "react-redux";
 import { fetchMedia, uploadMedia } from "@/store/actions/media";
 import { useSession } from "next-auth/react";
@@ -27,40 +11,24 @@ const { Search } = Input;
 const { Option } = Select;
 const { Text } = Typography;
 
-interface MediaLibraryModalProps {
-  isOpen: boolean;
-  onCancel: () => void;
-  onSelect: (media: Media) => void;
-  fetchMedia: (params: any) => Promise<void>;
-  uploadMedia: (
-    formData: FormData,
-    onSuccess: (response: any) => void,
-    onFailure: (error: string) => void
-  ) => Promise<void>;
-  mediaList: Media[];
-  mediaTotal: number;
-  mediaLoading: boolean;
-  title?: string;
-  accept?: string;
-}
+const MediaLibraryModal: React.FC = (props: any) => {
+  const {
+    isOpen,
+    onCancel,
+    onSelect,
+    fetchMedia,
+    uploadMedia,
+    mediaList,
+    mediaTotal,
+    mediaLoading,
+    title = "Media Library",
+    accept = "image/*",
+  } = props;
 
-const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
-  isOpen,
-  onCancel,
-  onSelect,
-  fetchMedia,
-  uploadMedia,
-  mediaList,
-  mediaTotal,
-  mediaLoading,
-  title = "Media Library",
-  accept = "image/*",
-}) => {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState("library");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState<number | undefined>(
-    undefined
-  );
+  const [statusFilter, setStatusFilter] = useState<number | undefined>(undefined);
   const [sortBy, setSortBy] = useState("createdTime");
   const [sortDesc, setSortDesc] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
@@ -81,7 +49,7 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
       queryParams.status = statusFilter;
     }
 
-    await fetchMedia(queryParams);
+    fetchMedia(queryParams, session?.accessToken);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   };
@@ -105,9 +73,10 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
     const formData = new FormData();
     formData.append("file", file);
 
-    await uploadMedia(
+    uploadMedia(
       formData,
-      (response) => {
+      session?.accessToken,
+      (response: any) => {
         message.success("File uploaded successfully");
         onSelect({
           ...response,
@@ -116,7 +85,7 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
         onCancel();
         setUploading(false);
       },
-      (error) => {
+      (error: any) => {
         message.error(`Upload failed: ${error}`);
         setUploading(false);
       }
@@ -149,20 +118,8 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
     <div className="space-y-4">
       {/* Search and Filters */}
       <div className="flex gap-4 items-center">
-        <Search
-          placeholder="Search media..."
-          allowClear
-          style={{ width: 300 }}
-          onSearch={handleSearch}
-          defaultValue={searchKeyword}
-        />
-        <Select
-          defaultValue="all"
-          style={{ width: 120 }}
-          onChange={(value) =>
-            setStatusFilter(value === "all" ? undefined : Number(value))
-          }
-        >
+        <Search placeholder="Search media..." allowClear style={{ width: 300 }} onSearch={handleSearch} defaultValue={searchKeyword} />
+        <Select defaultValue="all" style={{ width: 120 }} onChange={(value) => setStatusFilter(value === "all" ? undefined : Number(value))}>
           <Option value="all">All Types</Option>
           <Option value="1">Images</Option>
           <Option value="2">Documents</Option>
@@ -175,26 +132,13 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
         <Spin spinning={mediaLoading}>
           <div className="grid grid-cols-5 gap-4 max-h-96 overflow-y-auto">
             {mediaList.map((item: Media) => (
-              <Card
-                key={item.id}
-                hoverable
-                className="cursor-pointer"
-                onClick={() => onSelect(item)}
-                bodyStyle={{ padding: 8 }}
-              >
+              <Card key={item.id} hoverable className="cursor-pointer" onClick={() => onSelect(item)} bodyStyle={{ padding: 8 }}>
                 <div className="relative">
                   {isImageFile(item.name) ? (
-                    <Image
-                      alt={item.name}
-                      src={getImageUrl(item.slug)}
-                      preview={false}
-                      className="w-full !h-28 object-cover rounded"
-                    />
+                    <Image alt={item.name} src={getImageUrl(item.slug)} preview={false} className="w-full !h-28 object-cover rounded" />
                   ) : (
                     <div className="w-full !h-28 flex items-center justify-center bg-gray-100 rounded">
-                      <div className="text-2xl text-gray-400">
-                        {getFileIcon(item.name)}
-                      </div>
+                      <div className="text-2xl text-gray-400">{getFileIcon(item.name)}</div>
                     </div>
                   )}
                 </div>
@@ -208,20 +152,10 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
       {mediaTotal > pageSize && (
         <div className="flex justify-center">
           <Button.Group>
-            <Button
-              disabled={pageNumber === 1}
-              onClick={() =>
-                handleQuery(searchKeyword, pageNumber - 1, pageSize)
-              }
-            >
+            <Button disabled={pageNumber === 1} onClick={() => handleQuery(searchKeyword, pageNumber - 1, pageSize)}>
               Previous
             </Button>
-            <Button
-              disabled={pageNumber * pageSize >= mediaTotal}
-              onClick={() =>
-                handleQuery(searchKeyword, pageNumber + 1, pageSize)
-              }
-            >
+            <Button disabled={pageNumber * pageSize >= mediaTotal} onClick={() => handleQuery(searchKeyword, pageNumber + 1, pageSize)}>
               Next
             </Button>
           </Button.Group>
@@ -248,9 +182,7 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
             <div>
               <Text className="text-lg font-medium">Click to upload</Text>
               <br />
-              <Text className="text-sm text-gray-500">
-                or drag and drop files here
-              </Text>
+              <Text className="text-sm text-gray-500">or drag and drop files here</Text>
             </div>
             {uploading && <Spin />}
           </div>
@@ -258,9 +190,7 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
       </div>
 
       <div className="text-center">
-        <Text className="text-sm text-gray-500">
-          Supported formats: JPG, PNG, GIF, WebP, SVG
-        </Text>
+        <Text className="text-sm text-gray-500">Supported formats: JPG, PNG, GIF, WebP, SVG</Text>
       </div>
     </div>
   );
@@ -279,21 +209,8 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
   ];
 
   return (
-    <Modal
-      title={title}
-      open={isOpen}
-      onCancel={onCancel}
-      width={1200}
-      footer={null}
-      centered
-      destroyOnClose
-    >
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={tabItems}
-        className="mt-4"
-      />
+    <Modal title={title} open={isOpen} onCancel={onCancel} width={1200} footer={null} centered destroyOnClose>
+      <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} className="mt-4" />
     </Modal>
   );
 };
@@ -305,12 +222,8 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = {
-  fetchMedia: (params: any) => fetchMedia(params),
-  uploadMedia: (
-    formData: FormData,
-    onSuccess: (response: any) => void,
-    onFailure: (error: string) => void
-  ) => uploadMedia(formData, onSuccess, onFailure),
+  fetchMedia: fetchMedia,
+  uploadMedia: uploadMedia,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MediaLibraryModal);

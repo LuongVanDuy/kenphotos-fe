@@ -1,37 +1,33 @@
 "use client";
 
 import React, { useEffect, useCallback, useState } from "react";
-import { Button, Tag, Input, Select, Modal, Form, message, TreeSelect, Card, Row, Col, Statistic, Divider, Empty, Spin, Badge, Table } from "antd";
-import {
-  PlusOutlined,
-  FolderOutlined,
-  SearchOutlined,
-  FilterOutlined,
-  ReloadOutlined,
-  BranchesOutlined,
-  CalendarOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import { fetchWithToken, postWithToken } from "@/app/api/index";
-import { useSelector, useDispatch, connect } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { fetchCategories, updateCategory, deleteCategory, fetchCategoryDetail } from "@/store/actions/categories";
-import { Tree, Space } from "antd";
+import { Button, Input, Select, Modal, Table, Dropdown } from "antd";
+import { PlusOutlined, FolderOutlined, MoreOutlined } from "@ant-design/icons";
+import { connect } from "react-redux";
+import { fetchCategories, fetchCategory } from "@/store/actions/categories";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
-import type { DataNode } from "antd/es/tree";
-import { Typography, Tooltip } from "antd";
+import { Typography } from "antd";
 import CategoryForm from "@/components/Admin/Post/CategoryForm";
+import { useSession } from "next-auth/react";
 
 const { Option } = Select;
-const { Title, Text, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
 const sortFields = [
   { value: "name", label: "Name" },
   { value: "createdAt", label: "Created At" },
 ];
 
+export type TableListItem = {
+  id: number;
+  name: string;
+  description: string;
+  action: any;
+};
+
 const CategoryPage: React.FC = (props: any) => {
-  const { fetchCategories, categoryList, categoryLoading } = props;
+  const { fetchCategories, categoryList, categoryLoading, categoryTotal, fetchCategory } = props;
+  const { data: session } = useSession();
 
   const [sortBy, setSortBy] = useState<string>("name");
   const [sortDesc, setSortDesc] = useState<boolean>(false);
@@ -43,6 +39,81 @@ const CategoryPage: React.FC = (props: any) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
 
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  };
+
+  const columns: any[] = [
+    {
+      title: "Danh mục",
+      dataIndex: "name",
+      key: "name",
+      formItemProps: {
+        style: { marginBottom: 0 },
+        labelCol: { span: 0 },
+        wrapperCol: { span: 24 },
+      },
+      render: (text: any, record: any) => {
+        const prefix = Array(record.level).fill("—").join(" ");
+        return (
+          <span style={{ fontWeight: "500", color: "#2271b1" }}>
+            {prefix ? `${prefix} ` : ""}
+            {text}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+      search: false,
+      width: "40%",
+      render: (text: any) => {
+        if (!text) return null;
+        const plainText = stripHtml(text);
+        const truncated = plainText.length > 200 ? plainText.slice(0, 200) + "..." : plainText;
+        return <span>{truncated}</span>;
+      },
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 120,
+      render: (_: any, record: any) => (
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "view",
+                label: "View",
+                icon: <EyeOutlined />,
+                onClick: () => handleView(record),
+              },
+              {
+                key: "edit",
+                label: "Edit",
+                icon: <EditOutlined />,
+                onClick: () => handleEdit(record),
+              },
+              {
+                key: "delete",
+                label: "Delete",
+                icon: <DeleteOutlined />,
+                onClick: () => handleDelete(record),
+              },
+            ],
+          }}
+          trigger={["click"]}
+        >
+          <Button type="text" icon={<MoreOutlined />} />
+        </Dropdown>
+      ),
+    },
+  ];
+
   function handleQuery(keyword: string, page = 1, itemsPerPage = 10) {
     const queryParams = {
       search: keyword,
@@ -51,73 +122,16 @@ const CategoryPage: React.FC = (props: any) => {
       itemsPerPage,
     };
 
-    fetchCategories(queryParams);
+    fetchCategories(queryParams, session?.accessToken);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   }
 
   useEffect(() => {
-    handleQuery(keyword);
-  }, []);
-
-  function buildTree(flat: any[], parentId: number | null = null): DataNode[] {
-    return flat
-      .filter((cat) => (cat.parentId ?? null) === parentId)
-      .map((cat) => ({
-        title: (
-          <div className="flex items-center justify-between group py-3 px-3 rounded-lg hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200">
-            <div className="flex items-center flex-1 min-w-0">
-              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mr-3">
-                <FolderOutlined style={{ color: "#1677ff", fontSize: 16 }} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <Typography.Text strong className="text-gray-800" ellipsis>
-                    {cat.name}
-                  </Typography.Text>
-                  {cat.parentId && <Badge count="Sub" size="small" style={{ backgroundColor: "#52c41a" }} />}
-                </div>
-                {cat.description && <div className="text-xs text-gray-500 truncate mt-1 max-w-xs">{cat.description}</div>}
-                <div className="flex items-center gap-4 mt-1 text-xs text-gray-400">
-                  {cat.parentId && (
-                    <span className="flex items-center gap-1">
-                      <BranchesOutlined />
-                      Parent: {categoryList.find((p: any) => p.id === cat.parentId)?.name || "Unknown"}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-4">
-              <Tooltip title="View Details">
-                <Button type="text" size="small" icon={<EyeOutlined />} onClick={() => setSelectedCategory(cat)} className="hover:bg-blue-100" />
-              </Tooltip>
-              <Tooltip title="Edit Category">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={() => {
-                    setEditingId(cat.id);
-                    setModalMode("edit");
-                    setShowModal(true);
-                  }}
-                  className="hover:bg-blue-100"
-                />
-              </Tooltip>
-              <Tooltip title="Delete Category">
-                <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => handleDelete(cat)} className="hover:bg-red-100" />
-              </Tooltip>
-            </div>
-          </div>
-        ),
-        key: cat.id,
-        value: cat.id,
-        children: buildTree(flat, cat.id),
-      }));
-  }
-
-  const treeData = buildTree(categoryList);
+    if (session?.accessToken) {
+      handleQuery(keyword);
+    }
+  }, [session?.accessToken]);
 
   const handleCategorySuccess = () => {
     setEditingId(null);
@@ -157,6 +171,17 @@ const CategoryPage: React.FC = (props: any) => {
         // }
       },
     });
+  };
+
+  const handleView = (record: any) => {
+    setSelectedCategory(record);
+  };
+
+  const handleEdit = (record: any) => {
+    setEditingId(record.id);
+    setModalMode("edit");
+    setShowModal(true);
+    setSelectedCategory(null);
   };
 
   return (
@@ -206,29 +231,24 @@ const CategoryPage: React.FC = (props: any) => {
         </Button>
       </div>
 
-      <Card className="shadow-sm" loading={categoryLoading}>
-        {categoryList.length === 0 ? (
-          <Empty description="No categories found" image={Empty.PRESENTED_IMAGE_SIMPLE}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                setEditingId(null);
-                setModalMode("create");
-                setShowModal(true);
-              }}
-            >
-              Create First Category
-            </Button>
-          </Empty>
-        ) : (
-          <div className="bg-white rounded-lg">
-            <Tree treeData={treeData} defaultExpandAll className="category-tree" showLine={{ showLeafIcon: false }} showIcon={false} />
-          </div>
-        )}
-      </Card>
+      <Table<TableListItem>
+        columns={columns}
+        dataSource={categoryList}
+        loading={categoryLoading}
+        rowKey="id"
+        pagination={{
+          current: pageNumber,
+          pageSize,
+          total: categoryTotal,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+          onChange: (page, pageSize) => {
+            handleQuery(keyword, page, pageSize);
+          },
+        }}
+      />
 
-      {/* Category Details Modal */}
       {selectedCategory && (
         <Modal
           title={
@@ -298,6 +318,7 @@ const CategoryPage: React.FC = (props: any) => {
         setOpen={setShowModal}
         onSuccess={handleCategorySuccess}
         editingId={editingId}
+        fetchCategory={fetchCategory}
       />
     </div>
   );
@@ -305,11 +326,13 @@ const CategoryPage: React.FC = (props: any) => {
 
 const mapStateToProps = (state: any) => ({
   categoryList: state.categories.list,
+  categoryTotal: state.categories.total,
   categoryLoading: state.categories.loading,
 });
 
 const mapDispatchToProps = {
   fetchCategories: fetchCategories,
+  fetchCategory: fetchCategory,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CategoryPage);

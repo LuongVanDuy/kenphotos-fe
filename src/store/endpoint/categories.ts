@@ -10,8 +10,8 @@ export default {
       : "";
     return "post/categories" + queryString;
   },
-  fetchCategory: (id: string) => `post/categories/${id}`,
+  fetchCategory: (id: number) => `post/categories/${id}`,
   createCategory: () => "post/categories",
-  updateCategory: (id: string) => `post/categories/${id}`,
-  deleteCategory: (id: string) => `post/categories/${id}`,
+  updateCategory: (id: number) => `post/categories/${id}`,
+  deleteCategory: (id: number) => `post/categories/${id}`,
 };

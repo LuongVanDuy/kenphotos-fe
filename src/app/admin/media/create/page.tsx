@@ -1,28 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { connect } from "react-redux";
-import {
-  Card,
-  Upload,
-  Button,
-  message,
-  Progress,
-  List,
-  Image,
-  Typography,
-  Tag,
-} from "antd";
-import {
-  InboxOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  ArrowLeftOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-} from "@ant-design/icons";
+import { Card, Upload, Button, message, Progress, List, Image, Typography, Tag } from "antd";
+import { InboxOutlined, DeleteOutlined, EyeOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import type { UploadProps, UploadFile } from "antd";
 import { uploadMedia } from "@/store/actions/media";
 import { getImageUrl } from "@/utils";
@@ -31,32 +13,19 @@ const { Dragger } = Upload;
 const { Title, Text } = Typography;
 
 const FILE_SIZE_LIMIT = 2 * 1024 * 1024;
-const ALLOWED_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-  "image/svg+xml",
-];
+const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
 
 interface UploadedFile extends UploadFile {
   uploadedUrl?: string;
 }
 
-interface Props {
-  uploadMedia: (
-    accessToken: any,
-    formData: FormData,
-    onSuccess: (response: any) => void,
-    onFailure: (error: string) => void
-  ) => void;
-  uploadLoading: boolean;
-  uploadError: boolean;
-  uploadMessage: string;
+interface MediaCreatePageProps {
+  uploadMedia: typeof uploadMedia;
+  single?: boolean;
 }
 
-const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
+const MediaCreatePage: React.FC = (props: any) => {
+  const { uploadMedia } = props;
   const { data: session } = useSession();
   const [file, setFile] = useState<UploadedFile | null>(null);
 
@@ -83,19 +52,14 @@ const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
     const formData = new FormData();
     formData.append("files", uploadFile.originFileObj!);
 
-    // Simulate progress
     const progressInterval = setInterval(() => {
-      setFile((prev) =>
-        prev
-          ? { ...prev, percent: Math.min((prev.percent || 0) + 10, 90) }
-          : null
-      );
+      setFile((prev) => (prev ? { ...prev, percent: Math.min((prev.percent || 0) + 10, 90) } : null));
     }, 200);
 
     uploadMedia(
-      session.accessToken,
       formData,
-      (response) => {
+      session?.accessToken,
+      (response: any) => {
         clearInterval(progressInterval);
 
         setFile((prev) =>
@@ -111,11 +75,9 @@ const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
         );
         message.success("Upload successful!");
       },
-      (error) => {
+      (error: any) => {
         clearInterval(progressInterval);
-        setFile((prev) =>
-          prev ? { ...prev, status: "error", percent: 0 } : null
-        );
+        setFile((prev) => (prev ? { ...prev, status: "error", percent: 0 } : null));
         message.error(`Upload failed: ${error}`);
       }
     );
@@ -128,10 +90,7 @@ const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
   const handlePreview = (previewFile: UploadedFile) => {
     if (previewFile.uploadedUrl) {
       window.open(getImageUrl(previewFile.uploadedUrl), "_blank");
-    } else if (
-      previewFile.type?.startsWith("image/") &&
-      previewFile.originFileObj
-    ) {
+    } else if (previewFile.type?.startsWith("image/") && previewFile.originFileObj) {
       const url = URL.createObjectURL(previewFile.originFileObj);
       window.open(url, "_blank");
     }
@@ -166,13 +125,7 @@ const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
           onClick={() => handlePreview(fileItem)}
           disabled={!fileItem.type?.startsWith("image/")}
         />,
-        <Button
-          key="remove"
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={handleRemove}
-        />,
+        <Button key="remove" type="text" danger icon={<DeleteOutlined />} onClick={handleRemove} />,
       ]}
     >
       <List.Item.Meta
@@ -180,12 +133,8 @@ const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
         title={
           <div className="flex items-center gap-2">
             <span>{fileItem.name}</span>
-            {fileItem.status === "done" && (
-              <CheckCircleOutlined className="text-green-500" />
-            )}
-            {fileItem.status === "error" && (
-              <CloseCircleOutlined className="text-red-500" />
-            )}
+            {fileItem.status === "done" && <CheckCircleOutlined className="text-green-500" />}
+            {fileItem.status === "error" && <CloseCircleOutlined className="text-red-500" />}
           </div>
         }
         description={
@@ -193,13 +142,7 @@ const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
             <div className="text-sm text-gray-500">
               {Math.round((fileItem.size || 0) / 1024)} KB • {fileItem.type}
             </div>
-            {fileItem.status === "uploading" && (
-              <Progress
-                percent={fileItem.percent || 0}
-                size="small"
-                status="active"
-              />
-            )}
+            {fileItem.status === "uploading" && <Progress percent={fileItem.percent || 0} size="small" status="active" />}
             {fileItem.status === "done" && fileItem.uploadedUrl && (
               <Image
                 src={getImageUrl(fileItem.uploadedUrl)}
@@ -221,10 +164,7 @@ const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
     <div className="">
       <div className="mb-6">
         <Title level={2}>Upload Images</Title>
-        <Text type="secondary">
-          Drag & drop or click to upload. JPG, PNG, GIF, WebP, SVG supported.
-          Max 2MB.
-        </Text>
+        <Text type="secondary">Drag & drop or click to upload. JPG, PNG, GIF, WebP, SVG supported. Max 2MB.</Text>
       </div>
 
       <Card>
@@ -233,19 +173,13 @@ const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
             <InboxOutlined />
           </p>
           <p className="ant-upload-text">Click or drag image to upload</p>
-          <p className="ant-upload-hint">
-            Only image files supported. Max 2MB.
-          </p>
+          <p className="ant-upload-hint">Only image files supported. Max 2MB.</p>
         </Dragger>
 
         {file && (
           <div className="mt-4">
             <Button onClick={() => setFile(null)}>Clear</Button>
-            <List
-              dataSource={[file]}
-              renderItem={renderFileItem}
-              className="mt-4"
-            />
+            <List dataSource={[file]} renderItem={renderFileItem} className="mt-4" />
           </div>
         )}
       </Card>
@@ -253,10 +187,8 @@ const MediaCreatePage: React.FC<Props> = ({ uploadMedia }) => {
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  uploadLoading: state.media.uploadLoading,
-  uploadError: state.media.uploadError,
-  uploadMessage: state.media.uploadMessage,
-});
+const mapDispatchToProps = {
+  uploadMedia: uploadMedia,
+};
 
-export default connect(mapStateToProps, { uploadMedia })(MediaCreatePage);
+export default connect(null, mapDispatchToProps)(MediaCreatePage);

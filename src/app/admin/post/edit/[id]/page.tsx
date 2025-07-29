@@ -5,20 +5,72 @@ import { useParams, useRouter } from "next/navigation";
 import { connect } from "react-redux";
 import { fetchPost, updatePost } from "@/store/actions/posts";
 import PostForm from "@/components/Admin/Post/PostForm";
+import { Form, message } from "antd";
+import { useSession } from "next-auth/react";
 
 const EditPostPage: React.FC = (props: any) => {
-  const { fetchPost, updatePost, postDetail, postLoading } = props;
+  const { fetchPost, postDetail, postLoading, postError, updatePost } = props;
+  const { data: session } = useSession();
+
   const params = useParams();
   const postId = Number(params.id);
   const router = useRouter();
+  const [form] = Form.useForm();
+  const [formField, setFormField] = useState<any | undefined>();
+  const [loading, setLoading] = useState(false);
 
   const loadData = () => {
-    fetchPost(postId);
+    fetchPost(postId, session?.accessToken);
   };
 
   useEffect(() => {
-    loadData();
-  }, [postId]);
+    if (session?.accessToken) {
+      loadData();
+    }
+  }, [session?.accessToken]);
+
+  useEffect(() => {
+    if (postDetail) {
+      setFormField(postDetail);
+    }
+  }, [postDetail]);
+
+  useEffect(() => {
+    if (formField && Object.keys(formField).length) {
+      form.setFieldsValue({
+        title: formField.title,
+        content: formField.content,
+        excerpt: formField.excerpt,
+        slug: formField.slug,
+        status: formField.status,
+        password: formField.password,
+        thumbnail: formField.thumbnail,
+        categoryIds: formField.categoryIds,
+      });
+    }
+  }, [formField]);
+
+  const onSuccess = () => {
+    message.success("Post updated successfully!");
+    setLoading(false);
+  };
+
+  const onFailure = (error: any) => {
+    message.error(error?.message || "Failed to update post");
+    setLoading(false);
+  };
+
+  const handleFinish = async (values: any) => {
+    const payload = {
+      id: postId,
+      data: {
+        ...values,
+      },
+    };
+    updatePost(payload, session?.accessToken, onSuccess, onFailure);
+  };
+
+  const handleDraft = async (values: any) => {};
 
   if (postLoading) {
     return (
@@ -31,7 +83,7 @@ const EditPostPage: React.FC = (props: any) => {
     );
   }
 
-  if (!postDetail) {
+  if (postError) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
@@ -44,20 +96,13 @@ const EditPostPage: React.FC = (props: any) => {
     );
   }
 
-  return (
-    <PostForm
-      mode="edit"
-      initialValues={postDetail}
-      onSuccess={() => router.push("/admin/post/list")}
-      postId={Number(params.id)}
-      updatePost={updatePost}
-    />
-  );
+  return <PostForm form={form} onFinish={handleFinish} onSaveDraft={handleDraft} mode="edit" loading={loading} initialValues={formField} />;
 };
 
 const mapStateToProps = (state: any) => ({
   postDetail: state.posts.detail,
   postLoading: state.posts.loading,
+  postError: state.posts.error,
 });
 
 const mapDispatchToProps = {

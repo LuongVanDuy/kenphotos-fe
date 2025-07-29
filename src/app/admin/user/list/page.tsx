@@ -1,30 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Tag,
-  Avatar,
-  Space,
-  message,
-  Select,
-  Input,
-  Table,
-  Dropdown,
-  Modal,
-} from "antd";
-import {
-  UserOutlined,
-  PlusOutlined,
-  MoreOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
+import { Button, Avatar, Space, message, Select, Input, Table, Dropdown, Modal } from "antd";
+import { UserOutlined, PlusOutlined, MoreOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { useDispatch, connect } from "react-redux";
-import { AppDispatch } from "@/store/store";
-import { fetchUsers } from "@/store/actions/users";
+import { connect } from "react-redux";
+import { deleteUser, fetchUsers } from "@/store/actions/users";
 import { useSession } from "next-auth/react";
 
 const { Option } = Select;
@@ -38,16 +19,11 @@ const sortFields = [
 ];
 
 const UserListPage: React.FC = (props: any) => {
-  const { fetchUsers, userList, userTotal, userLoading } = props;
-
+  const { fetchUsers, userList, userTotal, userLoading, deleteUser } = props;
+  const { data: session } = useSession();
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
-  const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<string>("createdTime");
   const [sortDesc, setSortDesc] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  const { data: session } = useSession();
   const [keyword, setKeyword] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -61,7 +37,7 @@ const UserListPage: React.FC = (props: any) => {
       itemsPerPage,
     };
 
-    fetchUsers(session?.accessToken, queryParams);
+    fetchUsers(queryParams, session?.accessToken);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   }
@@ -70,10 +46,20 @@ const UserListPage: React.FC = (props: any) => {
     if (session?.accessToken) {
       handleQuery(keyword);
     }
-  }, [session?.accessToken, sortBy, sortDesc]);
+  }, [session?.accessToken]);
 
   const handleEdit = (user: any) => {
     router.push(`/admin/user/edit/${user.id}`);
+  };
+
+  const onSuccess = () => {
+    message.success("Post deleted successfully");
+    handleQuery(keyword, pageNumber, pageSize);
+  };
+
+  const onFailure = (error: any) => {
+    message.error(error);
+    message.error(error || "Failed to delete post");
   };
 
   const handleDelete = async (user: any) => {
@@ -83,16 +69,8 @@ const UserListPage: React.FC = (props: any) => {
       okText: "Delete",
       okType: "danger",
       cancelText: "Cancel",
-      onOk: async () => {
-        try {
-          // TODO: Implement actual delete API call
-          await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-          message.success("User deleted successfully");
-          // Refresh the list
-          handleQuery(keyword, pageNumber, pageSize);
-        } catch (error: any) {
-          message.error(error.message || "Failed to delete user");
-        }
+      onOk() {
+        deleteUser(user.id, session?.accessToken, onSuccess, onFailure);
       },
     });
   };
@@ -150,9 +128,7 @@ const UserListPage: React.FC = (props: any) => {
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">
-            {new Date(date).toLocaleTimeString()}
-          </div>
+          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
         </div>
       ),
     },
@@ -201,9 +177,11 @@ const UserListPage: React.FC = (props: any) => {
           <Input.Search
             placeholder="Search users"
             allowClear
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
             onSearch={(value) => {
               setKeyword(value);
-              setPage(1);
+              setPageNumber(1);
               handleQuery(value, 1, pageSize);
             }}
             style={{ width: 200 }}
@@ -215,20 +193,12 @@ const UserListPage: React.FC = (props: any) => {
               </Option>
             ))}
           </Select>
-          <Select
-            value={sortDesc}
-            onChange={(v) => setSortDesc(v)}
-            style={{ width: 120 }}
-          >
+          <Select value={sortDesc} onChange={(v) => setSortDesc(v)} style={{ width: 120 }}>
             <Option value={false}>Ascending</Option>
             <Option value={true}>Descending</Option>
           </Select>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => router.push("/admin/user/create")}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/user/create")}>
           Add New User
         </Button>
       </div>
@@ -244,8 +214,7 @@ const UserListPage: React.FC = (props: any) => {
           total: userTotal,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
           onChange: (page, pageSize) => {
             handleQuery(keyword, page, pageSize);
           },
@@ -263,6 +232,7 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps = {
   fetchUsers: fetchUsers,
+  deleteUser: deleteUser,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserListPage);

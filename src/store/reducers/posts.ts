@@ -6,12 +6,6 @@ import {
   FETCH_POST,
   FETCH_POST_SUCCESS,
   FETCH_POST_FAILURE,
-  CREATE_POST,
-  CREATE_POST_SUCCESS,
-  CREATE_POST_FAILURE,
-  UPDATE_POST,
-  UPDATE_POST_SUCCESS,
-  UPDATE_POST_FAILURE,
   FETCH_PUBLIC_POSTS,
   FETCH_PUBLIC_POSTS_SUCCESS,
   FETCH_PUBLIC_POSTS_FAILURE,
@@ -109,44 +103,6 @@ const postsReducer = (state = initialState, action: ActionType) => {
         loading: false,
         error: true,
         detailPublic: {},
-      };
-    case CREATE_POST:
-      return {
-        ...state,
-        loading: true,
-      };
-    case CREATE_POST_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        error: false,
-        message: "Post created successfully",
-      };
-    case CREATE_POST_FAILURE:
-      return {
-        ...state,
-        loading: false,
-        error: true,
-        message: action.payload.error,
-      };
-    case UPDATE_POST:
-      return {
-        ...state,
-        loading: true,
-      };
-    case UPDATE_POST_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        error: false,
-        message: "Post updated successfully",
-      };
-    case UPDATE_POST_FAILURE:
-      return {
-        ...state,
-        loading: false,
-        error: true,
-        message: action.payload.error,
       };
     default:
       return state;

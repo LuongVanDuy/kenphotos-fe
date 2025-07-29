@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button, Tag, message, Select, Table, Dropdown, Modal } from "antd";
+import { Button, Tag, message, Select, Table, Dropdown, Modal, Input } from "antd";
 import { PlusOutlined, MoreOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { connect } from "react-redux";
 import { fetchPosts, deletePost } from "@/store/actions/posts";
+import { useSession } from "next-auth/react";
 
 const { Option } = Select;
 
@@ -25,7 +26,7 @@ const sortFields = [
 
 const PostListPage: React.FC = (props: any) => {
   const { fetchPosts, deletePost, postList, postTotal, postLoading } = props;
-
+  const { data: session } = useSession();
   const router = useRouter();
   const [status, setStatus] = useState<string>("all");
   const [deleteFlg, setDeleteFlg] = useState<string>("all");
@@ -43,17 +44,29 @@ const PostListPage: React.FC = (props: any) => {
       itemsPerPage,
     };
 
-    fetchPosts(queryParams);
+    fetchPosts(queryParams, session?.accessToken);
     setPageNumber(page);
     setPageSize(itemsPerPage);
   }
 
   useEffect(() => {
-    handleQuery(keyword);
-  }, []);
+    if (session?.accessToken) {
+      handleQuery(keyword);
+    }
+  }, [session?.accessToken]);
 
   const handleEdit = (post: any) => {
     router.push(`/admin/post/edit/${post.id}`);
+  };
+
+  const onSuccess = () => {
+    message.success("User deleted successfully");
+    handleQuery(keyword, pageNumber, pageSize);
+  };
+
+  const onFailure = (error: any) => {
+    message.error(error);
+    message.error(error || "Failed to delete user");
   };
 
   const handleDelete = (post: any) => {
@@ -64,16 +77,7 @@ const PostListPage: React.FC = (props: any) => {
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        deletePost(
-          { ids: [post.id] },
-          () => {
-            message.success("Post deleted successfully");
-            handleQuery(keyword, pageNumber, pageSize);
-          },
-          (error: any) => {
-            message.error(error || "Failed to delete post");
-          }
-        );
+        deletePost({ ids: [post.id] }, session?.accessToken, onSuccess, onFailure);
       },
     });
   };
@@ -160,7 +164,18 @@ const PostListPage: React.FC = (props: any) => {
 
       <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
         <div className="flex flex-wrap gap-2 items-center">
-          {/* <Input.Search placeholder="Search posts" allowClear onChange={(e) => debouncedSearch(e.target.value)} style={{ width: 200 }} /> */}
+          <Input.Search
+            placeholder="Search users"
+            allowClear
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onSearch={(value) => {
+              setKeyword(value);
+              setPageNumber(1);
+              handleQuery(value, 1, pageSize);
+            }}
+            style={{ width: 200 }}
+          />
           <Select value={status} onChange={setStatus} style={{ width: 120 }}>
             <Option value="all">All Status</Option>
             <Option value={0}>Draft</Option>

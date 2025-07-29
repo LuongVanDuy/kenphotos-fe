@@ -6,39 +6,36 @@ import { Button, Form, Input, message, Select, Spin } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Title from "antd/es/typography/Title";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
 import CategoryTreeSelector from "./CategoryTreeSelector";
 
-const PostForm: React.FC<any> = (props) => {
-  const { mode = "create", initialValues, onSuccess, postId, createPost, updatePost } = props;
+interface PostFormProps {
+  form?: any;
+  onFinish: (values: any) => void;
+  onSaveDraft: (values: any) => void;
+  mode: "create" | "edit";
+  loading: boolean;
+  initialValues?: any;
+}
 
-  const [form] = Form.useForm<PostFormData>();
-  const [loading, setLoading] = useState(false);
+const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, loading, initialValues }) => {
   const [isModalMediaOpen, setIsModalMediaOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<any>(null);
-  const router = useRouter();
 
   useEffect(() => {
-    if (initialValues?.thumbnail && initialValues.thumbnail.trim() !== "") {
-      setSelectedImage({ slug: initialValues.thumbnail });
-    }
+    const timeout = setTimeout(() => {
+      const thumbnail = form.getFieldValue("thumbnail");
+      if (thumbnail && !selectedImage) {
+        setSelectedImage({
+          slug: thumbnail,
+          title: "Featured Image",
+        });
+      }
+    }, 0);
 
-    if ((initialValues as any)?.categories && Array.isArray((initialValues as any).categories)) {
-      const categoryIds = (initialValues as any).categories.map((cat: any) => cat.category?.id).filter(Boolean);
-
-      form.setFieldsValue({
-        title: initialValues?.title || "",
-        slug: initialValues?.slug || "",
-        excerpt: initialValues?.excerpt || "",
-        content: initialValues?.content || "",
-        status: initialValues?.status ?? 1,
-        thumbnail: initialValues?.thumbnail || "",
-        categoryIds: categoryIds,
-      });
-    }
-  }, [initialValues, form]);
+    return () => clearTimeout(timeout);
+  }, [form, selectedImage]);
 
   const handleMediaSelect = (media: any) => {
     form.setFieldsValue({ thumbnail: media.slug });
@@ -56,46 +53,6 @@ const PostForm: React.FC<any> = (props) => {
     { value: 1, label: "Published" },
     { value: 2, label: "Archived" },
   ];
-
-  const onFinish = async (values: PostFormData) => {
-    setLoading(true);
-
-    const payload = {
-      title: values.title,
-      content: values.content,
-      excerpt: values.excerpt,
-      slug: values.slug,
-      status: values.status,
-      thumbnail: values.thumbnail || selectedImage?.slug || "",
-      categoryIds: Array.isArray(values.categoryIds) ? values.categoryIds.map(Number) : [],
-    };
-
-    const handleSuccess = (response: any) => {
-      message.success(mode === "edit" ? "Post updated successfully!" : "Post created successfully!");
-      form.resetFields();
-      setSelectedImage(null);
-      if (onSuccess) onSuccess();
-      router.push("/admin/post/list");
-      setLoading(false);
-    };
-
-    const handleFailure = (error: string) => {
-      console.error("Submit error:", error);
-      message.error(mode === "edit" ? "Failed to update post" : "Failed to create post");
-      setLoading(false);
-    };
-
-    if (mode === "edit" && postId && updatePost) {
-      updatePost(postId, payload, handleSuccess, handleFailure);
-    } else if (createPost) {
-      createPost(payload, handleSuccess, handleFailure);
-    }
-  };
-
-  const onSaveDraft = () => {
-    form.setFieldsValue({ status: 0 });
-    form.submit();
-  };
 
   return (
     <>
@@ -115,45 +72,27 @@ const PostForm: React.FC<any> = (props) => {
             </Button>
           </div>
         </div>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={{
-            title: initialValues?.title || "",
-            slug: initialValues?.slug || "",
-            excerpt: initialValues?.excerpt || "",
-            content: initialValues?.content || "",
-            status: initialValues?.status ?? 1,
-            thumbnail: initialValues?.thumbnail || "",
-            categoryIds: (initialValues as any)?.categories
-              ? (initialValues as any).categories.map((cat: any) => cat.category?.id).filter(Boolean)
-              : initialValues?.categoryIds || [],
-          }}
-        >
-          {/* Hidden field for thumbnail to ensure it's included in form values */}
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item name="thumbnail" style={{ display: "none" }}>
             <Input />
           </Form.Item>
 
           <div className="flex gap-8">
-            {/* Main Content Area */}
             <div className="flex-1">
               <div className="space-y-6">
-                {/* Title Input */}
                 <div>
                   <Form.Item name="title" rules={[{ required: true, message: "Please enter the title" }]} className="!mb-0">
                     <Input placeholder="Add title" style={{ fontSize: "24px", fontWeight: "400" }} />
                   </Form.Item>
                 </div>
-                {/* Permalink Box */}
+
                 <div>
                   <h3 className="text-sm font-semibold text-gray-700">Permalink</h3>
                   <Form.Item name="slug" rules={[{ required: true, message: "Please enter the slug" }]} className="!mb-0">
                     <Input placeholder="post-url-slug" size="small" addonBefore={process.env.NEXT_PUBLIC_LINK} />
                   </Form.Item>
                 </div>
-                {/* Content Editor */}
+
                 <div>
                   <h3 className="text-sm font-semibold text-gray-700">Content</h3>
                   <Form.Item name="content" rules={[{ required: true, message: "Please enter the content" }]} className="!mb-0 bg-white">
@@ -165,7 +104,7 @@ const PostForm: React.FC<any> = (props) => {
                     />
                   </Form.Item>
                 </div>
-                {/* Excerpt Box */}
+
                 <div className="border border-gray-300 rounded-sm">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">Excerpt</h3>
@@ -178,10 +117,9 @@ const PostForm: React.FC<any> = (props) => {
                 </div>
               </div>
             </div>
-            {/* Sidebar */}
+
             <div className="w-80 flex-shrink-0">
               <div className="space-y-6">
-                {/* Publish Box */}
                 <div className="border border-gray-300 rounded-sm bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">Publish</h3>
@@ -195,7 +133,7 @@ const PostForm: React.FC<any> = (props) => {
                     </div>
                   </div>
                 </div>
-                {/* Featured Image Box */}
+
                 <div className="border border-gray-300 rounded-sm bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">Featured Image</h3>
@@ -227,7 +165,6 @@ const PostForm: React.FC<any> = (props) => {
                     )}
                   </div>
                 </div>
-                {/* Categories Box */}
                 <div className="border border-gray-300 rounded-sm bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">Categories</h3>
@@ -243,10 +180,7 @@ const PostForm: React.FC<any> = (props) => {
                       ]}
                       className="!mb-0"
                     >
-                      <CategoryTreeSelector
-                        value={form.getFieldValue("categoryIds")}
-                        onChange={(value) => form.setFieldsValue({ categoryIds: value })}
-                      />
+                      <CategoryTreeSelector />
                     </Form.Item>
                   </div>
                 </div>

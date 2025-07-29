@@ -2,42 +2,75 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useDispatch, useSelector, connect } from "react-redux";
-import { AppDispatch, RootState } from "@/store/store";
+import { connect } from "react-redux";
 import { fetchUser, updateUser } from "@/store/actions/users";
-import { UserForm } from "../../create/page";
+import { Form, message } from "antd";
+import UserForm from "@/components/Admin/User/UserForm";
 import { useSession } from "next-auth/react";
 
-const EditUserPage: React.FC = (props: any) => {
-  const { fetchUser, updateUser } = props;
-  const params = useParams();
-  const router = useRouter();
+const UpdateUser: React.FC = (props: any) => {
+  const { fetchUser, userDetail, userLoading, updateUser, usesError } = props;
   const { data: session } = useSession();
-  const [initialValues, setInitialValues] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const params = useParams();
+  const userId = Number(params.id);
+  const [form] = Form.useForm();
+  const [formField, setFormField] = useState<any | undefined>();
+  const [loading, setLoading] = useState(false);
+
+  const loadData = () => {
+    fetchUser(userId, session?.accessToken);
+  };
 
   useEffect(() => {
-    const loadUser = async () => {
-      if (params.id) {
-        try {
-          setLoading(true);
-          const response = await fetchUser(String(params.id));
+    if (session?.accessToken) {
+      loadData();
+    }
+  }, [session?.accessToken]);
 
-          if (response.payload?.data) {
-            setInitialValues(response.payload.data);
-          }
-        } catch (error) {
-          console.error("Failed to load user:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
+  useEffect(() => {
+    if (userDetail) {
+      setFormField(userDetail);
+    }
+  }, [userDetail]);
+
+  useEffect(() => {
+    if (formField && Object.keys(formField).length) {
+      form.setFieldsValue({
+        firstName: formField.firstName,
+        lastName: formField.lastName,
+        email: formField.email,
+        phoneNumber: formField.phoneNumber,
+        businessName: formField.businessName,
+        country: formField.country,
+        timezone: formField.timezone,
+        postalCode: formField.postalCode,
+        businessWebsite: formField.businessWebsite,
+      });
+    }
+  }, [formField]);
+
+  const onSuccess = () => {
+    message.success("User updated successfully!");
+    setLoading(false);
+  };
+
+  const onFailure = (error: any) => {
+    message.error(error);
+    setLoading(false);
+  };
+
+  const handleFinish = async (values: any) => {
+    const payload = {
+      id: userId,
+      data: {
+        ...values,
+      },
     };
+    updateUser(payload, session?.accessToken, onSuccess, onFailure);
+  };
 
-    loadUser();
-  }, [params.id, fetchUser, session?.accessToken]);
-
-  if (loading) {
+  if (userLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
@@ -48,15 +81,12 @@ const EditUserPage: React.FC = (props: any) => {
     );
   }
 
-  if (!initialValues) {
+  if (usesError) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
           <p className="text-red-600 mb-4">User not found</p>
-          <button
-            onClick={() => router.push("/admin/user/list")}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
+          <button onClick={() => router.push("/admin/user/list")} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             Back to Users
           </button>
         </div>
@@ -64,20 +94,18 @@ const EditUserPage: React.FC = (props: any) => {
     );
   }
 
-  return (
-    <UserForm
-      mode="edit"
-      initialValues={initialValues}
-      onSuccess={() => router.push("/admin/user/list")}
-      userId={Number(params.id)}
-      updateUser={updateUser}
-    />
-  );
+  return <UserForm form={form} onFinish={handleFinish} mode="edit" loading={loading} />;
 };
+
+const mapStateToProps = (state: any) => ({
+  userDetail: state.users.detail,
+  userLoading: state.users.loading,
+  usesError: state.users.error,
+});
 
 const mapDispatchToProps = {
   fetchUser: fetchUser,
   updateUser: updateUser,
 };
 
-export default connect(null, mapDispatchToProps)(EditUserPage);
+export default connect(mapStateToProps, mapDispatchToProps)(UpdateUser);
