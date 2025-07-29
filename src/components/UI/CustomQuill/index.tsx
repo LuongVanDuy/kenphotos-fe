@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
 import { customMessage } from "@/utils/messageHelper";
 import { slugifyFileName } from "@/utils/renameUploadedImage";
+import { getImageUrl } from "@/utils";
+import MediaLibraryModal from "../MediaLibraryModal";
 
 // Interface cho props của CustomQuill
 interface CustomQuillProps {
@@ -24,6 +26,7 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
   const editorRef = useRef<any>(null); // Dùng any hoặc import kiểu từ @types/quill nếu cần
   const [isEditorReady, setIsEditorReady] = useState(false);
   const cleanupResizeRef = useRef<(() => void) | null>(null);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
 
   // Function to calculate and set max-width for ql-editor
   const calculateAndSetEditorMaxWidth = () => {
@@ -94,39 +97,116 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
     }
   };
 
-  // Thêm CSS cho undo/redo buttons
-  const addUndoRedoCSS = () => {
+  // Thêm CSS cho WordPress-style editor
+  const addWordPressStyleCSS = () => {
     if (typeof document === "undefined") return;
 
-    const styleId = "quill-undo-redo-styles";
+    const styleId = "quill-wordpress-styles";
     if (document.getElementById(styleId)) return;
 
     const style = document.createElement("style");
     style.id = styleId;
     style.textContent = `
+      /* Main container styling */
+      .ql-container {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        color: #1e1e1e;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        min-height: 300px;
+      }
+
+      /* Toolbar styling - WordPress style */
+      .ql-toolbar {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 4px 4px 0 0;
+        padding: 8px 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+
+      /* Button groups */
+      .ql-toolbar .ql-formats {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        margin-right: 8px;
+        padding-right: 8px;
+        border-right: 1px solid #e0e0e0;
+      }
+
+      .ql-toolbar .ql-formats:last-child {
+        border-right: none;
+        margin-right: 0;
+        padding-right: 0;
+      }
+
+      /* Button styling */
+      .ql-toolbar button {
+        width: 32px;
+        height: 32px;
+        border: 1px solid transparent;
+        background: transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #555;
+        transition: all 0.2s ease;
+        position: relative;
+      }
+
+      .ql-toolbar button:hover {
+        background: #fff;
+        border-color: #0073aa;
+        color: #0073aa;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+
+      .ql-toolbar button.ql-active {
+        background: #0073aa;
+        border-color: #0073aa;
+        color: #fff;
+      }
+
+      .ql-toolbar button:active {
+        background: #005a87;
+        border-color: #005a87;
+        color: #fff;
+      }
+
+      /* Undo/Redo buttons */
       .ql-toolbar .ql-undo,
       .ql-toolbar .ql-redo {
-        width: 28px;
-        height: 28px;
-        border: none;
-        background: none;
+        width: 32px;
+        height: 32px;
+        border: 1px solid transparent;
+        background: transparent;
         cursor: pointer;
         font-size: 16px;
-        border-radius: 3px;
-        margin-right: 2px;
-        color: #444;
-        display: inline-block;
-        vertical-align: top;
+        border-radius: 4px;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
       }
       
       .ql-toolbar .ql-undo:hover,
       .ql-toolbar .ql-redo:hover {
-        background-color: #f0f0f0;
-      }
-      
-      .ql-toolbar .ql-undo:active,
-      .ql-toolbar .ql-redo:active {
-        background-color: #e0e0e0;
+        background: #fff;
+        border-color: #0073aa;
+        color: #0073aa;
       }
       
       .ql-toolbar .ql-undo::before {
@@ -135,6 +215,279 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
       
       .ql-toolbar .ql-redo::before {
         content: "↷";
+      }
+
+      /* Select dropdowns */
+      .ql-toolbar .ql-picker {
+        height: 32px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        background: transparent;
+        color: #555;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .ql-toolbar .ql-picker:hover {
+        background: #fff;
+        border-color: #0073aa;
+        color: #0073aa;
+      }
+
+      .ql-toolbar .ql-picker-label {
+        border: none;
+        padding: 0 8px;
+        font-size: 14px;
+        color: inherit;
+      }
+
+      .ql-toolbar .ql-picker-options {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 4px 0;
+      }
+
+      .ql-toolbar .ql-picker-item {
+        padding: 6px 12px;
+        font-size: 14px;
+        color: #555;
+        cursor: pointer;
+      }
+
+      .ql-toolbar .ql-picker-item:hover {
+        background: #f0f8ff;
+        color: #0073aa;
+      }
+
+      /* Color picker */
+      .ql-toolbar .ql-color .ql-picker-options,
+      .ql-toolbar .ql-background .ql-picker-options {
+        width: 152px;
+        padding: 8px;
+      }
+
+      .ql-toolbar .ql-color .ql-picker-label,
+      .ql-toolbar .ql-background .ql-picker-label {
+        width: 20px;
+        height: 20px;
+        border-radius: 2px;
+        margin: 0 4px;
+      }
+
+      /* Editor content area */
+      .ql-editor {
+        padding: 20px;
+        min-height: 280px;
+        background: #fff;
+        border: none;
+        outline: none;
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+        color: inherit;
+        overflow-x: auto;
+        max-width: 100%;
+        transition: border-color 0.3s, background-color 0.3s;
+      }
+
+      .ql-editor:focus {
+        background: #fff;
+      }
+
+      /* Placeholder styling */
+      .ql-editor.ql-blank::before {
+        color: #999;
+        font-style: italic;
+        font-size: 16px;
+        left: 20px;
+        right: 20px;
+      }
+
+      /* Content styling */
+      .ql-editor h1 {
+        font-size: 2em;
+        font-weight: 600;
+        margin: 0.67em 0;
+        color: #1e1e1e;
+      }
+
+      .ql-editor h2 {
+        font-size: 1.5em;
+        font-weight: 600;
+        margin: 0.83em 0;
+        color: #1e1e1e;
+      }
+
+      .ql-editor h3 {
+        font-size: 1.17em;
+        font-weight: 600;
+        margin: 1em 0;
+        color: #1e1e1e;
+      }
+
+      .ql-editor p {
+        margin: 0 0 1em 0;
+        line-height: 1.6;
+      }
+
+      .ql-editor blockquote {
+        border-left: 4px solid #0073aa;
+        margin: 1.5em 0;
+        padding: 0.5em 0 0.5em 1em;
+        background: #f9f9f9;
+        font-style: italic;
+      }
+
+      .ql-editor code {
+        background: #f1f1f1;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+        font-size: 0.9em;
+      }
+
+      .ql-editor pre {
+        background: #f1f1f1;
+        padding: 1em;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 1em 0;
+      }
+
+      .ql-editor pre code {
+        background: none;
+        padding: 0;
+      }
+
+      /* List styling */
+      .ql-editor ul,
+      .ql-editor ol {
+        margin: 1em 0;
+        padding-left: 2em;
+      }
+
+      .ql-editor li {
+        margin: 0.5em 0;
+      }
+
+      /* Link styling */
+      .ql-editor a {
+        color: #0073aa;
+        text-decoration: underline;
+      }
+
+      .ql-editor a:hover {
+        color: #005a87;
+      }
+
+      /* Table styling */
+      .ql-editor table {
+        width: 100%;
+        max-width: 100%;
+        border-collapse: collapse;
+        margin: 1em 0;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .ql-editor table td,
+      .ql-editor table th {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+        vertical-align: top;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+      }
+
+      .ql-editor table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #1e1e1e;
+      }
+
+      .ql-editor table tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+
+      .ql-editor table tr:hover {
+        background: #f0f8ff;
+      }
+
+      /* Image styling */
+      .ql-editor img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 1em auto;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      /* Drag and drop visual feedback */
+      .ql-editor.drag-over {
+        border: 2px dashed #0073aa !important;
+        background-color: #f0f8ff !important;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .ql-toolbar {
+          padding: 6px 8px;
+          gap: 2px;
+        }
+
+        .ql-toolbar button {
+          width: 28px;
+          height: 28px;
+          font-size: 12px;
+        }
+
+        .ql-toolbar .ql-formats {
+          margin-right: 4px;
+          padding-right: 4px;
+        }
+
+        .ql-editor {
+          padding: 16px;
+          font-size: 16px;
+        }
+      }
+
+      /* Focus states */
+      .ql-container.ql-snow:focus-within {
+        border-color: #0073aa;
+        box-shadow: 0 0 0 1px #0073aa;
+      }
+
+      /* Better table module styling */
+      .ql-better-table {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .ql-better-table .ql-picker {
+        height: 32px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        background: transparent;
+        color: #555;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .ql-better-table .ql-picker:hover {
+        background: #fff;
+        border-color: #0073aa;
+        color: #0073aa;
       }
     `;
     document.head.appendChild(style);
@@ -189,61 +542,85 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
   }, [isEditorReady]);
 
   const uploadImage = async () => {
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
-    input.click();
-    input.onchange = async () => {
-      // triggered when file is selected
-      const file = input.files?.[0];
-      const isImage = file!.type.startsWith("image/");
+    // Mở Media Library Modal thay vì file input
+    setIsMediaModalOpen(true);
+  };
 
-      const maxSize = 10 * 1024 * 1024;
+  // Handle image selection from Media Library
+  const handleImageSelect = (media: any) => {
+    if (!editorRef.current) return;
 
-      if (!isImage) {
-        customMessage.error(
-          "Invalid file format. Only image files are allowed."
+    try {
+      const range = editorRef.current.getSelection();
+      if (!range) {
+        // Nếu không có selection, insert ở cuối
+        const length = editorRef.current.getLength();
+        editorRef.current.setSelection(length, 0);
+      }
+
+      // Insert image vào editor với getImageUrl
+      const imageUrl = getImageUrl(media.slug || media.url);
+      if (imageUrl) {
+        editorRef.current.insertEmbed(
+          range?.index || editorRef.current.getLength() - 1,
+          "image",
+          imageUrl
         );
-        return;
+
+        // Move cursor after image
+        setTimeout(() => {
+          const newIndex =
+            (range?.index || editorRef.current.getLength() - 1) + 1;
+          editorRef.current.setSelection(newIndex, 0);
+        }, 100);
+
+        customMessage.success("Image inserted successfully!");
       }
+    } catch (error) {
+      console.error("Error inserting image:", error);
+      customMessage.error("Failed to insert image. Please try again.");
+    }
+  };
 
-      if (file!.size > maxSize) {
-        customMessage.error("Image must be under 10MB.");
-        return;
-      }
+  // Handle direct file upload (fallback)
+  const handleDirectFileUpload = async (file: File) => {
+    const isImage = file.type.startsWith("image/");
+    const maxSize = 10 * 1024 * 1024; // 10MB
 
-      const renamedFile = new File([file!], slugifyFileName(file!.name), {
-        type: file!.type,
-      });
+    if (!isImage) {
+      customMessage.error("Invalid file format. Only image files are allowed.");
+      return;
+    }
 
-      if (file && renamedFile) {
-        const messageKey = "blog-editor-image-upload";
-        customMessage.loading("Uploading blog editor image...", messageKey);
+    if (file.size > maxSize) {
+      customMessage.error("Image must be under 10MB.");
+      return;
+    }
 
-        try {
-          let imageUrl;
-          // const imageUrl = await uploadFileS3(
-          //   renamedFile,
-          //   "blog-admin-upload",
-          //   "image-upload"
-          // );
-          // Use the environment variable for image URL
-          const fullImageUrl = imageUrl
-            ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${imageUrl}`
-            : imageUrl;
-          const range = editorRef.current.getSelection(); // get current cursor position
-          editorRef.current.insertEmbed(range.index, "image", fullImageUrl); // embed image at cursor position
-          customMessage.destroy(messageKey);
-          customMessage.success("Blog Image editor created successfully!");
-        } catch (err) {
-          customMessage.destroy(messageKey);
-          console.error("[Image Upload Error]", err);
-          customMessage.error(
-            "Blog Editor Image creation failed. Please try again later."
-          );
-        }
-      }
-    };
+    const renamedFile = new File([file], slugifyFileName(file.name), {
+      type: file.type,
+    });
+
+    const messageKey = "blog-editor-image-upload";
+    customMessage.loading("Uploading image...", messageKey);
+
+    try {
+      // TODO: Implement actual file upload logic here
+      // const imageUrl = await uploadFileS3(renamedFile, "blog-admin-upload", "image-upload");
+
+      // For now, create a temporary URL
+      const imageUrl = URL.createObjectURL(file);
+
+      const range = editorRef.current.getSelection();
+      editorRef.current.insertEmbed(range?.index || 0, "image", imageUrl);
+
+      customMessage.destroy(messageKey);
+      customMessage.success("Image uploaded and inserted successfully!");
+    } catch (err) {
+      customMessage.destroy(messageKey);
+      console.error("[Image Upload Error]", err);
+      customMessage.error("Image upload failed. Please try again later.");
+    }
   };
 
   // Create table size selector UI
@@ -257,21 +634,23 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
     selector.style.cssText = `
       position: absolute;
       background: white;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       border-radius: 6px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       z-index: 1000;
-      padding: 12px;
+      padding: 16px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-width: 240px;
     `;
 
     const title = document.createElement("div");
-    title.textContent = "Select table size";
+    title.textContent = "Insert Table";
     title.style.cssText = `
       font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: #333;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #1e1e1e;
+      text-align: center;
     `;
     selector.appendChild(title);
 
@@ -281,7 +660,8 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
       display: grid;
       grid-template-columns: repeat(10, 20px);
       gap: 2px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      justify-content: center;
     `;
 
     const indicator = document.createElement("div");
@@ -290,6 +670,10 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
       font-size: 12px;
       color: #666;
       text-align: center;
+      padding: 4px;
+      background: #f9f9f9;
+      border-radius: 4px;
+      margin-bottom: 8px;
     `;
 
     // Create 8x10 grid of cells
@@ -305,6 +689,7 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
         cursor: pointer;
         background: white;
         transition: background-color 0.1s;
+        border-radius: 2px;
       `;
 
       cell.onmouseenter = () => {
@@ -316,9 +701,11 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
           const cellElement = cells[j] as HTMLElement;
 
           if (cellRow <= row && cellCol <= col) {
-            cellElement.style.background = "#e3f2fd";
+            cellElement.style.background = "#0073aa";
+            cellElement.style.borderColor = "#0073aa";
           } else {
             cellElement.style.background = "white";
+            cellElement.style.borderColor = "#ddd";
           }
         }
         indicator.textContent = `${row} x ${col}`;
@@ -334,8 +721,8 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
       grid.appendChild(cell);
     }
 
-    selector.appendChild(grid);
     selector.appendChild(indicator);
+    selector.appendChild(grid);
 
     return selector;
   };
@@ -503,57 +890,7 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
       const Formula: any = Quill.import("formats/formula");
       Quill.register(Formula, true);
 
-      addUndoRedoCSS();
-
-      // Add CSS for table overflow handling
-      const addTableOverflowCSS = () => {
-        if (typeof document === "undefined") return;
-
-        const styleId = "quill-table-overflow-styles";
-        if (document.getElementById(styleId)) return;
-
-        const style = document.createElement("style");
-        style.id = styleId;
-        style.textContent = `
-          .ql-editor {
-            overflow-x: auto;
-            max-width: 100%;
-          }
-          
-          .ql-editor table {
-            min-width: 100%;
-            table-layout: fixed;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-          }
-          
-          .ql-editor table td,
-          .ql-editor table th {
-            min-width: 60px;
-            max-width: 200px;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            white-space: normal;
-            padding: 8px;
-            border: 1px solid #ddd;
-          }
-          
-          .ql-editor table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-          }
-          
-          /* Ensure table doesn't break editor layout */
-          .ql-editor .ql-table {
-            display: block;
-            width: 100%;
-            overflow-x: auto;
-          }
-        `;
-        document.head.appendChild(style);
-      };
-
-      addTableOverflowCSS();
+      addWordPressStyleCSS();
 
       // Cấu hình Quill với đầy đủ tính năng
       editorRef.current = new Quill(quillRef.current, {
@@ -561,21 +898,13 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
         modules: {
           toolbar: {
             container: [
-              ["undo", "redo"],
+              [{ header: [1, 2, 3, false] }],
               ["bold", "italic", "underline", "strike"],
-              ["blockquote", "code-block"],
-              ["link", "image", "video", "formula"],
-              [{ header: 1 }, { header: 2 }],
-              [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
-              [{ script: "sub" }, { script: "super" }],
-              [{ indent: "-1" }, { indent: "+1" }],
-              [{ direction: "rtl" }],
-              [{ size: ["small", false, "large", "huge"] }],
-              [{ header: [1, 2, 3, 4, 5, 6, false] }],
-              [{ color: [] }, { background: [] }],
-              [{ font: [] }],
+              [{ list: "ordered" }, { list: "bullet" }],
               [{ align: [] }],
-              ["table"],
+              ["link", "image", "table"],
+              ["blockquote", "code-block"],
+              ["undo", "redo"],
               ["clean"],
             ],
             handlers: {
@@ -705,6 +1034,53 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
         }
       );
 
+      // Handle paste events for images
+      editorRef.current.root.addEventListener("paste", (e: ClipboardEvent) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.type.indexOf("image") !== -1) {
+            e.preventDefault();
+            const file = item.getAsFile();
+            if (file) {
+              handleDirectFileUpload(file);
+            }
+            break;
+          }
+        }
+      });
+
+      // Handle drag and drop for images
+      editorRef.current.root.addEventListener("dragover", (e: DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        editorRef.current.root.classList.add("drag-over");
+      });
+
+      editorRef.current.root.addEventListener("dragleave", (e: DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        editorRef.current.root.classList.remove("drag-over");
+      });
+
+      editorRef.current.root.addEventListener("drop", (e: DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        editorRef.current.root.classList.remove("drag-over");
+
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) {
+          const file = files[0];
+          if (file.type.startsWith("image/")) {
+            handleDirectFileUpload(file);
+          } else {
+            customMessage.error("Please drop an image file.");
+          }
+        }
+      });
+
       // Tính toán và set max-width cho editor
       calculateAndSetEditorMaxWidth();
 
@@ -744,7 +1120,20 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
     }
   }, [value, isEditorReady]);
 
-  return <div ref={quillRef} {...props} />;
+  return (
+    <>
+      <div ref={quillRef} {...props} />
+
+      {/* Media Library Modal */}
+      <MediaLibraryModal
+        isOpen={isMediaModalOpen}
+        onCancel={() => setIsMediaModalOpen(false)}
+        onSelect={handleImageSelect}
+        title="Select Image for Editor"
+        accept="image/*"
+      />
+    </>
+  );
 };
 
 export default CustomQuill;
