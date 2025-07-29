@@ -17,13 +17,13 @@ export default function Home() {
       <Banner />
       <WhyChooseUs />
       <Services />
-      <Following />
+      {/* <Following /> */}
       <Resources />
-      <WindowViewStyles />
-      <TrustedBy />
-      <AboutUs />
-      <Clients />
-      <Work />
+      {/* <WindowViewStyles /> */}
+      {/* <TrustedBy /> */}
+      {/* <AboutUs /> */}
+      {/* <Clients /> */}
+      {/* <Work /> */}
       <WindowViewStyles />
       <Reviews />
       {/* <PhotoEditingGuarantee /> */}

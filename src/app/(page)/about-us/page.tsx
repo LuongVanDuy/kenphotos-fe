@@ -1,52 +1,53 @@
-import Clients from '@/components/Home/Clients'
-import Following from '@/components/Home/Following'
-import FreeTestFiles from '@/components/Home/FreeTestFiles'
-import BaseLayout from '@/components/Layout/BaseLayout'
-import Footer from '@/components/Layout/Footer'
-import Navbar from '@/components/Layout/Navbar'
-import LayoutProvider from '@/components/Layout/Provider'
+'use client'
+
+import Reviews from '@/components/Home/Review'
 import Image from 'next/image'
 
-interface StoryItem {
-  title: string
-  description: string
-  imagePath: string
-}
-
-const storyData: StoryItem[] = [
+const timelineData = [
   {
-    title: 'The way to get started is to quit talking and begin doing!',
-    description:
-      'At True Color, we understand that in the dynamic world of real estate, captivating visuals are paramount. We are a dedicated team of professionals committed to providing top-tier real estate photo editing services that elevate your property listings to new heights.',
-    imagePath: '/images/resourse-2.jpg',
+    day: 'Day 1',
+    title: '1. Faith',
+    content: `We believe that we will be happy when we develop every day. Development should not
+      just be for ourselves but should be for others: that is family, friends, colleagues,
+      community and customers, only then can we live a valuable life.`,
   },
   {
-    title: 'Passion',
-    description:
-      'Established with a passion for enhancing real estate imagery, TRUE COLOR is a leading provider of premium photo editing solutions tailored specifically for the real estate industry. With years of experience and a keen eye for detail, our team brings properties to life through expert editing techniques and creative flair.',
-    imagePath: '/images/resourse-2.jpg',
+    day: 'Day 2',
+    title: '2. Mission',
+    content: `True Color strives to create an environment for each person to be proud of
+      themselves and their work, and to bring sustainable value to customers and the
+      work community.`,
   },
   {
-    title: 'Professional service',
-    description:
-      "Whether you're a real estate agent, photographer, or property developer, partnering with True Color is the key to unlocking the full potential of your property listings. With our expert editing services, you can showcase your properties in the best possible light and attract more buyers than ever before.",
-    imagePath: '/images/resourse-2.jpg',
+    day: 'Day 3',
+    title: '3. Business philosophy',
+    content: `What drives us to develop is the trust of customers and partners. As long as
+      others believe in True Color's personality, True color will work as if it were for
+      itself. Trust from customers helps True Color constantly change to move forward,
+      learning every day from useful things to bring even higher value to customers.`,
+  },
+  {
+    day: 'Day 4',
+    title: '4. High quality standards',
+    content: `Quality is our biggest priority, True Color edited photos meet the highest
+      standards, satisfying the most demanding customers, we have customers who have
+      been working with us for more than 5 years.`,
   },
 ]
 
 const AboutPage = () => {
   return (
-    <>
-      <div className='min-h-[350px] bg-black'>
+    <div className='px-[10px]'>
+      <div className='min-h-[350px]'>
         <div className='max-w-content mx-auto'>
-          <div className='px-4 md:px-12 py-16 text-white text-left'>
+          <div className='px-4 md:px-0 py-16 text-white text-left'>
             <p className='text-[24px] text-gray-400 font-medium mb-4'>About us</p>
-            <h1 className='text-[32px] md:text-[48px] leading-tight font-[500] mb-6'>
+            <h1 className='text-[32px] md:text-[48px] leading-tight font-[500] mb-6 text-black'>
               We are True Color. A digital
               <br className='hidden md:block' />
               design and editing company
             </h1>
-            <p className='max-w-3xl text-base md:text-lg text-gray-300 mb-12'>
+            <p className='max-w-3xl text-base md:text-lg  mb-12 text-black'>
               We help our clients build their brand identity, and design, develop, launch, and
               support their digital products. Working with startups and real estate businesses from
               all over the world.
@@ -54,24 +55,24 @@ const AboutPage = () => {
 
             <div className='grid grid-cols-3 gap-4 max-w-md'>
               <div className='text-left'>
-                <p className='text-3xl md:text-4xl font-semibold text-white'>150+</p>
+                <p className='text-3xl md:text-4xl font-semibold text-black'>150+</p>
                 <p className='text-sm text-gray-400 mt-1'>team members</p>
               </div>
               <div className='text-left'>
-                <p className='text-3xl md:text-4xl font-semibold text-white'>500+</p>
+                <p className='text-3xl md:text-4xl font-semibold text-black'>500+</p>
                 <p className='text-sm text-gray-400 mt-1'>completed projects</p>
               </div>
               <div className='text-left'>
-                <p className='text-3xl md:text-4xl font-semibold text-white'>10</p>
+                <p className='text-3xl md:text-4xl font-semibold text-black'>10</p>
                 <p className='text-sm text-gray-400 mt-1'>years in business</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {/* Phần mới thêm vào */}
-      <div className='max-w-content px-4 py-8 md:py-[50px] mx-auto'>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-[160px]'>
+
+      <div className='max-w-content  py-8 md:py-[50px] mx-auto'>
+        <div className='grid grid-cols-1 md:grid-cols-2 md:gap-[160px]'>
           {/* Cột trái */}
           <div className='space-y-20'>
             <div>
@@ -124,10 +125,13 @@ const AboutPage = () => {
               </ul>
             </div>
           </div>
-
           {/* Cột phải với offset */}
-
-          <div className=' space-y-20 pt-[220px]'>
+          <div className=' space-y-20 md:mt-[100px]'>
+            <div className='hidden md:block'>
+              <h2 className='text-[32px] md:text-[48px] leading-tight text-center font-[500]  text-black'>
+                Our Story
+              </h2>
+            </div>
             <div>
               <div className='w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50'>
                 <Image
@@ -181,184 +185,52 @@ const AboutPage = () => {
         </div>
       </div>
 
-      <div className='max-w-content px-4 py-8 md:py-[50px] mx-auto'>
-        <h2 className='text-center text-3xl md:text-[54px] text-[#6EC9FA] font-semibold mb-6 md:mb-10'>
-          Our Story
-        </h2>
-
-        {storyData.map((item, index) => (
-          <div key={index} className='flex flex-col md:flex-row'>
-            <div className='border-2 border-green-500 p-1 w-full md:flex-1'>
-              <div className='border-2 border-green-500 h-full flex flex-col items-center justify-center p-4 md:px-5'>
-                <h3 className='text-xl md:text-2xl font-semibold mb-3 md:mb-4 text-center'>
-                  {item.title}
-                </h3>
-                <p className='text-sm md:text-base text-gray-600 text-center'>{item.description}</p>
-              </div>
-            </div>
-            <div className='border-2 border-green-500 p-1 w-full md:flex-1 mt-2 md:mt-0'>
-              <div className='p-2 border-2 border-green-500'>
-                <Image
-                  src={item.imagePath}
-                  alt={item.title}
-                  width={300}
-                  height={224}
-                  className='object-cover w-full h-[200px] md:h-[224px]'
-                  priority
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12 mt-20 px-5'>
-          <div>
-            <h3 className='text-2xl md:text-3xl font-semibold mb-6 text-center'>Experience</h3>
-            <p className='text-gray-600 text-center leading-relaxed'>
-              We boast over a decade of real estate photo editing proficiency, offering diverse
-              services. These options include image enhancement, background removal, photo
-              enhancement options such as changing daytime photos to sunset, virtual furniture
-              incorporation, and clutter removal to optimize presentation standards and visual
-              appeal.
-            </p>
-          </div>
-
-          <div>
-            <h3 className='text-2xl md:text-3xl font-semibold mb-6 text-center'>Clients</h3>
-            <p className='text-gray-600 text-center leading-relaxed'>
-              Our clients come from various parts of the world, including photographers, agents,
-              brokers, and real estate investors. Many discerning customers have seamlessly
-              integrated our services into their operations, regarding us as indispensable members
-              of their teams. This testament underscores the trust and efficacy that we consistently
-              deliver in our collaborative endeavors.
-            </p>
-          </div>
-
-          <div>
-            <h3 className='text-2xl md:text-3xl font-semibold mb-6 text-center'>Object</h3>
-            <p className='text-gray-600 text-center leading-relaxed'>
-              Our editing solutions are designed to meet the needs of residences and high-end
-              properties seeking accelerated sales. We prioritize delivering photos with realistic
-              and precise colors, which helps in capturing the attention of potential buyers and
-              speeding up the sales process.
-            </p>
-          </div>
-
-          <div>
-            <h3 className='text-2xl md:text-3xl font-semibold mb-6 text-center'>Technique</h3>
-            <p className='text-gray-600 text-center leading-relaxed'>
-              By following our rigorous 21-step professional editing protocol, we always maintain
-              our confidence in providing images of the highest quality. Even when presented with
-              challenging conditions such as underexposure or backlighting, our skilled team
-              effectively corrects imperfections like lens stains and camera lens curvature,
-              ensuring flawless results with unwavering precision and attention to detail.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className='bg-[#D4EFFF] py-16 md:py-20'>
-        <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-10'>
-          <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
-              10+
-            </h3>
-            <p className='text-sm sm:text-base text-gray-600'>Experience</p>
-          </div>
-
-          <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
-              15
-            </h3>
-            <p className='text-sm sm:text-base text-gray-600'>Countries</p>
-          </div>
-
-          <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
-              1,000+
-            </h3>
-            <p className='text-sm sm:text-base text-gray-600'>Clients</p>
-          </div>
-
-          <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
-              4,500+
-            </h3>
-            <p className='text-sm sm:text-base text-gray-600'>Houses/Month</p>
-          </div>
-
-          <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
-              5,000
-            </h3>
-            <p className='text-sm sm:text-base text-gray-600'>Est. Hours Saved</p>
-          </div>
-
-          <div className='text-center'>
-            <h3 className='text-3xl sm:text-4xl lg:text-5xl text-[#6EC9FA] font-semibold mb-2'>
-              2M+
-            </h3>
-            <p className='text-sm sm:text-base text-gray-600'>Photos</p>
-          </div>
-        </div>
-      </div>
-      <div className='py-16 md:py-20'>
+      <div className='py-16 md:py-24 bg-gray '>
         <div className='max-w-content mx-auto px-4'>
-          <h2 className='text-center text-3xl md:text-[54px] text-gray-800 font-semibold mb-12 md:mb-16'>
-            Mission and values
+          <h2 className='text-start text-3xl md:text-5xl font-semibold text-gray-900 mb-16'>
+            Just one week from start to finish
           </h2>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 md:gap-16'>
-            <div>
-              <h3 className='text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-center'>
-                1. Faith
-              </h3>
-              <p className='text-gray-600 text-center leading-relaxed'>
-                We believe that we will be happy when we develop every day. Development should not
-                just be for ourselves but should be for others: that is family, friends, colleagues,
-                community and customers, only then can we live a valuable life.
-              </p>
-            </div>
-
-            <div>
-              <h3 className='text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-center'>
-                2. Mission
-              </h3>
-              <p className='text-gray-600 text-center leading-relaxed'>
-                True Color strives to create an environment for each person to be proud of
-                themselves and their work, and to bring sustainable value to customers and the work
-                community.
-              </p>
-            </div>
-
-            <div>
-              <h3 className='text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-center'>
-                3. Business philosophy
-              </h3>
-              <p className='text-gray-600 text-center leading-relaxed'>
-                What drives us to develop is the trust of customers and partners. As long as others
-                believe in True Color's personality, True color will work as if it were for itself.
-                Trust from customers helps True Color constantly change to move forward, learning
-                every day from useful things to bring even higher value to customers.
-              </p>
-            </div>
-
-            <div>
-              <h3 className='text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-center'>
-                4. High quality standards
-              </h3>
-              <p className='text-gray-600 text-center leading-relaxed'>
-                Quality is our biggest priority, True Color edited photos meet the highest
-                standards, satisfying the most demanding customers, we have customers who have been
-                working with us for more than 5 years.
-              </p>
-            </div>
-          </div>
+          <ul className='md:flex'>
+            {timelineData.map((item, index) => (
+              <li key={index} className='md:flex-col flex-1 justify-between flex gap-10'>
+                <div className='md:flex-row flex flex-col items-center gap-[12px] md:gap-[10px]'>
+                  <div className='h-3 w-3 md:mx-[4px]'>
+                    <svg
+                      fill='none'
+                      height='24'
+                      viewBox='0 0 24 24'
+                      width='24'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <rect
+                        height='23'
+                        rx='11.5'
+                        stroke='currentColor'
+                        width='23'
+                        x='0.5'
+                        y='0.500488'
+                      ></rect>
+                      <circle cx='12' cy='12.0005' fill='currentColor' r='6'></circle>
+                    </svg>
+                  </div>
+                  {/* Chỉ thêm đường kẻ nếu không phải phần tử cuối */}
+                  {index !== timelineData.length - 1 && (
+                    <div className='md:h-[1px] md:w-full h-full w-[1px] ml-[10px] md:ml-0 md:mt-3 bg-black'></div>
+                  )}
+                </div>
+                <div className='md:pb-0 md:pr-5 pb-8 flex-1'>
+                  <span className='mb-[8px] block text-[#9D9DAD] text-[16px]'>{item.day}</span>
+                  <h3 className='mb-[16px] text-[24px] text-black'>{item.title}</h3>
+                  <p className='text-black text-[16px]'>{item.content}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
-      <Following />
-      <Clients />
-    </>
+      <Reviews />
+    </div>
   )
 }
 

@@ -15,7 +15,7 @@ interface BenefitItem {
 const WhyChooseUs: React.FC = () => {
   useEffect(() => {
     AOS.init({
-      duration: 300,
+      duration: 200,
       once: true,
       easing: 'ease-out-cubic',
     })
@@ -61,18 +61,18 @@ const WhyChooseUs: React.FC = () => {
   ]
 
   return (
-    <section className='py-16 bg-white' aria-labelledby='why-choose-us-heading'>
+    <section className='py-8 md:py-24 bg-white' aria-labelledby='why-choose-us-heading'>
       <div className='max-w-content mx-auto px-4'>
         <header className='text-center mb-12'>
           <h2
-            className='text-[20px] md:text-[30px] lg:text-[38px] font-[600] normal-case not-italic no-underline leading-[1.2em] py-[10px] tracking-[0px] text-[#00B3F7]'
+            className='text-[20px] md:text-[30px] lg:text-[38px] font-[600] normal-case not-italic no-underline leading-[1.2em] py-[10px] tracking-[0px] text-black-base'
             id='services-subtitle'
             data-aos='fade-down'
           >
             Real Estate Photo Editing, Virtual Staging, Real Estate Videos Editing Services
           </h2>
           <h1
-            className='text-[20px] md:text-[55px] font-semibold normal-case not-italic py-[10px] no-underline leading-[1.2em] tracking-[0px] text-[#00A1F8]'
+            className='text-[20px] md:text-[55px] font-semibold normal-case not-italic py-[10px] no-underline leading-[1.2em] tracking-[0px] text-black-base'
             id='why-choose-us-heading'
             data-aos='fade-up'
             data-aos-delay='200'
@@ -104,7 +104,7 @@ const WhyChooseUs: React.FC = () => {
                   priority
                 />
               </div>
-              <h3 className='text-[17px] md:text-[28px] font-semibold text-text-blue mb-2'>
+              <h3 className='text-[17px] md:text-[28px] font-semibold text-black-base mb-2'>
                 {benefit.title}
               </h3>
               <p className='text-sm text-text-gray-dark leading-relaxed'>{benefit.description}</p>

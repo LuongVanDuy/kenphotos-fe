@@ -46,7 +46,7 @@ const Resources: React.FC = () => {
   ]
 
   return (
-    <section className='py-8 md:py-16 bg-white'>
+    <section className='py-8 md:py-24 bg-[#fff]'>
       <div className='max-w-content mx-auto px-4 text-center'>
         <h3 className='text-[25px] md:text-[45px] font-semibold normal-case not-italic no-underline leading-[1.2em] tracking-[0px] text-[#1C244B] mb-6'>
           Below are our resources
