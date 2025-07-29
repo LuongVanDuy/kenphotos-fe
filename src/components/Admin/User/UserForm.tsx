@@ -131,8 +131,9 @@ const UserForm: React.FC<UserFormProps> = ({
 
                 {/* Right Column - Form Fields */}
                 <Col span={20}>
-                  <div className="space-y-6">
-                    <Row gutter={32}>
+                  <div className="space-y-2">
+                    {/* Row 1: First Name & Last Name */}
+                    <Row gutter={24}>
                       <Col span={12}>
                         <Form.Item
                           name="firstName"
@@ -150,115 +151,10 @@ const UserForm: React.FC<UserFormProps> = ({
                         >
                           <Input
                             placeholder="Enter first name"
-                            className="h-11 border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                          />
-                        </Form.Item>
-
-                        <Form.Item
-                          name="businessName"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Business Name
-                            </span>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please enter business name",
-                            },
-                          ]}
-                        >
-                          <Input
-                            placeholder="Enter business name"
-                            className="h-11 border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                          />
-                        </Form.Item>
-
-                        <Form.Item
-                          name="country"
-                          label={
-                            <div>
-                              <span className="text-gray-700 font-medium">
-                                Country
-                              </span>
-                              <div className="text-xs text-gray-500 font-normal mt-1">
-                                Country of your bank. Used by Stripe for
-                                payouts.
-                              </div>
-                            </div>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please select country",
-                            },
-                          ]}
-                        >
-                          <Select
-                            placeholder="Select country"
-                            className="h-11"
-                            suffixIcon={
-                              <span className="text-gray-400">▼</span>
-                            }
-                            dropdownClassName="rounded-lg"
-                          >
-                            {countryOptions.map((option) => (
-                              <Option key={option.value} value={option.value}>
-                                {option.label}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-
-                        <Form.Item
-                          name="timezone"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Timezone
-                            </span>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please select timezone",
-                            },
-                          ]}
-                        >
-                          <Select
-                            placeholder="Select timezone"
-                            className="h-11"
-                            suffixIcon={
-                              <span className="text-gray-400">▼</span>
-                            }
-                            dropdownClassName="rounded-lg"
-                          >
-                            {timezoneOptions.map((option) => (
-                              <Option key={option.value} value={option.value}>
-                                {option.label}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-
-                        <Form.Item
-                          name="businessWebsite"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Business Website
-                            </span>
-                          }
-                          rules={[
-                            { type: "url", message: "Please enter valid URL" },
-                          ]}
-                        >
-                          <Input
-                            placeholder="https://my-website.com"
-                            className="h-11 border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
                           />
                         </Form.Item>
                       </Col>
-
-                      {/* Right Column Fields */}
                       <Col span={12}>
                         <Form.Item
                           name="lastName"
@@ -276,10 +172,36 @@ const UserForm: React.FC<UserFormProps> = ({
                         >
                           <Input
                             placeholder="Enter last name"
-                            className="h-11 border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
                           />
                         </Form.Item>
+                      </Col>
+                    </Row>
 
+                    {/* Row 2: Business Name & Email */}
+                    <Row gutter={24}>
+                      <Col span={12}>
+                        <Form.Item
+                          name="businessName"
+                          label={
+                            <span className="text-gray-700 font-medium">
+                              Business Name
+                            </span>
+                          }
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter business name",
+                            },
+                          ]}
+                        >
+                          <Input
+                            placeholder="Enter business name"
+                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
                         <Form.Item
                           name="email"
                           label={
@@ -297,10 +219,48 @@ const UserForm: React.FC<UserFormProps> = ({
                         >
                           <Input
                             placeholder="Enter email address"
-                            className="h-11 border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
                           />
                         </Form.Item>
+                      </Col>
+                    </Row>
 
+                    {/* Row 3: Country & Phone Number */}
+                    <Row gutter={24}>
+                      <Col span={12}>
+                        <Form.Item
+                          name="country"
+                          label={
+                            <div>
+                              <span className="text-gray-700 font-medium">
+                                Country
+                              </span>
+                            </div>
+                          }
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select country",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Select country"
+                            className="!h-[40px]"
+                            suffixIcon={
+                              <span className="text-gray-400">▼</span>
+                            }
+                            dropdownClassName="rounded-lg"
+                          >
+                            {countryOptions.map((option) => (
+                              <Option key={option.value} value={option.value}>
+                                {option.label}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
                         <Form.Item
                           name="phoneNumber"
                           label={
@@ -317,11 +277,47 @@ const UserForm: React.FC<UserFormProps> = ({
                         >
                           <Input
                             placeholder="Enter phone number"
-                            className="h-11 border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
                             prefix={<span className="text-gray-400">+1</span>}
                           />
                         </Form.Item>
+                      </Col>
+                    </Row>
 
+                    {/* Row 4: Timezone & Postal Code */}
+                    <Row gutter={24}>
+                      <Col span={12}>
+                        <Form.Item
+                          name="timezone"
+                          label={
+                            <span className="text-gray-700 font-medium">
+                              Timezone
+                            </span>
+                          }
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select timezone",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Select timezone"
+                            className="!h-[40px]"
+                            suffixIcon={
+                              <span className="text-gray-400">▼</span>
+                            }
+                            dropdownClassName="rounded-lg"
+                          >
+                            {timezoneOptions.map((option) => (
+                              <Option key={option.value} value={option.value}>
+                                {option.label}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
                         <Form.Item
                           name="postalCode"
                           label={
@@ -338,10 +334,33 @@ const UserForm: React.FC<UserFormProps> = ({
                         >
                           <Input
                             placeholder="Enter postal code"
-                            className="h-11 border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
                           />
                         </Form.Item>
                       </Col>
+                    </Row>
+
+                    {/* Row 5: Business Website */}
+                    <Row gutter={24}>
+                      <Col span={12}>
+                        <Form.Item
+                          name="businessWebsite"
+                          label={
+                            <span className="text-gray-700 font-medium">
+                              Business Website
+                            </span>
+                          }
+                          rules={[
+                            { type: "url", message: "Please enter valid URL" },
+                          ]}
+                        >
+                          <Input
+                            placeholder="https://my-website.com"
+                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>{/* Empty column for alignment */}</Col>
                     </Row>
 
                     {/* Hidden avatar field */}
@@ -371,7 +390,7 @@ const UserForm: React.FC<UserFormProps> = ({
                         >
                           <Input.Password
                             placeholder="Enter password"
-                            className="h-11 border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
                           />
                         </Form.Item>
                       </div>
@@ -383,13 +402,13 @@ const UserForm: React.FC<UserFormProps> = ({
                         type="primary"
                         htmlType="submit"
                         loading={loading}
-                        className="bg-blue-600 border-blue-600 hover:bg-blue-700 h-11 px-8 rounded-lg font-medium shadow-sm transition-colors"
+                        className="bg-blue-600 border-blue-600 hover:bg-blue-700 !h-[40px] px-8 rounded-lg font-medium shadow-sm transition-colors"
                       >
                         {loading ? "Saving..." : "Save Changes"}
                       </Button>
                       <Button
                         onClick={() => router.back()}
-                        className="h-11 px-8 rounded-lg font-medium border-gray-300 hover:border-gray-400 transition-colors"
+                        className="!h-[40px] px-8 rounded-lg font-medium border-gray-300 hover:border-gray-400 transition-colors"
                       >
                         Cancel
                       </Button>

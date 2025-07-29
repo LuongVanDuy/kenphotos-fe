@@ -81,7 +81,8 @@
 }
 
 .ant-input,
-.ant-input-number {
+.ant-input-number,
+.ant-select {
   background: #fff !important;
   box-shadow: none !important;
   transition: border 0.2s, box-shadow 0.2s;
