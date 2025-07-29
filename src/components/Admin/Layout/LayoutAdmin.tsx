@@ -133,7 +133,7 @@ const AdminLayout = ({ children }: Props) => {
             style={{
               padding: isMobile ? "16px" : "32px",
               background: "#f0f0f0",
-              minHeight: "calc(100vh - 200px)",
+              minHeight: "calc(100vh - 72px)",
             }}
           >
             {children}
