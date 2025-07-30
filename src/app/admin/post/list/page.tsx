@@ -11,6 +11,7 @@ import {
   Modal,
   Input,
   Space,
+  Avatar,
 } from "antd";
 import {
   PlusOutlined,
@@ -20,6 +21,7 @@ import {
   EyeOutlined,
   RestOutlined,
   DeleteFilled,
+  PictureOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,6 +33,7 @@ import {
 } from "@/store/actions/posts";
 import { useSession } from "next-auth/react";
 import { AppDispatch, RootState } from "@/store/store";
+import { getImageUrl } from "@/utils";
 
 const { Option } = Select;
 
@@ -255,10 +258,25 @@ const PostListPage: React.FC = () => {
       width: 80,
     },
     {
-      title: "Title",
-      dataIndex: "title",
-      key: "title",
-      render: (title: string) => <span className="font-medium">{title}</span>,
+      title: "Post",
+      key: "post",
+      render: (_: any, record: any) => (
+        <Space>
+          {record.thumbnail ? (
+            <Avatar
+              size={40}
+              src={getImageUrl(record.thumbnail)}
+              style={{ width: 60, height: 40, objectFit: "cover" }}
+            />
+          ) : (
+            <Avatar size={40} icon={<PictureOutlined />} />
+          )}
+          <div>
+            <div className="font-medium">{record.title}</div>
+            <div className="text-sm text-gray-500">{record.slug}</div>
+          </div>
+        </Space>
+      ),
     },
     {
       title: "Status",

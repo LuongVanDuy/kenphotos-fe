@@ -1,12 +1,13 @@
 import CustomQuill from "@/components/UI/CustomQuill";
 import { PostFormData } from "@/types";
 import { getImageUrl } from "@/utils";
+import { slugify } from "@/utils/slugify";
 import { DeleteOutlined, PictureOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Select, Spin } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Title from "antd/es/typography/Title";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
 import CategoryTreeSelector from "./CategoryTreeSelector";
 
@@ -19,9 +20,19 @@ interface PostFormProps {
   initialValues?: any;
 }
 
-const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, loading, initialValues }) => {
+const PostForm: React.FC<PostFormProps> = ({
+  form,
+  onFinish,
+  onSaveDraft,
+  mode,
+  loading,
+  initialValues,
+}) => {
   const [isModalMediaOpen, setIsModalMediaOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+  const [slugDebounceTimer, setSlugDebounceTimer] =
+    useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -36,6 +47,57 @@ const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, 
 
     return () => clearTimeout(timeout);
   }, [form, selectedImage]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (slugDebounceTimer) {
+        clearTimeout(slugDebounceTimer);
+      }
+    };
+  }, [slugDebounceTimer]);
+
+  // Auto-generate slug from title (WordPress style)
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const title = e.target.value;
+
+      // Clear existing timer
+      if (slugDebounceTimer) {
+        clearTimeout(slugDebounceTimer);
+      }
+
+      // Set new timer for debounced slug generation
+      const timer = setTimeout(() => {
+        if (!isSlugManuallyEdited && title) {
+          const generatedSlug = slugify(title);
+          form.setFieldsValue({ slug: generatedSlug });
+        }
+      }, 500); // 500ms debounce
+
+      setSlugDebounceTimer(timer);
+    },
+    [form, isSlugManuallyEdited, slugDebounceTimer]
+  );
+
+  // Handle manual slug editing
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const slug = e.target.value;
+    setIsSlugManuallyEdited(true);
+
+    // Clean the slug input (remove special characters, convert to lowercase)
+    const cleanedSlug = slugify(slug);
+    if (cleanedSlug !== slug) {
+      form.setFieldsValue({ slug: cleanedSlug });
+    }
+  };
+
+  // Reset slug manual edit flag when form is reset
+  useEffect(() => {
+    if (mode === "create") {
+      setIsSlugManuallyEdited(false);
+    }
+  }, [mode]);
 
   const handleMediaSelect = (media: any) => {
     form.setFieldsValue({ thumbnail: media.slug });
@@ -67,7 +129,12 @@ const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, 
             <Button type="default" onClick={onSaveDraft} disabled={loading}>
               Save Draft
             </Button>
-            <Button type="primary" htmlType="submit" loading={loading} onClick={() => form.submit()}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              onClick={() => form.submit()}
+            >
               {mode === "edit" ? "Update" : "Publish"}
             </Button>
           </div>
@@ -81,37 +148,95 @@ const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, 
             <div className="flex-1">
               <div className="space-y-6">
                 <div>
-                  <Form.Item name="title" rules={[{ required: true, message: "Please enter the title" }]} className="!mb-0">
-                    <Input placeholder="Add title" style={{ fontSize: "24px", fontWeight: "400" }} />
+                  <Form.Item
+                    name="title"
+                    rules={[
+                      { required: true, message: "Please enter the title" },
+                    ]}
+                    className="!mb-0"
+                  >
+                    <Input
+                      placeholder="Add title"
+                      style={{ fontSize: "24px", fontWeight: "400" }}
+                      onChange={handleTitleChange}
+                    />
                   </Form.Item>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700">Permalink</h3>
-                  <Form.Item name="slug" rules={[{ required: true, message: "Please enter the slug" }]} className="!mb-0">
-                    <Input placeholder="post-url-slug" size="small" addonBefore={process.env.NEXT_PUBLIC_LINK} />
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Permalink
+                  </h3>
+                  <Form.Item
+                    name="slug"
+                    rules={[
+                      { required: true, message: "Please enter the slug" },
+                    ]}
+                    className="!mb-0"
+                  >
+                    <Input
+                      placeholder="post-url-slug"
+                      size="small"
+                      addonBefore={process.env.NEXT_PUBLIC_LINK}
+                      onChange={handleSlugChange}
+                      suffix={
+                        !isSlugManuallyEdited && (
+                          <span className="text-xs text-gray-400">
+                            Auto-generated from title
+                          </span>
+                        )
+                      }
+                    />
                   </Form.Item>
+                  {!isSlugManuallyEdited && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      The slug will be automatically generated from the title.
+                      You can edit it manually if needed.
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700">Content</h3>
-                  <Form.Item name="content" rules={[{ required: true, message: "Please enter the content" }]} className="!mb-0 bg-white">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Content
+                  </h3>
+                  <Form.Item
+                    name="content"
+                    rules={[
+                      { required: true, message: "Please enter the content" },
+                    ]}
+                    className="!mb-0 bg-white"
+                  >
                     <CustomQuill
                       placeholder="Start writing or type / to choose a block..."
                       style={{ minHeight: "400px" }}
                       className="quill-editor"
-                      onChange={(value) => form.setFieldsValue({ content: value })}
+                      onChange={(value) =>
+                        form.setFieldsValue({ content: value })
+                      }
                     />
                   </Form.Item>
                 </div>
 
                 <div className="border border-gray-300 rounded-sm">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">Excerpt</h3>
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      Excerpt
+                    </h3>
                   </div>
                   <div className="bg-white p-4">
-                    <Form.Item name="excerpt" rules={[{ required: true, message: "Please enter the excerpt" }]} className="!mb-0">
-                      <TextArea placeholder="Write an excerpt (optional)" rows={4} size="small" />
+                    <Form.Item
+                      name="excerpt"
+                      rules={[
+                        { required: true, message: "Please enter the excerpt" },
+                      ]}
+                      className="!mb-0"
+                    >
+                      <TextArea
+                        placeholder="Write an excerpt (optional)"
+                        rows={4}
+                        size="small"
+                      />
                     </Form.Item>
                   </div>
                 </div>
@@ -122,13 +247,25 @@ const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, 
               <div className="space-y-6">
                 <div className="border border-gray-300 rounded-sm bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">Publish</h3>
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      Publish
+                    </h3>
                   </div>
                   <div className="p-4 space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Status:</span>
-                      <Form.Item name="status" rules={[{ required: true, message: "Please select status" }]} className="!mb-0">
-                        <Select size="small" style={{ width: 120 }} options={statusOptions} />
+                      <Form.Item
+                        name="status"
+                        rules={[
+                          { required: true, message: "Please select status" },
+                        ]}
+                        className="!mb-0"
+                      >
+                        <Select
+                          size="small"
+                          style={{ width: 120 }}
+                          options={statusOptions}
+                        />
                       </Form.Item>
                     </div>
                   </div>
@@ -136,7 +273,9 @@ const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, 
 
                 <div className="border border-gray-300 rounded-sm bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">Featured Image</h3>
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      Featured Image
+                    </h3>
                   </div>
                   <div className="p-4">
                     {selectedImage ? (
@@ -151,15 +290,31 @@ const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, 
                             />
                           </div>
                           <div className="absolute top-1 right-1">
-                            <Button type="text" icon={<DeleteOutlined />} onClick={handleRemoveImage} size="small" />
+                            <Button
+                              type="text"
+                              icon={<DeleteOutlined />}
+                              onClick={handleRemoveImage}
+                              size="small"
+                            />
                           </div>
                         </div>
-                        <Button type="primary" size="small" icon={<PictureOutlined />} onClick={() => setIsModalMediaOpen(true)}>
+                        <Button
+                          type="primary"
+                          size="small"
+                          icon={<PictureOutlined />}
+                          onClick={() => setIsModalMediaOpen(true)}
+                        >
                           Replace Image
                         </Button>
                       </div>
                     ) : (
-                      <Button type="primary" size="large" icon={<PictureOutlined />} onClick={() => setIsModalMediaOpen(true)} className="w-full">
+                      <Button
+                        type="primary"
+                        size="large"
+                        icon={<PictureOutlined />}
+                        onClick={() => setIsModalMediaOpen(true)}
+                        className="w-full"
+                      >
                         Set Featured Image
                       </Button>
                     )}
@@ -167,7 +322,9 @@ const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, 
                 </div>
                 <div className="border border-gray-300 rounded-sm bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">Categories</h3>
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      Categories
+                    </h3>
                   </div>
                   <div className="p-4">
                     <Form.Item
@@ -189,7 +346,12 @@ const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, 
           </div>
         </Form>
       </div>
-      <MediaLibraryModal isOpen={isModalMediaOpen} onCancel={() => setIsModalMediaOpen(false)} onSelect={handleMediaSelect} accept="image/*" />
+      <MediaLibraryModal
+        isOpen={isModalMediaOpen}
+        onCancel={() => setIsModalMediaOpen(false)}
+        onSelect={handleMediaSelect}
+        accept="image/*"
+      />
     </>
   );
 };

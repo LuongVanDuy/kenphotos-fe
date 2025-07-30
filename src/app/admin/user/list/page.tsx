@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteUser, fetchUsers } from "@/store/actions/users";
 import { useSession } from "next-auth/react";
 import { AppDispatch, RootState } from "@/store/store";
+import { getImageUrl } from "@/utils";
 
 const { Option } = Select;
 
@@ -121,7 +122,15 @@ const UserListPage: React.FC = () => {
       key: "user",
       render: (_: any, record: any) => (
         <Space>
-          <Avatar size="small" icon={<UserOutlined />} />
+          {record.avatar ? (
+            <Avatar
+              size={40}
+              src={getImageUrl(record.avatar)}
+              style={{ width: 60, height: 40, objectFit: "cover" }}
+            />
+          ) : (
+            <Avatar size={40} icon={<UserOutlined />} />
+          )}
           <div>
             <div className="font-medium">
               {record.firstName} {record.lastName}

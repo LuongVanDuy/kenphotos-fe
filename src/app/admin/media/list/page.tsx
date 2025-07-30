@@ -110,10 +110,10 @@ const MediaListPage: React.FC = () => {
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        const slugs = selectedMedia.map((media) => media.slug);
+        const ids = selectedMedia.map((media) => media.id);
         dispatch(
           deleteMedia(
-            slugs,
+            { ids },
             session?.accessToken || "",
             () => {
               message.success("Media files deleted successfully");

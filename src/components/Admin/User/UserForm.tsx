@@ -22,8 +22,9 @@ import {
 } from "@ant-design/icons";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
 import { getImageUrl } from "@/utils";
+import Title from "antd/es/typography/Title";
 
-const { Title, Text } = Typography;
+const { Title: AntTitle, Text } = Typography;
 
 interface UserFormProps {
   form?: FormInstance;
@@ -78,32 +79,283 @@ const UserForm: React.FC<UserFormProps> = ({
 
   return (
     <>
-      <div className=" bg-white">
-        <div className=" mx-auto px-6 py-12">
-          {/* Header */}
-          <div className="mb-8">
-            <Title level={2} className="text-gray-800 mb-2">
+      <div>
+        <div className="flex items-center justify-between mb-7">
+          <div className="flex items-center space-x-4">
+            <Title level={4} className="!mb-0">
               {mode === "create" ? "Create New User" : "Edit User Profile"}
             </Title>
-            <Text className="text-gray-600">
-              {mode === "create"
-                ? "Add a new user to your system"
-                : "Update user information and preferences"}
-            </Text>
           </div>
-
-          <div className="">
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              className="p-8"
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => router.back()}
+              className="!h-[40px] px-8 rounded-lg font-medium border-gray-300 hover:border-gray-400 transition-colors"
             >
-              <Row gutter={48} align="top">
-                {/* Left Column - Avatar */}
-                <Col span={4}>
-                  <div className="text-center">
-                    <div className="mb-6">
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              onClick={() => form?.submit()}
+              className="bg-blue-600 border-blue-600 hover:bg-blue-700 !h-[40px] px-8 rounded-lg font-medium shadow-sm transition-colors"
+            >
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
+        </div>
+
+        <Form form={form} layout="vertical" onFinish={onFinish}>
+          <div className="flex gap-8">
+            <div className="flex-1">
+              <div className="space-y-6">
+                <div className="border border-gray-300 rounded-sm bg-white ">
+                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      Basic Information
+                    </h3>
+                  </div>
+
+                  <div className=" flex flex-col gap-5 p-8">
+                    <div className="">
+                      <Row gutter={24}>
+                        <Col span={12}>
+                          <Form.Item
+                            name="firstName"
+                            label="First Name"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please enter first name",
+                              },
+                            ]}
+                            className="!mb-0"
+                          >
+                            <Input
+                              placeholder="Enter first name"
+                              className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item
+                            name="lastName"
+                            label="Last Name"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please enter last name",
+                              },
+                            ]}
+                            className="!mb-0"
+                          >
+                            <Input
+                              placeholder="Enter last name"
+                              className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </div>
+
+                    <div className=" space-y-4">
+                      <Row gutter={24}>
+                        <Col span={12}>
+                          <Form.Item
+                            name="businessName"
+                            label="Business Name"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please enter business name",
+                              },
+                            ]}
+                            className="!mb-0"
+                          >
+                            <Input
+                              placeholder="Enter business name"
+                              className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item
+                            name="email"
+                            label="Email"
+                            rules={[
+                              { required: true, message: "Please enter email" },
+                              {
+                                type: "email",
+                                message: "Please enter valid email",
+                              },
+                            ]}
+                            className="!mb-0"
+                          >
+                            <Input
+                              placeholder="Enter email address"
+                              className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+
+                      <Row gutter={24}>
+                        <Col span={12}>
+                          <Form.Item
+                            name="country"
+                            label="Country"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please select country",
+                              },
+                            ]}
+                            className="!mb-0"
+                          >
+                            <Select
+                              placeholder="Select country"
+                              className="!h-[40px]"
+                              suffixIcon={
+                                <span className="text-gray-400">▼</span>
+                              }
+                              dropdownClassName="rounded-lg"
+                            >
+                              {countryOptions.map((option) => (
+                                <Option key={option.value} value={option.value}>
+                                  {option.label}
+                                </Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item
+                            name="phoneNumber"
+                            label="Phone Number"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please enter phone number",
+                              },
+                            ]}
+                            className="!mb-0"
+                          >
+                            <Input
+                              placeholder="Enter phone number"
+                              className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                              prefix={<span className="text-gray-400">+1</span>}
+                            />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+
+                      <Row gutter={24}>
+                        <Col span={12}>
+                          <Form.Item
+                            name="timezone"
+                            label="Timezone"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please select timezone",
+                              },
+                            ]}
+                            className="!mb-0"
+                          >
+                            <Select
+                              placeholder="Select timezone"
+                              className="!h-[40px]"
+                              suffixIcon={
+                                <span className="text-gray-400">▼</span>
+                              }
+                              dropdownClassName="rounded-lg"
+                            >
+                              {timezoneOptions.map((option) => (
+                                <Option key={option.value} value={option.value}>
+                                  {option.label}
+                                </Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item
+                            name="postalCode"
+                            label="Postal Code"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please enter postal code",
+                              },
+                            ]}
+                            className="!mb-0"
+                          >
+                            <Input
+                              placeholder="Enter postal code"
+                              className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                            />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+
+                      <Form.Item
+                        name="businessWebsite"
+                        label="Business Website"
+                        rules={[
+                          { type: "url", message: "Please enter valid URL" },
+                        ]}
+                        className="!mb-0"
+                      >
+                        <Input
+                          placeholder="https://my-website.com"
+                          className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                        />
+                      </Form.Item>
+                    </div>
+
+                    {mode === "create" && (
+                      <div className="">
+                        <Form.Item
+                          name="password"
+                          label="Password"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter password",
+                            },
+                            {
+                              min: 6,
+                              message: "Password must be at least 6 characters",
+                            },
+                          ]}
+                          className="!mb-0"
+                        >
+                          <Input.Password
+                            placeholder="Enter password"
+                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                          />
+                        </Form.Item>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Form.Item name="avatar" hidden>
+                  <Input />
+                </Form.Item>
+              </div>
+            </div>
+
+            <div className="w-80 flex-shrink-0">
+              <div className="space-y-6">
+                <div className="border border-gray-300 rounded-sm bg-white">
+                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      Profile Picture
+                    </h3>
+                  </div>
+                  <div className="p-4">
+                    <div className="text-center">
                       <div className="relative inline-block">
                         <div
                           className="w-36 h-36 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center bg-gray-50 hover:border-blue-400 transition-colors duration-200 cursor-pointer"
@@ -127,298 +379,11 @@ const UserForm: React.FC<UserFormProps> = ({
                       </div>
                     </div>
                   </div>
-                </Col>
-
-                {/* Right Column - Form Fields */}
-                <Col span={20}>
-                  <div className="space-y-2">
-                    {/* Row 1: First Name & Last Name */}
-                    <Row gutter={24}>
-                      <Col span={12}>
-                        <Form.Item
-                          name="firstName"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              First Name
-                            </span>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please enter first name",
-                            },
-                          ]}
-                        >
-                          <Input
-                            placeholder="Enter first name"
-                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col span={12}>
-                        <Form.Item
-                          name="lastName"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Last Name
-                            </span>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please enter last name",
-                            },
-                          ]}
-                        >
-                          <Input
-                            placeholder="Enter last name"
-                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                          />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-
-                    {/* Row 2: Business Name & Email */}
-                    <Row gutter={24}>
-                      <Col span={12}>
-                        <Form.Item
-                          name="businessName"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Business Name
-                            </span>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please enter business name",
-                            },
-                          ]}
-                        >
-                          <Input
-                            placeholder="Enter business name"
-                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col span={12}>
-                        <Form.Item
-                          name="email"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Email
-                            </span>
-                          }
-                          rules={[
-                            { required: true, message: "Please enter email" },
-                            {
-                              type: "email",
-                              message: "Please enter valid email",
-                            },
-                          ]}
-                        >
-                          <Input
-                            placeholder="Enter email address"
-                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                          />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-
-                    {/* Row 3: Country & Phone Number */}
-                    <Row gutter={24}>
-                      <Col span={12}>
-                        <Form.Item
-                          name="country"
-                          label={
-                            <div>
-                              <span className="text-gray-700 font-medium">
-                                Country
-                              </span>
-                            </div>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please select country",
-                            },
-                          ]}
-                        >
-                          <Select
-                            placeholder="Select country"
-                            className="!h-[40px]"
-                            suffixIcon={
-                              <span className="text-gray-400">▼</span>
-                            }
-                            dropdownClassName="rounded-lg"
-                          >
-                            {countryOptions.map((option) => (
-                              <Option key={option.value} value={option.value}>
-                                {option.label}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                      <Col span={12}>
-                        <Form.Item
-                          name="phoneNumber"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Phone Number
-                            </span>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please enter phone number",
-                            },
-                          ]}
-                        >
-                          <Input
-                            placeholder="Enter phone number"
-                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                            prefix={<span className="text-gray-400">+1</span>}
-                          />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-
-                    {/* Row 4: Timezone & Postal Code */}
-                    <Row gutter={24}>
-                      <Col span={12}>
-                        <Form.Item
-                          name="timezone"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Timezone
-                            </span>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please select timezone",
-                            },
-                          ]}
-                        >
-                          <Select
-                            placeholder="Select timezone"
-                            className="!h-[40px]"
-                            suffixIcon={
-                              <span className="text-gray-400">▼</span>
-                            }
-                            dropdownClassName="rounded-lg"
-                          >
-                            {timezoneOptions.map((option) => (
-                              <Option key={option.value} value={option.value}>
-                                {option.label}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                      <Col span={12}>
-                        <Form.Item
-                          name="postalCode"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Postal Code
-                            </span>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please enter postal code",
-                            },
-                          ]}
-                        >
-                          <Input
-                            placeholder="Enter postal code"
-                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                          />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-
-                    {/* Row 5: Business Website */}
-                    <Row gutter={24}>
-                      <Col span={12}>
-                        <Form.Item
-                          name="businessWebsite"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Business Website
-                            </span>
-                          }
-                          rules={[
-                            { type: "url", message: "Please enter valid URL" },
-                          ]}
-                        >
-                          <Input
-                            placeholder="https://my-website.com"
-                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col span={12}>{/* Empty column for alignment */}</Col>
-                    </Row>
-
-                    {/* Hidden avatar field */}
-                    <Form.Item name="avatar" hidden>
-                      <Input />
-                    </Form.Item>
-
-                    {mode === "create" && (
-                      <div className="pt-4 border-t border-gray-100">
-                        <Form.Item
-                          name="password"
-                          label={
-                            <span className="text-gray-700 font-medium">
-                              Password
-                            </span>
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please enter password",
-                            },
-                            {
-                              min: 6,
-                              message: "Password must be at least 6 characters",
-                            },
-                          ]}
-                        >
-                          <Input.Password
-                            placeholder="Enter password"
-                            className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
-                          />
-                        </Form.Item>
-                      </div>
-                    )}
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-4 pt-6 border-t border-gray-100">
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={loading}
-                        className="bg-blue-600 border-blue-600 hover:bg-blue-700 !h-[40px] px-8 rounded-lg font-medium shadow-sm transition-colors"
-                      >
-                        {loading ? "Saving..." : "Save Changes"}
-                      </Button>
-                      <Button
-                        onClick={() => router.back()}
-                        className="!h-[40px] px-8 rounded-lg font-medium border-gray-300 hover:border-gray-400 transition-colors"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                </Col>
-              </Row>
-            </Form>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </Form>
       </div>
 
       {/* Media Library Modal */}

@@ -52,7 +52,7 @@ export const uploadMedia = (
 
 export const deleteMedia =
   (
-    payload: string[],
+    payload: { ids: number[] },
     accessToken: string,
     onSuccess: () => void,
     onFailure: (error: string) => void
