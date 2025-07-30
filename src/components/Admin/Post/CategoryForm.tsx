@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, TreeSelect, Button, message, Modal } from "antd";
+import { Form, Input, TreeSelect, Button, message, Modal, Spin } from "antd";
 import type { DataNode } from "antd/es/tree";
-import { useDispatch } from "react-redux";
-import { createCategory, updateCategory } from "@/store/actions/categories";
-import { AppDispatch } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createCategory,
+  fetchCategory,
+  updateCategory,
+} from "@/store/actions/categories";
+import { AppDispatch, RootState } from "@/store/store";
 import { useSession } from "next-auth/react";
 
 export interface CategoryFormValues {
@@ -13,18 +17,8 @@ export interface CategoryFormValues {
   parentId?: number;
 }
 
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  parentId?: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 interface CategoryFormProps {
-  categories: Category[];
+  categories: any[];
   mode?: "create" | "edit";
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -33,10 +27,7 @@ interface CategoryFormProps {
   fetchCategory?: any;
 }
 
-function buildTree(
-  flat: Category[],
-  parentId: number | null = null
-): DataNode[] {
+function buildTree(flat: any[], parentId: number | null = null): DataNode[] {
   return flat
     .filter((cat) => (cat.parentId ?? null) === parentId)
     .map((cat) => ({
@@ -54,51 +45,42 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   setOpen,
   onSuccess,
   editingId,
-  fetchCategory,
 }) => {
   const [form] = Form.useForm();
   const treeData = buildTree(categories);
   const dispatch = useDispatch<AppDispatch>();
   const { data: session } = useSession();
+  const categoryDetail = useSelector(
+    (state: RootState) => state.categories.detail
+  );
   const [loading, setLoading] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
   useEffect(() => {
-    if (open && mode === "edit" && editingId) {
-      fetchCategoryData();
-    } else if (open && mode === "create") {
-      form.resetFields();
-      setEditingCategory(null);
+    if (open && mode === "edit" && editingId && session?.accessToken) {
+      setLoadingDetail(true);
+      dispatch(fetchCategory(editingId, session.accessToken) as any);
     }
-  }, [open, mode, editingId]);
+    // eslint-disable-next-line
+  }, [open, mode, editingId, session?.accessToken]);
 
-  const fetchCategoryData = () => {
-    if (!editingId) return;
-
-    setLoadingDetail(true);
-
-    const handleSuccess = (response: any) => {
-      const categoryData = response;
-      setEditingCategory(categoryData);
-
+  useEffect(() => {
+    if (
+      open &&
+      mode === "edit" &&
+      categoryDetail &&
+      categoryDetail.id === editingId
+    ) {
       form.setFieldsValue({
-        name: categoryData.name,
-        slug: categoryData.slug,
-        description: categoryData.description,
-        parentId: categoryData.parentId || undefined,
+        name: categoryDetail.name,
+        slug: categoryDetail.slug,
+        description: categoryDetail.description,
+        parentId: categoryDetail.parentId || undefined,
       });
-      setLoadingDetail(false);
-    };
-
-    const handleFailure = (error: string) => {
-      message.error(error || "Failed to load category details");
-      setOpen(false);
-      setLoadingDetail(false);
-    };
-
-    fetchCategory(editingId, handleSuccess, handleFailure);
-  };
+      setLoadingDetail(false); // detail đã về, tắt loading
+    }
+    // eslint-disable-next-line
+  }, [categoryDetail, open, mode, editingId]);
 
   const handleSubmit = (values: CategoryFormValues) => {
     setLoading(true);
@@ -123,7 +105,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       );
       setOpen(false);
       form.resetFields();
-      setEditingCategory(null);
 
       // Call onSuccess callback if provided
       if (onSuccess) {
@@ -137,11 +118,11 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       setLoading(false);
     };
 
-    if (mode === "edit" && editingCategory) {
+    if (mode === "edit" && editingId) {
       // Update category
       dispatch(
         updateCategory(
-          { id: editingCategory.id, data: payload },
+          { id: editingId, data: payload },
           session?.accessToken || "",
           handleSuccess,
           handleFailure
@@ -168,49 +149,51 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       footer={null}
       maskClosable={false}
       centered
-      confirmLoading={loadingDetail}
+      // confirmLoading={loadingDetail} // ĐÃ BỎ
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[{ required: true, message: "Name is required" }]}
-        >
-          <Input placeholder="Enter category name" />
-        </Form.Item>
+      <Spin spinning={loadingDetail}>
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: "Name is required" }]}
+          >
+            <Input placeholder="Enter category name" />
+          </Form.Item>
 
-        <Form.Item
-          label="Slug"
-          name="slug"
-          rules={[{ required: true, message: "Slug is required" }]}
-        >
-          <Input placeholder="Enter category slug" />
-        </Form.Item>
+          <Form.Item
+            label="Slug"
+            name="slug"
+            rules={[{ required: true, message: "Slug is required" }]}
+          >
+            <Input placeholder="Enter category slug" />
+          </Form.Item>
 
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[{ required: true, message: "Description is required" }]}
-        >
-          <Input.TextArea placeholder="Enter category description" rows={3} />
-        </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true, message: "Description is required" }]}
+          >
+            <Input.TextArea placeholder="Enter category description" rows={3} />
+          </Form.Item>
 
-        <Form.Item label="Parent Category" name="parentId">
-          <TreeSelect
-            style={{ width: "100%" }}
-            treeData={treeData}
-            placeholder="Select parent category (optional)"
-            allowClear
-            treeDefaultExpandAll
-          />
-        </Form.Item>
+          <Form.Item label="Parent Category" name="parentId">
+            <TreeSelect
+              style={{ width: "100%" }}
+              treeData={treeData}
+              placeholder="Select parent category (optional)"
+              allowClear
+              treeDefaultExpandAll
+            />
+          </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} block>
-            {mode === "edit" ? "Update" : "Create"} Category
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading} block>
+              {mode === "edit" ? "Update" : "Create"} Category
+            </Button>
+          </Form.Item>
+        </Form>
+      </Spin>
     </Modal>
   );
 };

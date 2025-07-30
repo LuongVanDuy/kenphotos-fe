@@ -10,6 +10,8 @@ import Image from "next/image";
 import React, { useEffect, useState, useCallback } from "react";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
 import CategoryTreeSelector from "./CategoryTreeSelector";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 interface PostFormProps {
   form?: any;
@@ -33,6 +35,23 @@ const PostForm: React.FC<PostFormProps> = ({
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
   const [slugDebounceTimer, setSlugDebounceTimer] =
     useState<NodeJS.Timeout | null>(null);
+
+  const categoryList = useSelector((state: RootState) => state.categories.list);
+
+  useEffect(() => {
+    if (mode === "create" && categoryList && categoryList.length > 0) {
+      const defaultCat = categoryList.find((cat: any) => cat.isDefault);
+      if (defaultCat) {
+        form?.setFieldsValue({ categoryIds: [defaultCat.id] });
+      }
+    }
+  }, [mode, categoryList, form]);
+
+  useEffect(() => {
+    if (mode === "create") {
+      setIsSlugManuallyEdited(false);
+    }
+  }, [mode]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -328,8 +347,8 @@ const PostForm: React.FC<PostFormProps> = ({
                     )}
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-sm bg-white">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                <div className="border border-gray-300 rounded-lg bg-white">
+                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300 rounded-t-lg">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Categories
                     </h3>
@@ -347,7 +366,17 @@ const PostForm: React.FC<PostFormProps> = ({
                       ]}
                       className="!mb-0"
                     >
-                      <CategoryTreeSelector />
+                      <CategoryTreeSelector
+                        renderCategoryLabel={(cat) =>
+                          cat.isDefault ? (
+                            <span style={{ color: "#1677ff", fontWeight: 600 }}>
+                              {cat.name} (Default)
+                            </span>
+                          ) : (
+                            cat.name
+                          )
+                        }
+                      />
                     </Form.Item>
                   </div>
                 </div>

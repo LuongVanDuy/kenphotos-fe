@@ -17,8 +17,14 @@ import {
   fetchCategories,
   fetchCategory,
   permanentDeleteCategory,
+  updateCategoryDefault,
 } from "@/store/actions/categories";
-import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  StarOutlined,
+} from "@ant-design/icons";
 import { Typography } from "antd";
 import CategoryForm from "@/components/Admin/Post/CategoryForm";
 import { useSession } from "next-auth/react";
@@ -105,6 +111,19 @@ const CategoryPage: React.FC = () => {
       },
     },
     {
+      title: "Default",
+      dataIndex: "isDefault",
+      key: "isDefault",
+      align: "center",
+      width: 100,
+      render: (isDefault: boolean) =>
+        isDefault ? (
+          <span style={{ color: "#52c41a", fontWeight: 600 }}>Default</span>
+        ) : (
+          <span style={{ color: "#aaa" }}>—</span>
+        ),
+    },
+    {
       title: "Actions",
       key: "actions",
       width: 120,
@@ -129,8 +148,14 @@ const CategoryPage: React.FC = () => {
             onClick: () => handleDelete(record),
             danger: true,
           },
+          {
+            key: "setDefault",
+            label: "Set Default",
+            icon: <StarOutlined />,
+            onClick: () => handleSetDefault(record),
+            disabled: record.isDefault,
+          },
         ];
-
         return (
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
             <Button type="text" icon={<MoreOutlined />} />
@@ -232,6 +257,29 @@ const CategoryPage: React.FC = () => {
     setModalMode("edit");
     setShowModal(true);
     setSelectedCategory(null);
+  };
+
+  const handleSetDefault = (cat: any) => {
+    Modal.confirm({
+      title: "Set as Default",
+      content: `Are you sure you want to set "${cat.name}" as the default category?`,
+      okText: "Set Default",
+      okType: "primary",
+      cancelText: "Cancel",
+      onOk() {
+        dispatch(
+          updateCategoryDefault(
+            { id: cat.id, data: { isDefault: true } },
+            session?.accessToken || "",
+            () => {
+              message.success("Set as default successfully");
+              handleQuery(keyword, pageNumber, pageSize);
+            },
+            (error) => message.error(error || "Failed to set default")
+          ) as any
+        );
+      },
+    });
   };
 
   return (
@@ -412,7 +460,6 @@ const CategoryPage: React.FC = () => {
         setOpen={setShowModal}
         onSuccess={handleCategorySuccess}
         editingId={editingId}
-        fetchCategory={fetchCategory}
       />
     </div>
   );

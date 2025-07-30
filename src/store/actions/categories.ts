@@ -7,7 +7,7 @@ import {
   FETCH_CATEGORY_SUCCESS,
   FETCH_CATEGORY_FAILURE,
 } from "../actionTypes";
-import { fetchWithToken, putWithToken, deleteWithToken } from "@/app/api/index";
+import { fetchWithToken, putWithToken, deleteWithToken, patchWithToken } from "@/app/api/index";
 import categoriesEndpoint from "../endpoint/categories";
 import { postWithToken } from "@/app/api/index";
 import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
@@ -31,10 +31,10 @@ export const fetchCategories = (payload: any, accessToken: string) => {
   };
 };
 
-export const fetchCategory = (payload: number, accessToken: string) => {
+export const fetchCategory = (id: number, accessToken: string) => {
   return (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_CATEGORY });
-    fetchWithToken(categoriesEndpoint.fetchCategory(payload), accessToken)
+    fetchWithToken(categoriesEndpoint.fetchCategory(id), accessToken)
       .then((response) => {
         dispatch({
           type: FETCH_CATEGORY_SUCCESS,
@@ -62,8 +62,8 @@ export const createCategory =
       () =>
         postWithToken(
           categoriesEndpoint.createCategory(),
-          payload,
-          accessToken
+          accessToken,
+          payload
         ),
       onSuccess,
       onFailure
@@ -82,8 +82,28 @@ export const updateCategory =
       () =>
         putWithToken(
           categoriesEndpoint.updateCategory(payload.id),
-          payload.data,
-          accessToken
+          accessToken,
+          payload.data
+        ),
+      onSuccess,
+      onFailure
+    );
+  };
+
+export const updateCategoryDefault =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        patchWithToken(
+          categoriesEndpoint.updateCategoryDefault(payload.id),
+          accessToken,
+          payload.data
         ),
       onSuccess,
       onFailure

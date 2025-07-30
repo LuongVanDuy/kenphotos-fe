@@ -11,9 +11,16 @@ interface Props {
   fetchCategories: any;
   value?: number[];
   onChange?: (value: number[]) => void;
+  renderCategoryLabel?: (cat: any) => React.ReactNode;
 }
 
-const CategoryTreeSelector: React.FC<Props> = ({ categoryList, fetchCategories, value = [], onChange }) => {
+const CategoryTreeSelector: React.FC<Props> = ({
+  categoryList,
+  fetchCategories,
+  value = [],
+  onChange,
+  renderCategoryLabel,
+}) => {
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -23,10 +30,14 @@ const CategoryTreeSelector: React.FC<Props> = ({ categoryList, fetchCategories, 
   }, [session?.accessToken]);
 
   return (
-    <Checkbox.Group value={value} onChange={onChange}>
+    <Checkbox.Group value={value} onChange={onChange} className="gap-2">
       {categoryList.map((cat: any) => (
-        <Checkbox key={cat.id} value={cat.id} style={{ marginLeft: cat.level * 20 }}>
-          {cat.name}
+        <Checkbox
+          key={cat.id}
+          value={cat.id}
+          style={{ marginLeft: cat.level * 20 }}
+        >
+          {renderCategoryLabel ? renderCategoryLabel(cat) : cat.name}
         </Checkbox>
       ))}
     </Checkbox.Group>
@@ -41,4 +52,7 @@ const mapDispatchToProps = {
   fetchCategories: fetchCategories,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryTreeSelector);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CategoryTreeSelector);
