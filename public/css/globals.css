@@ -296,3 +296,8 @@ body {
 .ant-upload {
   width: 100% !important;
 }
+
+.ant-image-img {
+  width: 100% !important;
+  height: 100% !important;
+}

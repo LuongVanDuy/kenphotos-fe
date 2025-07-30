@@ -73,7 +73,7 @@ const UserForm: React.FC<UserFormProps> = ({
   const handleAvatarSelect = (media: any) => {
     const imageUrl = getImageUrl(media.slug);
     setAvatarUrl(imageUrl);
-    form?.setFieldsValue({ avatar: media.slug });
+    form?.setFieldsValue({ avatarUrl: media.slug });
     setIsMediaModalOpen(false);
   };
 
@@ -340,7 +340,7 @@ const UserForm: React.FC<UserFormProps> = ({
                   </div>
                 </div>
 
-                <Form.Item name="avatar" hidden>
+                <Form.Item name="avatarUrl" hidden>
                   <Input />
                 </Form.Item>
               </div>

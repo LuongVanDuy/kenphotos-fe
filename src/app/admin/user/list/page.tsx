@@ -122,14 +122,18 @@ const UserListPage: React.FC = () => {
       key: "user",
       render: (_: any, record: any) => (
         <Space>
-          {record.avatar ? (
+          {record.avatarUrl ? (
             <Avatar
-              size={40}
-              src={getImageUrl(record.avatar)}
-              style={{ width: 60, height: 40, objectFit: "cover" }}
+              src={getImageUrl(record.avatarUrl)}
+              style={{ width: 60, height: 40 }}
+              shape="square"
             />
           ) : (
-            <Avatar size={40} icon={<UserOutlined />} />
+            <Avatar
+              style={{ width: 60, height: 40 }}
+              icon={<UserOutlined />}
+              shape="square"
+            />
           )}
           <div>
             <div className="font-medium">

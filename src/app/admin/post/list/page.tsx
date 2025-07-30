@@ -40,7 +40,6 @@ const { Option } = Select;
 const statusMap: Record<number, { label: string; color: string }> = {
   0: { label: "Draft", color: "orange" },
   1: { label: "Published", color: "green" },
-  2: { label: "Archived", color: "default" },
 };
 const deleteFlgMap: Record<number, { label: string; color: string }> = {
   0: { label: "Active", color: "blue" },
@@ -264,12 +263,16 @@ const PostListPage: React.FC = () => {
         <Space>
           {record.thumbnail ? (
             <Avatar
-              size={40}
               src={getImageUrl(record.thumbnail)}
-              style={{ width: 60, height: 40, objectFit: "cover" }}
+              style={{ width: 60, height: 40 }}
+              shape="square"
             />
           ) : (
-            <Avatar size={40} icon={<PictureOutlined />} />
+            <Avatar
+              style={{ width: 60, height: 40 }}
+              icon={<PictureOutlined />}
+              shape="square"
+            />
           )}
           <div>
             <div className="font-medium">{record.title}</div>
@@ -392,7 +395,20 @@ const PostListPage: React.FC = () => {
             <Option value="all">All Status</Option>
             <Option value={0}>Draft</Option>
             <Option value={1}>Published</Option>
-            <Option value={2}>Archived</Option>
+          </Select>
+
+          <Select
+            value={deleteFlg}
+            onChange={(value) => {
+              setDeleteFlg(value);
+              setSelectedRowKeys([]);
+              setSelectedPosts([]);
+              handleQuery(keyword, 1, pageSize);
+            }}
+            className="w-[120px] !h-[40px]"
+          >
+            <Option value={0}>Active Posts</Option>
+            <Option value={1}>Trash</Option>
           </Select>
           <Select
             value={sortBy}
@@ -456,34 +472,6 @@ const PostListPage: React.FC = () => {
             </>
           )}
         </div>
-      </div>
-
-      {/* Trash/Active Toggle */}
-      <div className="mb-4">
-        <Space>
-          <Button
-            type={deleteFlg === 0 ? "primary" : "default"}
-            onClick={() => {
-              setDeleteFlg(0);
-              setSelectedRowKeys([]);
-              setSelectedPosts([]);
-              handleQuery(keyword, 1, pageSize);
-            }}
-          >
-            Active Posts
-          </Button>
-          <Button
-            type={deleteFlg === 1 ? "primary" : "default"}
-            onClick={() => {
-              setDeleteFlg(1);
-              setSelectedRowKeys([]);
-              setSelectedPosts([]);
-              handleQuery(keyword, 1, pageSize);
-            }}
-          >
-            Trash
-          </Button>
-        </Space>
       </div>
 
       <Table

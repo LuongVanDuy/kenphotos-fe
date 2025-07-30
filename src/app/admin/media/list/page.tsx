@@ -132,7 +132,7 @@ const MediaListPage: React.FC = () => {
   const renderGridView = () => (
     <div className="media-library-content">
       {/* Media Grid */}
-      <div className="media-grid">
+      <div className="media-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-4">
         {mediaList.map((item: Media) => (
           <MediaItem
             key={item.id}

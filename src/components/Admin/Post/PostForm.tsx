@@ -113,7 +113,6 @@ const PostForm: React.FC<PostFormProps> = ({
   const statusOptions = [
     { value: 0, label: "Draft" },
     { value: 1, label: "Published" },
-    { value: 2, label: "Archived" },
   ];
 
   return (
@@ -125,31 +124,27 @@ const PostForm: React.FC<PostFormProps> = ({
               {mode === "edit" ? "Edit Post" : "Add New Post"}
             </Title>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button type="default" onClick={onSaveDraft} disabled={loading}>
-              Save Draft
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              onClick={() => form.submit()}
-            >
-              {mode === "edit" ? "Update" : "Publish"}
-            </Button>
-          </div>
         </div>
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          initialValues={{
+            status: 1, // Published by default
+            ...initialValues,
+          }}
+        >
           <Form.Item name="thumbnail" style={{ display: "none" }}>
             <Input />
           </Form.Item>
-
           <div className="flex gap-8">
             <div className="flex-1">
               <div className="space-y-6">
                 <div>
                   <Form.Item
                     name="title"
+                    label="Title"
+                    labelCol={{ style: { width: "100%" } }}
                     rules={[
                       { required: true, message: "Please enter the title" },
                     ]}
@@ -162,13 +157,13 @@ const PostForm: React.FC<PostFormProps> = ({
                     />
                   </Form.Item>
                 </div>
-
                 <div>
                   <h3 className="text-sm font-semibold text-gray-700">
                     Permalink
                   </h3>
                   <Form.Item
                     name="slug"
+                    labelCol={{ style: { width: "100%" } }}
                     rules={[
                       { required: true, message: "Please enter the slug" },
                     ]}
@@ -196,28 +191,32 @@ const PostForm: React.FC<PostFormProps> = ({
                   )}
                 </div>
 
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700">
-                    Content
-                  </h3>
-                  <Form.Item
-                    name="content"
-                    rules={[
-                      { required: true, message: "Please enter the content" },
-                    ]}
-                    className="!mb-0 bg-white"
-                  >
-                    <CustomQuill
-                      placeholder="Start writing or type / to choose a block..."
-                      style={{ minHeight: "400px" }}
-                      className="quill-editor"
-                      onChange={(value) =>
-                        form.setFieldsValue({ content: value })
-                      }
-                    />
-                  </Form.Item>
+                <div className="rounded-sm">
+                  <div className="bg-gray-50 px-4 py-3 border-t border-x border-gray-300 border ">
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      Content
+                    </h3>
+                  </div>
+                  <div className="bg-white ">
+                    <Form.Item
+                      name="content"
+                      labelCol={{ style: { width: "100%" } }}
+                      rules={[
+                        { required: true, message: "Please enter the content" },
+                      ]}
+                      className="!mb-0 bg-white"
+                    >
+                      <CustomQuill
+                        placeholder="Start writing or type / to choose a block..."
+                        style={{ minHeight: "400px" }}
+                        className="quill-editor"
+                        onChange={(value) =>
+                          form.setFieldsValue({ content: value })
+                        }
+                      />
+                    </Form.Item>
+                  </div>
                 </div>
-
                 <div className="border border-gray-300 rounded-sm">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -227,6 +226,8 @@ const PostForm: React.FC<PostFormProps> = ({
                   <div className="bg-white p-4">
                     <Form.Item
                       name="excerpt"
+                      label="Excerpt"
+                      labelCol={{ style: { width: "100%" } }}
                       rules={[
                         { required: true, message: "Please enter the excerpt" },
                       ]}
@@ -242,7 +243,6 @@ const PostForm: React.FC<PostFormProps> = ({
                 </div>
               </div>
             </div>
-
             <div className="w-80 flex-shrink-0">
               <div className="space-y-6">
                 <div className="border border-gray-300 rounded-sm bg-white">
@@ -256,6 +256,7 @@ const PostForm: React.FC<PostFormProps> = ({
                       <span className="text-sm text-gray-600">Status:</span>
                       <Form.Item
                         name="status"
+                        labelCol={{ style: { width: "100%" } }}
                         rules={[
                           { required: true, message: "Please select status" },
                         ]}
@@ -268,9 +269,16 @@ const PostForm: React.FC<PostFormProps> = ({
                         />
                       </Form.Item>
                     </div>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loading}
+                      block
+                    >
+                      {mode === "edit" ? "Update" : "Publish"}
+                    </Button>
                   </div>
                 </div>
-
                 <div className="border border-gray-300 rounded-sm bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -329,6 +337,8 @@ const PostForm: React.FC<PostFormProps> = ({
                   <div className="p-4">
                     <Form.Item
                       name="categoryIds"
+                      label="Categories"
+                      labelCol={{ style: { width: "100%" } }}
                       rules={[
                         {
                           required: true,

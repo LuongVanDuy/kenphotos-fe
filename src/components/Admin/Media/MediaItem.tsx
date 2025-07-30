@@ -54,7 +54,7 @@ const MediaItem: React.FC<MediaItemProps> = ({
 
   return (
     <div
-      className={`media-item w-48 h-48 relative overflow-hidden rounded-lg border transition-all ${
+      className={`media-item w-full h-full relative overflow-hidden rounded-lg border transition-all ${
         selected
           ? "border-blue-500 bg-blue-50 shadow-lg"
           : "border-gray-200 hover:shadow-lg"
@@ -76,6 +76,7 @@ const MediaItem: React.FC<MediaItemProps> = ({
           alt="preview"
           style={{ width: "100%" }}
           src={getImageUrl(item)}
+          className="border border-gray-300 rounded-lg shadow-sm object-cover"
         />
       ) : (
         <div className="flex items-center justify-center h-full bg-gray-50">

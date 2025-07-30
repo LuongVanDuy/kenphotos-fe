@@ -23,6 +23,7 @@ import { useSession } from "next-auth/react";
 import { Media } from "@/types";
 import { getImageUrl } from "@/utils";
 import { AppDispatch, RootState } from "@/store/store";
+import MediaItem from "@/components/Admin/Media/MediaItem";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -168,37 +169,15 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
       </div>
 
       {/* Media Grid */}
-      <div className="border rounded-lg p-4 bg-gray-50">
-        <Spin spinning={mediaLoading}>
-          <div className="grid grid-cols-5 gap-4 max-h-96 overflow-y-auto">
-            {mediaList.map((item: Media) => (
-              <Card
-                key={item.id}
-                hoverable
-                className="cursor-pointer"
-                onClick={() => onSelect(item)}
-                bodyStyle={{ padding: 8 }}
-              >
-                <div className="relative">
-                  {isImageFile(item.name) ? (
-                    <Image
-                      alt={item.name}
-                      src={getImageUrl(item.slug)}
-                      preview={false}
-                      className="w-full !h-28 object-cover rounded"
-                    />
-                  ) : (
-                    <div className="w-full !h-28 flex items-center justify-center bg-gray-100 rounded">
-                      <div className="text-2xl text-gray-400">
-                        {getFileIcon(item.name)}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            ))}
-          </div>
-        </Spin>
+      <div className="media-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-4 max-h-96 overflow-y-auto">
+        {mediaList.map((item: Media) => (
+          <MediaItem
+            key={item.id}
+            item={item}
+            selected={false}
+            onSelect={() => onSelect(item)}
+          />
+        ))}
       </div>
 
       {/* Pagination */}

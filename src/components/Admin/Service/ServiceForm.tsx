@@ -108,7 +108,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const statusOptions = [
     { value: 0, label: "Draft" },
     { value: 1, label: "Published" },
-    { value: 2, label: "Archived" },
   ];
 
   const typeOptions = [
@@ -152,19 +151,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
               {mode === "edit" ? "Edit Service" : "Add New Service"}
             </Title>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button type="default" onClick={onSaveDraft} disabled={loading}>
-              Save Draft
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              onClick={() => form.submit()}
-            >
-              {mode === "edit" ? "Update" : "Publish"}
-            </Button>
-          </div>
         </div>
 
         <Form
@@ -172,7 +158,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
           layout="vertical"
           onFinish={handleFinish}
           initialValues={{
-            status: 0,
+            status: 1, // Published by default
             type: 0,
             rating: 0,
             orderCount: 0,
@@ -193,6 +179,8 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                 <div>
                   <Form.Item
                     name="title"
+                    label="Title"
+                    labelCol={{ style: { width: "100%" } }}
                     rules={[
                       { required: true, message: "Please enter the title" },
                     ]}
@@ -212,6 +200,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </h3>
                   <Form.Item
                     name="slug"
+                    labelCol={{ style: { width: "100%" } }}
                     rules={[
                       { required: true, message: "Please enter the slug" },
                     ]}
@@ -239,26 +228,31 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   )}
                 </div>
 
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700">
-                    Content
-                  </h3>
-                  <Form.Item
-                    name="content"
-                    rules={[
-                      { required: true, message: "Please enter the content" },
-                    ]}
-                    className="!mb-0 bg-white"
-                  >
-                    <CustomQuill
-                      placeholder="Start writing service content..."
-                      style={{ minHeight: "400px" }}
-                      className="quill-editor"
-                      onChange={(value) =>
-                        form.setFieldsValue({ content: value })
-                      }
-                    />
-                  </Form.Item>
+                <div className="rounded-sm">
+                  <div className="bg-gray-50 px-4 py-3 border-t border-x border-gray-300 border ">
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      Content
+                    </h3>
+                  </div>
+                  <div className="bg-white ">
+                    <Form.Item
+                      name="content"
+                      labelCol={{ style: { width: "100%" } }}
+                      rules={[
+                        { required: true, message: "Please enter the content" },
+                      ]}
+                      className="!mb-0 bg-white"
+                    >
+                      <CustomQuill
+                        placeholder="Start writing service content..."
+                        style={{ minHeight: "400px" }}
+                        className="quill-editor"
+                        onChange={(value) =>
+                          form.setFieldsValue({ content: value })
+                        }
+                      />
+                    </Form.Item>
+                  </div>
                 </div>
 
                 <div className="border border-gray-300 rounded-sm">
@@ -268,7 +262,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </h3>
                   </div>
                   <div className="bg-white p-4">
-                    <Form.Item name="images" label="Images" className="!mb-0">
+                    <Form.Item
+                      name="images"
+                      label="Images"
+                      labelCol={{ style: { width: "100%" } }}
+                      className="!mb-0"
+                    >
                       <div>
                         <Button
                           type="primary"
@@ -306,6 +305,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </div>
                 </div>
 
+                {/* Các trường động đều label width 100% */}
                 <div className="border border-gray-300 rounded-sm">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -327,6 +327,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                     {...restField}
                                     name={[name, "name"]}
                                     label="Style Name"
+                                    labelCol={{ style: { width: "100%" } }}
                                     rules={[
                                       {
                                         required: true,
@@ -342,6 +343,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                     {...restField}
                                     name={[name, "description"]}
                                     label="Description"
+                                    labelCol={{ style: { width: "100%" } }}
                                   >
                                     <Input placeholder="Style description" />
                                   </Form.Item>
@@ -370,7 +372,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Form.List>
                   </div>
                 </div>
-
                 <div className="border border-gray-300 rounded-sm">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -392,6 +393,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                     {...restField}
                                     name={[name, "stepNumber"]}
                                     label="Step Number"
+                                    labelCol={{ style: { width: "100%" } }}
                                     rules={[
                                       {
                                         required: true,
@@ -411,6 +413,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                     {...restField}
                                     name={[name, "title"]}
                                     label="Step Title"
+                                    labelCol={{ style: { width: "100%" } }}
                                     rules={[
                                       {
                                         required: true,
@@ -426,6 +429,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                 {...restField}
                                 name={[name, "description"]}
                                 label="Description"
+                                labelCol={{ style: { width: "100%" } }}
                               >
                                 <TextArea
                                   placeholder="Step description"
@@ -455,7 +459,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Form.List>
                   </div>
                 </div>
-
                 <div className="border border-gray-300 rounded-sm">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -475,6 +478,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                 {...restField}
                                 name={[name, "description"]}
                                 label="Ideal For"
+                                labelCol={{ style: { width: "100%" } }}
                                 rules={[
                                   {
                                     required: true,
@@ -510,7 +514,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Form.List>
                   </div>
                 </div>
-
                 <div className="border border-gray-300 rounded-sm">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -530,6 +533,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                 {...restField}
                                 name={[name, "item"]}
                                 label="Included Item"
+                                labelCol={{ style: { width: "100%" } }}
                                 rules={[
                                   { required: true, message: "Missing item" },
                                 ]}
@@ -559,7 +563,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Form.List>
                   </div>
                 </div>
-
                 <div className="border border-gray-300 rounded-sm">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -581,6 +584,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                     {...restField}
                                     name={[name, "name"]}
                                     label="Add-on Name"
+                                    labelCol={{ style: { width: "100%" } }}
                                     rules={[
                                       {
                                         required: true,
@@ -596,6 +600,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                     {...restField}
                                     name={[name, "price"]}
                                     label="Price"
+                                    labelCol={{ style: { width: "100%" } }}
                                     rules={[
                                       {
                                         required: true,
@@ -621,6 +626,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                 {...restField}
                                 name={[name, "description"]}
                                 label="Description"
+                                labelCol={{ style: { width: "100%" } }}
                               >
                                 <TextArea
                                   placeholder="Add-on description"
@@ -666,6 +672,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       <span className="text-sm text-gray-600">Status:</span>
                       <Form.Item
                         name="status"
+                        labelCol={{ style: { width: "100%" } }}
                         rules={[
                           { required: true, message: "Please select status" },
                         ]}
@@ -682,6 +689,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       <span className="text-sm text-gray-600">Type:</span>
                       <Form.Item
                         name="type"
+                        labelCol={{ style: { width: "100%" } }}
                         rules={[
                           { required: true, message: "Please select type" },
                         ]}
@@ -694,9 +702,16 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                         />
                       </Form.Item>
                     </div>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loading}
+                      block
+                    >
+                      {mode === "edit" ? "Update" : "Publish"}
+                    </Button>
                   </div>
                 </div>
-
                 <div className="border border-gray-300 rounded-sm bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -707,6 +722,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     <Form.Item
                       name="originalPrice"
                       label="Original Price"
+                      labelCol={{ style: { width: "100%" } }}
                       rules={[
                         {
                           required: true,
@@ -724,10 +740,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                         }
                       />
                     </Form.Item>
-
                     <Form.Item
                       name="discountedPrice"
                       label="Discounted Price"
+                      labelCol={{ style: { width: "100%" } }}
                       className="!mb-0"
                     >
                       <InputNumber
@@ -741,7 +757,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Form.Item>
                   </div>
                 </div>
-
                 <div className="border border-gray-300 rounded-sm bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -749,7 +764,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </h3>
                   </div>
                   <div className="p-4 space-y-4">
-                    <Form.Item name="rating" label="Rating" className="!mb-0">
+                    <Form.Item
+                      name="rating"
+                      label="Rating"
+                      labelCol={{ style: { width: "100%" } }}
+                      className="!mb-0"
+                    >
                       <InputNumber
                         min={0}
                         max={5}
@@ -758,10 +778,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                         style={{ width: "100%" }}
                       />
                     </Form.Item>
-
                     <Form.Item
                       name="orderCount"
                       label="Order Count"
+                      labelCol={{ style: { width: "100%" } }}
                       className="!mb-0"
                     >
                       <InputNumber

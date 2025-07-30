@@ -39,7 +39,6 @@ const { Option } = Select;
 const statusMap: Record<number, { label: string; color: string }> = {
   0: { label: "Draft", color: "orange" },
   1: { label: "Published", color: "green" },
-  2: { label: "Archived", color: "default" },
 };
 
 const typeMap: Record<number, { label: string; color: string }> = {
@@ -426,7 +425,20 @@ const ServiceListPage: React.FC = () => {
             <Option value="all">All Status</Option>
             <Option value={0}>Draft</Option>
             <Option value={1}>Published</Option>
-            <Option value={2}>Archived</Option>
+          </Select>
+
+          <Select
+            value={deleteFlg}
+            onChange={(value) => {
+              setDeleteFlg(value);
+              setSelectedRowKeys([]);
+              setSelectedServices([]);
+              handleQuery(keyword, 1, pageSize);
+            }}
+            className="w-[120px] !h-[40px]"
+          >
+            <Option value={0}>Active Posts</Option>
+            <Option value={1}>Trash</Option>
           </Select>
           <Select
             value={type}
@@ -500,34 +512,6 @@ const ServiceListPage: React.FC = () => {
             </>
           )}
         </div>
-      </div>
-
-      {/* Trash/Active Toggle */}
-      <div className="mb-4">
-        <Space>
-          <Button
-            type={deleteFlg === 0 ? "primary" : "default"}
-            onClick={() => {
-              setDeleteFlg(0);
-              setSelectedRowKeys([]);
-              setSelectedServices([]);
-              handleQuery(keyword, 1, pageSize);
-            }}
-          >
-            Active Services
-          </Button>
-          <Button
-            type={deleteFlg === 1 ? "primary" : "default"}
-            onClick={() => {
-              setDeleteFlg(1);
-              setSelectedRowKeys([]);
-              setSelectedServices([]);
-              handleQuery(keyword, 1, pageSize);
-            }}
-          >
-            Trash
-          </Button>
-        </Space>
       </div>
 
       <Table
