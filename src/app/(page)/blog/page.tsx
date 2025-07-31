@@ -31,6 +31,7 @@ const BlogPage = ({ fetchPublicPosts, postList, postTotal, postLoading }: any) =
 
   const handleQuery = (searchText: string, nextPage: number) => {
     fetchPublicPosts({
+      limitWords: 0,
       search: searchText,
       page: nextPage,
       itemsPerPage: pageSize,
