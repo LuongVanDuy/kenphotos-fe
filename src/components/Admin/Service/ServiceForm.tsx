@@ -27,13 +27,10 @@ import {
 } from "@ant-design/icons";
 import CustomQuill from "@/components/UI/CustomQuill";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
-import Title from "antd/es/typography/Title";
 import { getImageUrl } from "@/utils";
 import { slugify } from "@/utils/slugify";
 
 const { TextArea } = Input;
-const { Option } = Select;
-const { Title: AntTitle } = Typography;
 
 interface ServiceFormProps {
   form?: any;
@@ -71,7 +68,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     };
   }, [slugDebounceTimer]);
 
-  // Auto-generate slug from title (WordPress style)
   const handleTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const title = e.target.value;
@@ -94,7 +90,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     [form, isSlugManuallyEdited, slugDebounceTimer]
   );
 
-  // Handle manual slug editing
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const slug = e.target.value;
     setIsSlugManuallyEdited(true);
@@ -106,19 +101,16 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     }
   };
 
-  // Reset slug manual edit flag when form is reset
   useEffect(() => {
     if (mode === "create") {
       setIsSlugManuallyEdited(false);
     }
   }, [mode]);
 
-  // Initialize selectedImages from initialValues if editing, or create default pair if creating
   useEffect(() => {
     if (initialValues?.images && mode === "edit") {
       setSelectedImages(initialValues.images);
     } else if (mode === "create") {
-      // Create default empty image pair
       setSelectedImages([{ beforeUrl: "", afterUrl: "" }]);
       form.setFieldsValue({ images: [{ beforeUrl: "", afterUrl: "" }] });
     }
@@ -212,13 +204,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
             status: 1,
             type: 0,
             rating: 0,
-            orderCount: 0,
+            orderCount: "",
             originalPrice: 0,
             discountedPrice: 0,
             images: [],
-            idealFors: [],
-            includes: [],
-            addOns: [],
+            idealFors: [{ label: "" }],
+            includes: [{ label: "" }],
+            addOns: [{ title: "", description: "" }],
             ...initialValues,
           }}
         >
@@ -228,16 +220,16 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                 <div>
                   <Form.Item
                     name="title"
-                    label="Title"
                     labelCol={{ style: { width: "100%" } }}
                     rules={[
                       { required: true, message: "Please enter the title" },
                     ]}
-                    className="!mb-0"
+                    className="!mb-0 "
                   >
                     <Input
                       placeholder="Add service title"
                       style={{ fontSize: "24px", fontWeight: "400" }}
+                      className="!rounded-none"
                       onChange={handleTitleChange}
                     />
                   </Form.Item>
@@ -258,6 +250,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     <Input
                       placeholder="service-url-slug"
                       size="small"
+                      className="!rounded-none"
                       addonBefore={process.env.NEXT_PUBLIC_LINK}
                       onChange={handleSlugChange}
                       suffix={
@@ -317,11 +310,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       className="!mb-0"
                     >
                       <div>
-                        <div className="space-y-6">
+                        <div className="grid grid-cols-2 gap-6">
                           {selectedImages.map((image, index) => (
-                            <div key={index}>
-                              {index > 0 && <Divider />}
-                              <div className="flex items-center justify-between mb-4">
+                            <div key={index} className={`p-5 border-2`}>
+                              <div className="flex items-center justify-between mb-4 ">
                                 <h4 className="text-lg font-semibold text-gray-700">
                                   Image Pair {index + 1}
                                 </h4>
@@ -331,10 +323,9 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                     icon={<DeleteOutlined />}
                                     onClick={() => handleRemoveImage(index)}
                                     size="small"
-                                    className="text-gray-400 hover:text-red-500"
-                                  >
-                                    Remove
-                                  </Button>
+                                    className="ml-2 text-gray-400 hover:text-red-500"
+                                    style={{ marginTop: 2 }}
+                                  />
                                 )}
                               </div>
 
@@ -346,7 +337,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       Before Image
                                     </span>
                                     <Button
-                                      type="link"
+                                      type="primary"
                                       size="small"
                                       onClick={() =>
                                         handleSelectImage("before", index)
@@ -386,7 +377,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       After Image
                                     </span>
                                     <Button
-                                      type="link"
+                                      type="primary"
                                       size="small"
                                       onClick={() =>
                                         handleSelectImage("after", index)
@@ -424,11 +415,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                         </div>
                         <div className="flex justify-center items-center mt-6">
                           <Button
-                            type="dashed"
+                            type="primary"
                             icon={<PlusOutlined />}
                             onClick={handleAddImagePair}
                             className="hover:border-blue-500"
-                            size="small"
+                            size="large"
                           >
                             Add Image Pair
                           </Button>
@@ -459,51 +450,20 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                             </span>
                           ),
                           children: (
-                            <div className="p-6 bg-gray-50 rounded-r-lg h-full relative">
-                              <div className="flex justify-between items-center mb-4">
-                                <span className="font-semibold text-base text-gray-700">
-                                  Who is this service ideal for?
-                                </span>
-                                <Button
-                                  type="dashed"
-                                  icon={<PlusOutlined />}
-                                  onClick={() =>
-                                    form.getFieldValue("idealFors")?.length <
-                                      10 &&
-                                    form.getFieldValue("idealFors").length >=
-                                      0 &&
-                                    form.setFieldsValue({
-                                      idealFors: [
-                                        ...(form.getFieldValue("idealFors") ||
-                                          []),
-                                        { label: "" },
-                                      ],
-                                    })
-                                  }
-                                  className="ml-2 hover:border-blue-500"
-                                  size="small"
-                                >
-                                  Add
-                                </Button>
-                              </div>
+                            <div className="rounded-r-lg h-full relative p-5">
                               <Form.List name="idealFors">
                                 {(fields, { add, remove }) => (
-                                  <div>
-                                    {fields.length === 0 && (
-                                      <div className="text-gray-400 italic text-sm mb-2">
-                                        No items. Click Add to create.
-                                      </div>
-                                    )}
+                                  <div className="space-y-5">
                                     {fields.map(
                                       ({ key, name, ...restField }, idx) => (
                                         <div
                                           key={key}
-                                          className="mb-4 p-4 bg-white rounded shadow-sm border border-gray-200 flex items-start group"
+                                          className="  bg-white rounded  flex items-start group"
                                         >
                                           <Form.Item
                                             {...restField}
                                             name={[name, "label"]}
-                                            className="flex-1 mb-0"
+                                            className="flex-1 !mb-0"
                                             rules={[
                                               {
                                                 required: true,
@@ -531,6 +491,30 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                   </div>
                                 )}
                               </Form.List>
+
+                              <div className="flex justify-end mt-5">
+                                <Button
+                                  type="primary"
+                                  icon={<PlusOutlined />}
+                                  onClick={() =>
+                                    form.getFieldValue("idealFors")?.length <
+                                      10 &&
+                                    form.getFieldValue("idealFors").length >=
+                                      0 &&
+                                    form.setFieldsValue({
+                                      idealFors: [
+                                        ...(form.getFieldValue("idealFors") ||
+                                          []),
+                                        { label: "" },
+                                      ],
+                                    })
+                                  }
+                                  className="ml-2 hover:border-blue-500"
+                                  size="large"
+                                >
+                                  Add
+                                </Button>
+                              </div>
                             </div>
                           ),
                         },
@@ -543,51 +527,20 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                             </span>
                           ),
                           children: (
-                            <div className="p-6 bg-gray-50 rounded-r-lg h-full relative">
-                              <div className="flex justify-between items-center mb-4">
-                                <span className="font-semibold text-base text-gray-700">
-                                  What do you provide?
-                                </span>
-                                <Button
-                                  type="dashed"
-                                  icon={<PlusOutlined />}
-                                  onClick={() =>
-                                    form.getFieldValue("includes")?.length <
-                                      10 &&
-                                    form.getFieldValue("includes").length >=
-                                      0 &&
-                                    form.setFieldsValue({
-                                      includes: [
-                                        ...(form.getFieldValue("includes") ||
-                                          []),
-                                        { label: "" },
-                                      ],
-                                    })
-                                  }
-                                  className="ml-2 hover:border-blue-500"
-                                  size="small"
-                                >
-                                  Add
-                                </Button>
-                              </div>
+                            <div className="rounded-r-lg h-full relative p-5">
                               <Form.List name="includes">
                                 {(fields, { add, remove }) => (
-                                  <div>
-                                    {fields.length === 0 && (
-                                      <div className="text-gray-400 italic text-sm mb-2">
-                                        No items. Click Add to create.
-                                      </div>
-                                    )}
+                                  <div className="space-y-5">
                                     {fields.map(
                                       ({ key, name, ...restField }, idx) => (
                                         <div
                                           key={key}
-                                          className="mb-4 p-4 bg-white rounded shadow-sm border border-gray-200 flex items-start group"
+                                          className="  bg-white rounded  flex items-start group"
                                         >
                                           <Form.Item
                                             {...restField}
                                             name={[name, "label"]}
-                                            className="flex-1 mb-0"
+                                            className="flex-1 !mb-0"
                                             rules={[
                                               {
                                                 required: true,
@@ -595,7 +548,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                               },
                                             ]}
                                           >
-                                            <Input placeholder="What's included in this service?" />
+                                            <TextArea
+                                              placeholder="What's included in this service?"
+                                              rows={2}
+                                              className="resize-none"
+                                            />
                                           </Form.Item>
                                           <Button
                                             type="text"
@@ -611,6 +568,30 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                   </div>
                                 )}
                               </Form.List>
+
+                              <div className="flex justify-end items-center mt-5">
+                                <Button
+                                  type="primary"
+                                  icon={<PlusOutlined />}
+                                  onClick={() =>
+                                    form.getFieldValue("includes")?.length <
+                                      10 &&
+                                    form.getFieldValue("includes").length >=
+                                      0 &&
+                                    form.setFieldsValue({
+                                      includes: [
+                                        ...(form.getFieldValue("includes") ||
+                                          []),
+                                        { label: "" },
+                                      ],
+                                    })
+                                  }
+                                  className="ml-2 hover:border-blue-500"
+                                  size="large"
+                                >
+                                  Add
+                                </Button>
+                              </div>
                             </div>
                           ),
                         },
@@ -622,13 +603,72 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                             </span>
                           ),
                           children: (
-                            <div className="p-6 bg-gray-50 rounded-r-lg h-full relative">
-                              <div className="flex justify-between items-center mb-4">
-                                <span className="font-semibold text-base text-gray-700">
-                                  Extra services for this package
-                                </span>
+                            <div className="rounded-r-lg h-full relative p-5">
+                              <Form.List name="addOns">
+                                {(fields, { add, remove }) => (
+                                  <div className="space-y-5">
+                                    {fields.map(
+                                      ({ key, name, ...restField }, idx) => (
+                                        <div
+                                          key={key}
+                                          className="flex items-center gap-3  bg-white rounded  flex items-start group"
+                                        >
+                                          <Row gutter={16} className="flex-1">
+                                            <Col span={12}>
+                                              <Form.Item
+                                                {...restField}
+                                                name={[name, "title"]}
+                                                labelCol={{
+                                                  style: { width: "100%" },
+                                                }}
+                                                className="flex-1 !mb-0"
+                                                rules={[
+                                                  {
+                                                    required: true,
+                                                    message: "Required",
+                                                  },
+                                                ]}
+                                              >
+                                                <TextArea
+                                                  placeholder="Add-on name"
+                                                  rows={2}
+                                                />
+                                              </Form.Item>
+                                            </Col>
+                                            <Col span={12}>
+                                              <Form.Item
+                                                {...restField}
+                                                name={[name, "description"]}
+                                                labelCol={{
+                                                  style: { width: "100%" },
+                                                }}
+                                                className="flex-1 !mb-0"
+                                              >
+                                                <TextArea
+                                                  placeholder="Add-on description"
+                                                  rows={2}
+                                                />
+                                              </Form.Item>
+                                            </Col>
+                                          </Row>
+
+                                          <Button
+                                            type="text"
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => remove(name)}
+                                            size="small"
+                                            className="text-gray-400 hover:text-red-500 mt-5"
+                                          />
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                )}
+                              </Form.List>
+
+                              <div className="flex justify-end items-center mb-4">
                                 <Button
-                                  type="dashed"
+                                  type="primary"
                                   icon={<PlusOutlined />}
                                   onClick={() =>
                                     form.getFieldValue("addOns")?.length < 10 &&
@@ -644,105 +684,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       ],
                                     })
                                   }
-                                  className="ml-2 hover:border-blue-500"
-                                  size="small"
+                                  className="mt-5"
+                                  size="large"
                                 >
                                   Add
                                 </Button>
                               </div>
-                              <Form.List name="addOns">
-                                {(fields, { add, remove }) => (
-                                  <div>
-                                    {fields.length === 0 && (
-                                      <div className="text-gray-400 italic text-sm mb-2">
-                                        No add-ons. Click Add to create.
-                                      </div>
-                                    )}
-                                    {fields.map(
-                                      ({ key, name, ...restField }, idx) => (
-                                        <div
-                                          key={key}
-                                          className="mb-4 p-4 bg-white rounded shadow-sm border border-gray-200 group"
-                                        >
-                                          <Row gutter={16}>
-                                            <Col span={12}>
-                                              <Form.Item
-                                                {...restField}
-                                                name={[name, "title"]}
-                                                label="Add-on Name"
-                                                labelCol={{
-                                                  style: { width: "100%" },
-                                                }}
-                                                rules={[
-                                                  {
-                                                    required: true,
-                                                    message: "Required",
-                                                  },
-                                                ]}
-                                                className="mb-2"
-                                              >
-                                                <Input placeholder="Add-on name" />
-                                              </Form.Item>
-                                            </Col>
-                                            <Col span={12}>
-                                              <Form.Item
-                                                {...restField}
-                                                name={[name, "price"]}
-                                                label="Price"
-                                                labelCol={{
-                                                  style: { width: "100%" },
-                                                }}
-                                                rules={[
-                                                  {
-                                                    required: true,
-                                                    message: "Required",
-                                                  },
-                                                ]}
-                                                className="mb-2"
-                                              >
-                                                <InputNumber
-                                                  min={0}
-                                                  placeholder="0.00"
-                                                  style={{ width: "100%" }}
-                                                  formatter={(value) =>
-                                                    `$ ${value}`.replace(
-                                                      /\B(?=(\d{3})+(?!\d))/g,
-                                                      ","
-                                                    )
-                                                  }
-                                                />
-                                              </Form.Item>
-                                            </Col>
-                                          </Row>
-                                          <Form.Item
-                                            {...restField}
-                                            name={[name, "description"]}
-                                            label="Description"
-                                            labelCol={{
-                                              style: { width: "100%" },
-                                            }}
-                                            className="mb-2"
-                                          >
-                                            <TextArea
-                                              placeholder="Add-on description"
-                                              rows={2}
-                                            />
-                                          </Form.Item>
-                                          <div className="flex justify-end">
-                                            <Button
-                                              type="text"
-                                              icon={<DeleteOutlined />}
-                                              onClick={() => remove(name)}
-                                              size="small"
-                                              className="text-gray-400 hover:text-red-500"
-                                            />
-                                          </div>
-                                        </div>
-                                      )
-                                    )}
-                                  </div>
-                                )}
-                              </Form.List>
                             </div>
                           ),
                         },

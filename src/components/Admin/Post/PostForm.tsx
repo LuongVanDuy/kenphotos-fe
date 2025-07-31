@@ -160,7 +160,6 @@ const PostForm: React.FC<PostFormProps> = ({
                 <div>
                   <Form.Item
                     name="title"
-                    label="Title"
                     labelCol={{ style: { width: "100%" } }}
                     rules={[
                       { required: true, message: "Please enter the title" },
@@ -169,6 +168,7 @@ const PostForm: React.FC<PostFormProps> = ({
                   >
                     <Input
                       placeholder="Add title"
+                      className="!rounded-none"
                       style={{ fontSize: "24px", fontWeight: "400" }}
                       onChange={handleTitleChange}
                     />
@@ -345,7 +345,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     )}
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-lg bg-white">
+                <div className="border border-gray-300  bg-white">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300 rounded-t-lg">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Categories
