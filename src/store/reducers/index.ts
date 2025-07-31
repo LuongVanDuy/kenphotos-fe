@@ -5,6 +5,7 @@ import categoriesReducer from "./categories";
 import postsReducer from "./posts";
 import settingsReducer from "./settings";
 import servicesReducer from "./services";
+import ordersReducer from "./orders";
 
 const rootReducer = combineReducers({
   media: mediaReducer,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   categories: categoriesReducer,
   settings: settingsReducer,
   services: servicesReducer,
+  orders: ordersReducer,
 });
 
 export default rootReducer;
