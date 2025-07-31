@@ -310,3 +310,7 @@ body {
   border-top: none !important;
   border-bottom: none !important;
 }
+
+.ant-tabs-tabpane {
+  padding: 0 !important;
+}

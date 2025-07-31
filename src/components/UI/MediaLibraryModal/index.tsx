@@ -155,18 +155,6 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
           onSearch={handleSearch}
           defaultValue={searchKeyword}
         />
-        <Select
-          defaultValue="all"
-          style={{ width: 120 }}
-          onChange={(value) =>
-            setStatusFilter(value === "all" ? undefined : Number(value))
-          }
-        >
-          <Option value="all">All Types</Option>
-          <Option value="1">Images</Option>
-          <Option value="2">Documents</Option>
-          <Option value="3">Videos</Option>
-        </Select>
       </div>
 
       {/* Media Grid */}

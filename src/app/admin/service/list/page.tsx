@@ -102,7 +102,20 @@ const ServiceListPage: React.FC = () => {
     if (session?.accessToken) {
       handleQuery(keyword);
     }
-  }, [session?.accessToken, deleteFlg]);
+  }, [
+    session?.accessToken,
+    deleteFlg,
+    status,
+    type,
+    pageNumber,
+    pageSize,
+    sortBy,
+    sortDesc,
+  ]);
+
+  useEffect(() => {
+    handleQuery(keyword, pageNumber, pageSize);
+  }, [pageNumber, pageSize]);
 
   const handleEdit = (service: any) => {
     router.push(`/admin/service/edit/${service.id}`);
