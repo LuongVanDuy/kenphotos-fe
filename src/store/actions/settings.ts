@@ -24,5 +24,5 @@ export const fetchSetting = (payload: any, accessToken: any) => {
 };
 
 export const upsertSetting = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => patchWithToken(settings.upsertSetting(payload.namespace), accessToken, payload.data), onSuccess, onFailure);
+  await asyncActionWrapper(() => putWithToken(settings.upsertSetting(payload.namespace), accessToken, payload.data), onSuccess, onFailure);
 };

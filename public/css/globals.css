@@ -305,3 +305,8 @@ body {
 .ant-checkbox-wrapper {
   width: 100% !important;
 }
+
+.ql-toolbar.ql-snow {
+  border-top: none !important;
+  border-bottom: none !important;
+}

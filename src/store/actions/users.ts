@@ -11,6 +11,9 @@ import {
   FETCH_USERS,
   FETCH_USERS_FAILURE,
   FETCH_USERS_SUCCESS,
+  CHANGE_PASSWORD,
+  CHANGE_PASSWORD_SUCCESS,
+  CHANGE_PASSWORD_FAILURE,
 } from "../actionTypes";
 import { AppDispatch } from "../store";
 import users from "../endpoint/users";
@@ -98,4 +101,35 @@ export const deleteUser =
       onSuccess,
       onFailure
     );
+  };
+
+export const changePassword =
+  (
+    id: number,
+    payload: { newPassword: string; confirmPassword: string },
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async (dispatch: AppDispatch) => {
+    dispatch({ type: CHANGE_PASSWORD });
+    try {
+      const response = await putWithToken(
+        users.changePassword(id),
+        accessToken,
+        payload
+      );
+      dispatch({
+        type: CHANGE_PASSWORD_SUCCESS,
+        payload: { data: response },
+      });
+      onSuccess();
+    } catch (error: any) {
+      const message = error?.message || "Failed to change password";
+      dispatch({
+        type: CHANGE_PASSWORD_FAILURE,
+        payload: { error: message },
+      });
+      onFailure(message);
+    }
   };

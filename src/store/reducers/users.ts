@@ -1,6 +1,16 @@
 import { ActionType, StateType } from "@/types";
 
-import { FETCH_USERS, FETCH_USERS_SUCCESS, FETCH_USERS_FAILURE, FETCH_USER, FETCH_USER_SUCCESS, FETCH_USER_FAILURE } from "../actionTypes";
+import {
+  FETCH_USERS,
+  FETCH_USERS_SUCCESS,
+  FETCH_USERS_FAILURE,
+  FETCH_USER,
+  FETCH_USER_SUCCESS,
+  FETCH_USER_FAILURE,
+  CHANGE_PASSWORD,
+  CHANGE_PASSWORD_SUCCESS,
+  CHANGE_PASSWORD_FAILURE,
+} from "../actionTypes";
 
 const initialState: StateType = {
   loading: true,
@@ -53,6 +63,27 @@ const usersReducer = (state = initialState, action: ActionType) => {
         loading: false,
         error: true,
         detail: {},
+      };
+    case CHANGE_PASSWORD:
+      return {
+        ...state,
+        loading: true,
+        error: false,
+        message: "",
+      };
+    case CHANGE_PASSWORD_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        message: "Password changed successfully",
+      };
+    case CHANGE_PASSWORD_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: true,
+        message: action.payload?.error || "Failed to change password",
       };
     default:
       return state;

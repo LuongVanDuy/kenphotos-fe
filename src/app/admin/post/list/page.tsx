@@ -45,10 +45,6 @@ const deleteFlgMap: Record<number, { label: string; color: string }> = {
   0: { label: "Active", color: "blue" },
   1: { label: "Deleted", color: "red" },
 };
-const sortFields = [
-  { value: "createdTime", label: "Created Time" },
-  { value: "title", label: "Title" },
-];
 
 const PostListPage: React.FC = () => {
   const { data: session } = useSession();
@@ -245,10 +241,6 @@ const PostListPage: React.FC = () => {
     });
   };
 
-  const handleView = (post: any) => {
-    router.push(`/admin/post/${post.id}`);
-  };
-
   const columns = [
     {
       title: "ID",
@@ -282,6 +274,43 @@ const PostListPage: React.FC = () => {
       ),
     },
     {
+      title: "Author",
+      key: "author",
+      render: (_: any, record: any) => (
+        <div>
+          {record.author ? (
+            <>
+              <div className="font-medium">
+                {record.author.firstName} {record.author.lastName}
+              </div>
+              <div className="text-sm text-gray-500">{record.author.email}</div>
+            </>
+          ) : (
+            <span className="text-gray-400">No author</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "Categories",
+      key: "categories",
+      render: (_: any, record: any) => (
+        <div>
+          {record.categories && record.categories.length > 0 ? (
+            <div className="flex flex-wrap gap-1">
+              {record.categories.map((cat: any, index: number) => (
+                <Tag key={index} color="blue">
+                  {cat.category?.name || "Unknown"}
+                </Tag>
+              ))}
+            </div>
+          ) : (
+            <span className="text-gray-400">No categories</span>
+          )}
+        </div>
+      ),
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
@@ -291,16 +320,7 @@ const PostListPage: React.FC = () => {
         </Tag>
       ),
     },
-    {
-      title: "Deleted",
-      dataIndex: "deleteFlg",
-      key: "deleteFlg",
-      render: (deleteFlg: number) => (
-        <Tag color={deleteFlgMap[deleteFlg]?.color || "default"}>
-          {deleteFlgMap[deleteFlg]?.label || deleteFlg}
-        </Tag>
-      ),
-    },
+
     {
       title: "Created",
       dataIndex: "createdTime",
@@ -338,12 +358,6 @@ const PostListPage: React.FC = () => {
               },
             ]
           : [
-              {
-                key: "view",
-                label: "View",
-                icon: <EyeOutlined />,
-                onClick: () => handleView(record),
-              },
               {
                 key: "edit",
                 label: "Edit",
@@ -409,25 +423,6 @@ const PostListPage: React.FC = () => {
           >
             <Option value={0}>Active Posts</Option>
             <Option value={1}>Trash</Option>
-          </Select>
-          <Select
-            value={sortBy}
-            onChange={setSortBy}
-            className="w-[150px] !h-[40px]"
-          >
-            {sortFields.map((f) => (
-              <Option key={f.value} value={f.value}>
-                {f.label}
-              </Option>
-            ))}
-          </Select>
-          <Select
-            value={sortDesc}
-            onChange={(v) => setSortDesc(v)}
-            className="w-[120px] !h-[40px]"
-          >
-            <Option value={false}>Ascending</Option>
-            <Option value={true}>Descending</Option>
           </Select>
         </div>
         <div className="flex gap-2">

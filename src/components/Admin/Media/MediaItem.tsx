@@ -72,14 +72,16 @@ const MediaItem: React.FC<MediaItemProps> = ({
       )}
 
       {isImageFile(item.name) ? (
-        <Image
-          alt="preview"
-          style={{ width: "100%" }}
-          src={getImageUrl(item)}
-          className="border border-gray-300 rounded-lg shadow-sm object-cover"
-        />
+        <div className="aspect-square w-full">
+          <Image
+            alt="preview"
+            style={{ width: "100%", height: "100%" }}
+            src={getImageUrl(item)}
+            className="border border-gray-300 rounded-lg shadow-sm object-cover"
+          />
+        </div>
       ) : (
-        <div className="flex items-center justify-center h-full bg-gray-50">
+        <div className="aspect-square w-full flex items-center justify-center bg-gray-50">
           <div className="text-center">
             <div className="text-4xl text-gray-400">
               {getFileIcon(item.name)}

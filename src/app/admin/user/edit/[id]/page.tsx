@@ -116,6 +116,7 @@ const UpdateUser: React.FC = () => {
       onFinish={handleFinish}
       mode="edit"
       loading={loading}
+      userId={userId}
     />
   );
 };

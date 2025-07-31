@@ -17,8 +17,6 @@ import {
   AppstoreOutlined,
   UnorderedListOutlined,
   UploadOutlined,
-  SortAscendingOutlined,
-  SortDescendingOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
@@ -132,26 +130,27 @@ const MediaListPage: React.FC = () => {
   const renderGridView = () => (
     <div className="media-library-content">
       {/* Media Grid */}
-      <div className="media-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-4">
+      <div className="media-grid grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
         {mediaList.map((item: Media) => (
-          <MediaItem
-            key={item.id}
-            item={item}
-            selected={selectedRowKeys.includes(item.id)}
-            onSelect={(selected) => {
-              if (selected) {
-                setSelectedRowKeys([...selectedRowKeys, item.id]);
-                setSelectedMedia([...selectedMedia, item]);
-              } else {
-                setSelectedRowKeys(
-                  selectedRowKeys.filter((key) => key !== item.id)
-                );
-                setSelectedMedia(
-                  selectedMedia.filter((media) => media.id !== item.id)
-                );
-              }
-            }}
-          />
+          <div key={item.id} className="aspect-square">
+            <MediaItem
+              item={item}
+              selected={selectedRowKeys.includes(item.id)}
+              onSelect={(selected) => {
+                if (selected) {
+                  setSelectedRowKeys([...selectedRowKeys, item.id]);
+                  setSelectedMedia([...selectedMedia, item]);
+                } else {
+                  setSelectedRowKeys(
+                    selectedRowKeys.filter((key) => key !== item.id)
+                  );
+                  setSelectedMedia(
+                    selectedMedia.filter((media) => media.id !== item.id)
+                  );
+                }
+              }}
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -164,18 +163,16 @@ const MediaListPage: React.FC = () => {
       key: "preview",
       width: 80,
       render: (_: any, record: Media) => (
-        <div className="relative">
+        <div className="relative w-[60px] h-[60px]">
           {/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(record.name) ? (
             <Image
               alt="preview"
-              width={50}
-              height={50}
               src={getImageUrl(record.slug)}
               className="object-cover rounded"
             />
           ) : (
             <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded">
-              <span className="text-lg">📄</span>
+              📄
             </div>
           )}
         </div>
@@ -235,66 +232,6 @@ const MediaListPage: React.FC = () => {
                 Delete Selected ({selectedMedia.length})
               </Button>
             )}
-            <Button
-              type="primary"
-              icon={<UploadOutlined />}
-              onClick={() => router.push("/admin/media/create")}
-              size="large"
-            >
-              Add New
-            </Button>
-          </Space>
-        </div>
-      </div>
-
-      {/* Filters and Controls */}
-      <div className="media-filters">
-        <div className="media-filters-row">
-          <div className="media-filters-left">
-            {/* <Search
-              placeholder="Search media..."
-              allowClear
-              style={{ width: 300 }}
-              onSearch={handleSearch}
-              defaultValue={searchKeyword}
-            /> */}
-            <Select
-              defaultValue="all"
-              className="w-[120px] !h-[40px]"
-              onChange={(value) =>
-                setStatusFilter(value === "all" ? undefined : Number(value))
-              }
-            >
-              <Option value="all">All Types</Option>
-              <Option value="1">Images</Option>
-              <Option value="2">Documents</Option>
-              <Option value="3">Videos</Option>
-            </Select>
-            <Button.Group>
-              <Button
-                type={
-                  sortBy === "createdTime" && sortDesc ? "primary" : "default"
-                }
-                icon={<SortDescendingOutlined />}
-                onClick={() => handleSort("createdTime")}
-                size="small"
-              >
-                Newest
-              </Button>
-              <Button
-                type={
-                  sortBy === "createdTime" && !sortDesc ? "primary" : "default"
-                }
-                icon={<SortAscendingOutlined />}
-                onClick={() => handleSort("createdTime")}
-                size="small"
-              >
-                Oldest
-              </Button>
-            </Button.Group>
-          </div>
-
-          <div className="media-filters-right">
             <Button.Group>
               <Button
                 type={viewMode === "grid" ? "primary" : "default"}
@@ -307,7 +244,15 @@ const MediaListPage: React.FC = () => {
                 onClick={() => setViewMode("list")}
               />
             </Button.Group>
-          </div>
+            <Button
+              type="primary"
+              icon={<UploadOutlined />}
+              onClick={() => router.push("/admin/media/create")}
+              size="large"
+            >
+              Add New
+            </Button>
+          </Space>
         </div>
       </div>
 

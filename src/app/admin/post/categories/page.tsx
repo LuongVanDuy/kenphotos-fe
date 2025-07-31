@@ -130,12 +130,6 @@ const CategoryPage: React.FC = () => {
       render: (_: any, record: any) => {
         const menuItems = [
           {
-            key: "view",
-            label: "View",
-            icon: <EyeOutlined />,
-            onClick: () => handleView(record),
-          },
-          {
             key: "edit",
             label: "Edit",
             icon: <EditOutlined />,
@@ -246,10 +240,6 @@ const CategoryPage: React.FC = () => {
         );
       },
     });
-  };
-
-  const handleView = (record: any) => {
-    setSelectedCategory(record);
   };
 
   const handleEdit = (record: any) => {

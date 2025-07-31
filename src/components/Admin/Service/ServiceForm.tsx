@@ -145,12 +145,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   return (
     <>
       <div>
-        <div className="flex items-center justify-between mb-7">
-          <div className="flex items-center space-x-4">
-            <Title level={4} className="!mb-0">
-              {mode === "edit" ? "Edit Service" : "Add New Service"}
-            </Title>
-          </div>
+        <div className="flex items-center justify-between mb-5">
+          <h1 className="text-4xl font-bold ">
+            {mode === "edit" ? "Edit Service" : "Add New Service"}
+          </h1>
         </div>
 
         <Form

@@ -1,130 +1,334 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, Tabs, Form, message, Divider, Typography, Button, Alert, Input, Select, Switch, Image } from "antd";
-import { SaveOutlined, GlobalOutlined, MailOutlined, UploadOutlined } from "@ant-design/icons";
-import { Media } from "@/types";
-import { getImageUrl } from "@/utils";
+import {
+  Card,
+  Tabs,
+  Form,
+  message,
+  Divider,
+  Typography,
+  Button,
+  Input,
+  Select,
+  Upload,
+  Space,
+  Tooltip,
+  Modal,
+} from "antd";
+import {
+  SaveOutlined,
+  GlobalOutlined,
+  MailOutlined,
+  PictureOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  UploadOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
+import { useSession } from "next-auth/react";
+import { AppDispatch, RootState } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchSetting, upsertSetting } from "@/store/actions/settings";
-import { connect } from "react-redux";
+import { getImageUrl } from "@/utils";
+import Image from "next/image";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const SettingsPage: React.FC = (props: any) => {
-  const { fetchSetting, upsertSetting, settingData, settingLoading } = props;
+  const { data: session } = useSession();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const settingData = useSelector((state: RootState) => state.settings.detail);
+  const settingLoading = useSelector(
+    (state: RootState) => state.settings.loading
+  );
+
   const [generalForm] = Form.useForm();
   const [emailForm] = Form.useForm();
-  const [securityForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
-  const [isModalMediaOpen, setIsModalMediaOpen] = useState(false);
-  const [selectedSiteIcon, setSelectedSiteIcon] = useState<Media | null>(null);
-
   const [formField, setFormField] = useState<any | undefined>();
+  const [isModalMediaOpen, setIsModalMediaOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [previewVisible, setPreviewVisible] = useState(false);
 
   useEffect(() => {
-    fetchSetting(activeTab);
-  }, [activeTab]);
+    if (session?.accessToken) {
+      dispatch(fetchSetting(activeTab, session?.accessToken));
+    }
+  }, [activeTab, session?.accessToken]);
+
+  useEffect(() => {
+    if (settingData) {
+      setFormField(settingData);
+    }
+  }, [settingData]);
+
+  useEffect(() => {
+    if (formField && Object.keys(formField).length) {
+      if (activeTab === "general") {
+        generalForm.setFieldsValue({
+          siteName: formField.siteName,
+          siteDescription: formField.siteDescription,
+          siteUrl: formField.siteUrl,
+          siteLogo: formField.siteLogo,
+        });
+      } else {
+        emailForm.setFieldsValue({
+          SMTP_HOST: formField.SMTP_HOST,
+          SMTP_PORT: formField.SMTP_PORT,
+          SMTP_SECURITY: formField.SMTP_SECURITY,
+          SMTP_USERNAME: formField.SMTP_USERNAME,
+          SMTP_PASSWORD: formField.SMTP_PASSWORD,
+          FROM_EMAIL: formField.FROM_EMAIL,
+          FROM_NAME: formField.FROM_NAME,
+        });
+      }
+    }
+  }, [formField]);
+
+  const onSuccess = () => {
+    message.success("Settings saved successfully!");
+    setLoading(false);
+  };
+
+  const onFailure = (error: any) => {
+    message.error(`Save failed: ${error}`);
+    setLoading(false);
+  };
 
   const handleSaveSettings = async (values: any, formType: string) => {
     setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      console.log(`Saving ${formType} settings:`, values);
-      message.success(`${formType} settings saved successfully!`);
-    } catch (error) {
-      message.error(`Failed to save ${formType} settings`);
-    } finally {
-      setLoading(false);
-    }
+    const settingsArray = Object.entries(values).map(([key, value]) => ({
+      key,
+      value,
+    }));
+
+    const payload = {
+      namespace: formType,
+      data: {
+        settings: settingsArray,
+      },
+    };
+
+    dispatch(
+      upsertSetting(payload, session?.accessToken || "", onSuccess, onFailure)
+    );
   };
 
-  const handleMediaSelect = (media: Media) => {
-    setSelectedSiteIcon(media);
-    generalForm.setFieldsValue({ siteIcon: media });
+  const handleMediaSelect = (media: any) => {
+    generalForm.setFieldsValue({ siteLogo: media.slug });
+    setSelectedImage(media);
+    setIsModalMediaOpen(false);
+    message.success("Logo selected successfully!");
   };
 
-  const handleRemoveSiteIcon = () => {
-    setSelectedSiteIcon(null);
-    generalForm.setFieldsValue({ siteIcon: undefined });
+  const handleRemoveLogo = () => {
+    Modal.confirm({
+      title: "Remove Logo",
+      content:
+        "Are you sure you want to remove the current logo? This action cannot be undone.",
+      okText: "Remove",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk() {
+        generalForm.setFieldsValue({ siteLogo: "" });
+        setSelectedImage(null);
+        message.success("Logo removed successfully!");
+      },
+    });
+  };
+
+  const handlePreviewLogo = () => {
+    setPreviewVisible(true);
+  };
+
+  const getCurrentLogo = () => {
+    const logoValue = generalForm.getFieldValue("siteLogo");
+    return logoValue || formField?.siteLogo;
+  };
+
+  const getLogoInfo = () => {
+    const currentLogo = getCurrentLogo();
+    if (!currentLogo) return null;
+
+    // Try to get logo info from selected image or form field
+    const logoInfo = selectedImage || formField?.logoInfo;
+    return {
+      name: logoInfo?.name || "Logo",
+      size: logoInfo?.size || "Unknown",
+      dimensions: logoInfo?.dimensions || "Unknown",
+      type: logoInfo?.mimeType || "image/*",
+    };
   };
 
   const generalSettings = (
-    <Card>
+    <Card loading={settingLoading}>
       <Form
         form={generalForm}
         layout="vertical"
         onFinish={(values) => handleSaveSettings(values, "general")}
-        initialValues={{
-          siteName: "My Admin Panel",
-          siteDescription: "A comprehensive admin dashboard",
-          timezone: "UTC",
-          language: "en",
-          maintenanceMode: false,
-          allowRegistration: true,
-        }}
       >
-        <Title level={4}>Site Information</Title>
+        <Form.Item
+          name="siteLogo"
+          label={
+            <Space>
+              <span>Site Logo</span>
+              <Tooltip title="Recommended size: 200x200px, Max file size: 2MB. Supported formats: JPG, PNG, SVG">
+                <InfoCircleOutlined style={{ color: "#1890ff" }} />
+              </Tooltip>
+            </Space>
+          }
+        >
+          <div className="space-y-4">
+            {/* Logo Preview Section */}
+            <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
+              <div className="flex items-start gap-6">
+                {/* Logo Preview */}
+                <div className="flex flex-col items-center gap-3">
+                  <div className="relative">
+                    {getCurrentLogo() ? (
+                      <div className="relative">
+                        <Image
+                          src={getImageUrl(getCurrentLogo())}
+                          alt="Site Logo"
+                          width={120}
+                          height={120}
+                          className="rounded-lg border-2 border-gray-200 object-contain bg-white"
+                        />
+                        <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                          Active
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-[120px] h-[120px] bg-gray-200 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                        <div className="text-center">
+                          <PictureOutlined className="text-3xl text-gray-400 mb-2" />
+                          <div className="text-gray-500 text-sm">No logo</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <Text className="text-xs text-gray-500 text-center">
+                    Logo Preview
+                  </Text>
+                </div>
 
-        <Title level={4}>Site Icon</Title>
-        <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
-          The Site Icon is what you see in browser tabs, bookmark bars, and within the mobile app
-        </Text>
+                {/* Browser Preview */}
+                <div className="flex-1">
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                    {/* Browser Header */}
+                    <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex items-center gap-2">
+                      <div className="flex gap-1">
+                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      </div>
+                      <div className="flex-1 bg-white rounded px-3 py-1 mx-2 text-xs text-gray-600">
+                        {formField?.siteUrl || "example.com"}
+                      </div>
+                    </div>
 
-        <Form.Item name="siteIcon" label="Site Icon">
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div
-              style={{
-                width: 80,
-                height: 80,
-                border: "1px solid #d9d9d9",
-                borderRadius: 8,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#fafafa",
-                overflow: "hidden",
-              }}
-            >
-              {selectedSiteIcon ? (
-                <Image
-                  src={getImageUrl(selectedSiteIcon.slug)}
-                  alt={selectedSiteIcon.name}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  preview={false}
-                />
-              ) : (
-                <UploadOutlined style={{ fontSize: 24, color: "#999" }} />
-              )}
+                    {/* Browser Content */}
+                    <div className="p-4">
+                      <div className="flex items-center gap-3">
+                        {getCurrentLogo() ? (
+                          <Image
+                            src={getImageUrl(getCurrentLogo())}
+                            alt="Site Logo"
+                            width={32}
+                            height={32}
+                            className="rounded object-contain"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                        )}
+                        <div>
+                          <div className="font-semibold text-gray-800">
+                            {formField?.siteName || "Site Name"}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {formField?.siteDescription || "Site description"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <Text className="text-xs text-gray-500 mt-2 block">
+                    Browser Tab Preview
+                  </Text>
+                </div>
+              </div>
             </div>
-            <div style={{ flex: 1 }}>
-              <Button type="default" style={{ marginBottom: 8 }} onClick={() => setIsModalMediaOpen(true)}>
-                Change Site Icon
+
+            {/* Logo Actions */}
+            <div className="flex gap-3">
+              <Button
+                type="primary"
+                icon={<PictureOutlined />}
+                onClick={() => setIsModalMediaOpen(true)}
+                className="flex-1"
+              >
+                {getCurrentLogo() ? "Change Logo" : "Select Logo"}
               </Button>
-              <br />
-              <Button type="text" danger size="small" onClick={handleRemoveSiteIcon} disabled={!selectedSiteIcon}>
-                Remove Site Icon
-              </Button>
+
+              {getCurrentLogo() && (
+                <>
+                  <Tooltip title="Preview logo">
+                    <Button
+                      icon={<EyeOutlined />}
+                      onClick={handlePreviewLogo}
+                    />
+                  </Tooltip>
+
+                  <Tooltip title="Remove logo">
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={handleRemoveLogo}
+                    />
+                  </Tooltip>
+                </>
+              )}
             </div>
           </div>
         </Form.Item>
 
-        <Divider />
-
-        <Form.Item name="siteName" label="Site Name" rules={[{ required: true, message: "Please enter site name" }]}>
+        <Form.Item
+          name="siteName"
+          label="Site Name"
+          rules={[{ required: true, message: "Please enter site name" }]}
+        >
           <Input placeholder="Enter site name" />
         </Form.Item>
 
-        <Form.Item name="siteDescription" label="Site Description" rules={[{ required: true, message: "Please enter site description" }]}>
+        <Form.Item
+          name="siteDescription"
+          label="Site Description"
+          rules={[{ required: true, message: "Please enter site description" }]}
+        >
           <TextArea placeholder="Enter site description" rows={3} />
         </Form.Item>
 
+        <Form.Item
+          name="siteUrl"
+          label="Site URL"
+          rules={[{ required: true, message: "Please enter site URL" }]}
+        >
+          <Input placeholder="https://example.com" />
+        </Form.Item>
+
         <div style={{ marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" loading={loading} icon={<SaveOutlined />}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+          >
             Save General Settings
           </Button>
         </div>
@@ -146,25 +350,27 @@ const SettingsPage: React.FC = (props: any) => {
           adminEmail: "admin@example.com",
         }}
       >
-        <Alert
-          message="Email Configuration"
-          description="Configure SMTP settings to enable email notifications and communications."
-          type="info"
-          showIcon
-          className="mb-6"
-        />
-
-        <Title level={4}>SMTP Configuration</Title>
-
-        <Form.Item name="smtpHost" label="SMTP Host" rules={[{ required: true, message: "Please enter SMTP host" }]}>
+        <Form.Item
+          name="SMTP_HOST"
+          label="SMTP Host"
+          rules={[{ required: true, message: "Please enter SMTP host" }]}
+        >
           <Input placeholder="smtp.gmail.com" />
         </Form.Item>
 
-        <Form.Item name="smtpPort" label="SMTP Port" rules={[{ required: true, message: "Please enter SMTP port" }]}>
+        <Form.Item
+          name="SMTP_PORT"
+          label="SMTP Port"
+          rules={[{ required: true, message: "Please enter SMTP port" }]}
+        >
           <Input placeholder="587" />
         </Form.Item>
 
-        <Form.Item name="smtpSecurity" label="Security" rules={[{ required: true, message: "Please select security type" }]}>
+        <Form.Item
+          name="SMTP_SECURITY"
+          label="Security"
+          rules={[{ required: true, message: "Please select security type" }]}
+        >
           <Select
             options={[
               { value: "none", label: "None" },
@@ -175,39 +381,53 @@ const SettingsPage: React.FC = (props: any) => {
           />
         </Form.Item>
 
-        <Form.Item name="smtpUsername" label="SMTP Username" rules={[{ required: true, message: "Please enter SMTP username" }]}>
+        <Form.Item
+          name="SMTP_USERNAME"
+          label="SMTP Username"
+          rules={[{ required: true, message: "Please enter SMTP username" }]}
+        >
           <Input placeholder="your-email@gmail.com" />
         </Form.Item>
 
-        <Form.Item name="smtpPassword" label="SMTP Password" rules={[{ required: true, message: "Please enter SMTP password" }]}>
+        <Form.Item
+          name="SMTP_PASSWORD"
+          label="SMTP Password"
+          rules={[{ required: true, message: "Please enter SMTP password" }]}
+        >
           <Input.Password placeholder="Enter password" />
         </Form.Item>
 
         <Divider />
 
         <Title level={4}>Email Settings</Title>
-
-        <Form.Item name="adminEmail" label="Admin Email" rules={[{ required: true, message: "Please enter admin email" }]}>
+        {/* 
+        <Form.Item name="ADMIN_EMAIL" label="Admin Email" rules={[{ required: true, message: "Please enter admin email" }]}>
           <Input placeholder="admin@example.com" />
-        </Form.Item>
+        </Form.Item> */}
 
-        <Form.Item name="fromEmail" label="From Email" rules={[{ required: true, message: "Please enter from email" }]}>
+        <Form.Item
+          name="FROM_EMAIL"
+          label="From Email"
+          rules={[{ required: true, message: "Please enter from email" }]}
+        >
           <Input placeholder="noreply@example.com" />
         </Form.Item>
 
-        <Form.Item name="fromName" label="From Name" rules={[{ required: true, message: "Please enter from name" }]}>
+        <Form.Item
+          name="FROM_NAME"
+          label="From Name"
+          rules={[{ required: true, message: "Please enter from name" }]}
+        >
           <Input placeholder="Your Site Name" />
         </Form.Item>
 
-        <Form.Item name="emailNotifications" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-        <div style={{ marginBottom: 16 }}>
-          <span style={{ marginLeft: 8 }}>Enable Email Notifications</span>
-        </div>
-
         <div style={{ marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" loading={loading} icon={<SaveOutlined />}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+          >
             Save Email Settings
           </Button>
         </div>
@@ -232,26 +452,56 @@ const SettingsPage: React.FC = (props: any) => {
 
   return (
     <div>
-      <div className="mb-6">
-        <Title level={2}>Settings</Title>
-        <Text type="secondary">Configure your application settings and preferences</Text>
-      </div>
+      <h1 className="text-4xl font-bold ">Settings</h1>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} size="large" />
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems}
+        size="large"
+      />
+      <MediaLibraryModal
+        isOpen={isModalMediaOpen}
+        onCancel={() => setIsModalMediaOpen(false)}
+        onSelect={handleMediaSelect}
+        accept="image/*"
+      />
 
-      <MediaLibraryModal isOpen={isModalMediaOpen} onCancel={() => setIsModalMediaOpen(false)} onSelect={handleMediaSelect} accept="image/*" />
+      {/* Logo Preview Modal */}
+      {previewVisible && getCurrentLogo() && (
+        <Modal
+          title="Logo Preview"
+          open={previewVisible}
+          onCancel={() => setPreviewVisible(false)}
+          footer={[
+            <Button key="close" onClick={() => setPreviewVisible(false)}>
+              Close
+            </Button>,
+          ]}
+          width={600}
+          centered
+        >
+          <div className="text-center space-y-4">
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <Image
+                src={getImageUrl(getCurrentLogo())}
+                alt="Site Logo Preview"
+                width={300}
+                height={300}
+                className="mx-auto object-contain"
+              />
+            </div>
+            <div className="text-sm text-gray-600">
+              <p>This is how your logo will appear on your website.</p>
+              <p>
+                For best results, ensure your logo has a transparent background.
+              </p>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
 
-const mapStateToProps = (state: any) => ({
-  settingData: state.settings.detail,
-  settingLoading: state.settings.loading,
-});
-
-const mapDispatchToProps = {
-  fetchSetting: fetchSetting,
-  upsertSetting: upsertSetting,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);
+export default SettingsPage;

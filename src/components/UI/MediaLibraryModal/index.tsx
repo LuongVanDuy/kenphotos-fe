@@ -6,7 +6,6 @@ import {
   Button,
   Input,
   Select,
-  Image,
   Card,
   Typography,
   Spin,
@@ -24,6 +23,8 @@ import { Media } from "@/types";
 import { getImageUrl } from "@/utils";
 import { AppDispatch, RootState } from "@/store/store";
 import MediaItem from "@/components/Admin/Media/MediaItem";
+import Image from "next/image";
+import "./styles.css";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -169,14 +170,29 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
       </div>
 
       {/* Media Grid */}
-      <div className="media-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-4 max-h-96 overflow-y-auto">
-        {mediaList.map((item: Media) => (
-          <MediaItem
+      <div className="media-grid">
+        {mediaList.map((item: any) => (
+          <div
             key={item.id}
-            item={item}
-            selected={false}
-            onSelect={() => onSelect(item)}
-          />
+            className="media-item cursor-pointer border border-gray-200 rounded-lg overflow-hidden hover:border-blue-500 hover:shadow-md transition-all duration-200"
+            onClick={() => onSelect(item)}
+          >
+            {isImageFile(item.name) ? (
+              <div className="relative aspect-square">
+                <Image
+                  src={getImageUrl(item.slug)}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
+                />
+              </div>
+            ) : (
+              <div className="aspect-square flex items-center justify-center bg-gray-50">
+                {getFileIcon(item.name)}
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
@@ -208,8 +224,8 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
 
   // Upload Tab
   const UploadTab = () => (
-    <div className="space-y-4">
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+    <div className="space-y-4 h-full flex justify-center items-center w-full">
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center w-1/2 h-1/2 cursor-pointer flex justify-center items-center">
         <Upload
           accept={accept}
           beforeUpload={(file) => {
@@ -219,7 +235,7 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
           showUploadList={false}
           disabled={uploading}
         >
-          <div className="space-y-4">
+          <div className=" w-full">
             <UploadOutlined className="text-4xl text-gray-400" />
             <div>
               <Text className="text-lg font-medium">Click to upload</Text>
@@ -231,12 +247,6 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
             {uploading && <Spin />}
           </div>
         </Upload>
-      </div>
-
-      <div className="text-center">
-        <Text className="text-sm text-gray-500">
-          Supported formats: JPG, PNG, GIF, WebP, SVG
-        </Text>
       </div>
     </div>
   );
@@ -259,15 +269,17 @@ const MediaLibraryModal: React.FC<MediaLibraryModalProps> = ({
       title={title}
       open={isOpen}
       onCancel={onCancel}
-      width={1200}
+      width="95%"
       footer={null}
       centered
+      className="media-library-modal"
+      styles={{ body: { height: "calc(80vh)", overflow: "auto" } }}
     >
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
         items={tabItems}
-        className="mt-4"
+        className="mt-4 h-full"
       />
     </Modal>
   );
