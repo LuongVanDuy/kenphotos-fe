@@ -30,7 +30,7 @@ const initialState: ServiceState = {
   list: [],
   total: 0,
   detail: null,
-  loading: false,
+  loading: true,
   error: false,
   message: "",
   listPublic: [],

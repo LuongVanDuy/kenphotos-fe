@@ -91,6 +91,28 @@ export const adminMenuConfig: MenuItemConfig[] = [
     ],
   },
   {
+    key: "service",
+    icon: <AppstoreOutlined />,
+    label: "Services",
+    breadcrumbTitle: "Services",
+    children: [
+      {
+        key: "service-list",
+        icon: <UnorderedListOutlined />,
+        label: "All Services",
+        path: "/admin/service/list",
+        breadcrumbTitle: "List",
+      },
+      {
+        key: "service-create",
+        icon: <PlusOutlined />,
+        label: "Add New",
+        path: "/admin/service/create",
+        breadcrumbTitle: "Create New",
+      },
+    ],
+  },
+  {
     key: "order",
     icon: <ShoppingCartOutlined />,
     label: "Orders",
