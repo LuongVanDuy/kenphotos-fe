@@ -85,8 +85,9 @@ const Services: React.FC = () => {
   ]
 
   return (
-    <section className='bg-gray py-16'>
+    <section className='bg-white py-24 relative'>
       <div className='max-w-content mx-auto p-[10px] text-center'>
+        <span className='notch-top-left' aria-hidden='true'></span>
         <div className='py-[10px]'>
           <h2
             className='text-[25px] md:text-[60px] font-semibold normal-case not-italic no-underline leading-[1.2em] tracking-[0px] text-[#1C244B]'
@@ -148,6 +149,8 @@ const Services: React.FC = () => {
             )
           })}
         </div>
+
+        <span className='notch-bottom-right' aria-hidden='true'></span>
       </div>
     </section>
   )

@@ -1,23 +1,23 @@
-"use client";
+'use client'
 
-import store from "@/store/store";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { ConfigProvider } from "antd";
-import viVN from "antd/lib/locale/vi_VN";
-import { SessionProvider } from "next-auth/react";
-import { Provider } from "react-redux";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import FloatingContacts from "./Contacts";
+import store from '@/store/store'
+import { AntdRegistry } from '@ant-design/nextjs-registry'
+import { ConfigProvider } from 'antd'
+import viVN from 'antd/lib/locale/vi_VN'
+import { SessionProvider } from 'next-auth/react'
+import { Provider } from 'react-redux'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import FloatingContacts from './Contacts'
 
 export default function LayoutProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const [isHydrated, setIsHydrated] = useState(false);
-  const isAdminRoute = pathname?.startsWith("/admin");
+  const pathname = usePathname()
+  const [isHydrated, setIsHydrated] = useState(false)
+  const isAdminRoute = pathname?.startsWith('/admin')
 
   useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+    setIsHydrated(true)
+  }, [])
 
   if (!isHydrated) {
     return (
@@ -28,7 +28,7 @@ export default function LayoutProvider({ children }: { children: React.ReactNode
           </ConfigProvider>
         </AntdRegistry>
       </SessionProvider>
-    );
+    )
   }
 
   return (
@@ -40,11 +40,11 @@ export default function LayoutProvider({ children }: { children: React.ReactNode
           <ConfigProvider locale={viVN}>
             <Provider store={store}>
               {children}
-              <FloatingContacts />
+              {/* <FloatingContacts /> */}
             </Provider>
           </ConfigProvider>
         )}
       </AntdRegistry>
     </SessionProvider>
-  );
+  )
 }

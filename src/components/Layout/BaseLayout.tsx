@@ -22,7 +22,7 @@ export default function BaseLayout({ children }: { children: React.ReactNode }) 
       {/* <div ref={contactRef}>
         <FreeTestFiles />
       </div> */}
-      <FloatingContacts />
+      {/* <FloatingContacts /> */}
       <Footer />
     </>
   )

@@ -106,24 +106,23 @@ const ReviewColumn = ({ animationClass }: { animationClass: string }) => (
 
 const Reviews: React.FC = () => {
   return (
-    <section className='py-8 md:py-24 bg-white'>
+    <section className='py-24 bg-section relative'>
       <div className='text-center mx-auto'>
         <h2 className=' text-[25px] md:text-[45px] font-semibold normal-case not-italic no-underline leading-[1.2em] tracking-[0px] text-[#1C244B]'>
           Review
         </h2>
         <p className='mb-12'>Our clients love us, here are a few of their quotes.</p>
       </div>
-      <div className='max-w-content mx-auto px-4 text-center h-[700px] overflow-hidden relative'>
-        <div className='absolute top-0 left-0 w-full h-16 bg-gradient-to-b from-white to-transparent z-10 pointer-events-none'></div>
-        <div className='absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent z-10 pointer-events-none'></div>
+      <div className='max-w-content mx-auto px-4 text-center h-[600px] overflow-hidden relative'>
+        <div className='absolute top-0 left-0 w-full h-16 bg-gradient-to-b from-[#faf9f7] to-transparent z-10 pointer-events-none'></div>
+        <div className='absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-[#faf9f7] to-transparent z-10 pointer-events-none'></div>
         <div className='gap-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 px-2 md:px-8 lg:px-0 h-full overflow-hidden'>
           <ReviewColumn animationClass='animate-marqueeUp1' />
           <ReviewColumn animationClass='animate-marqueeUp2' />
           <ReviewColumn animationClass='animate-marqueeUp3' />
         </div>
       </div>
-
-      {/* ================ */}
+      <span className='notch-bottom-left' aria-hidden='true'></span>
     </section>
   )
 }

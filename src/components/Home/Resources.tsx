@@ -46,7 +46,7 @@ const Resources: React.FC = () => {
   ]
 
   return (
-    <section className='py-8 md:py-24 bg-[#fff]'>
+    <section className='py-24 bg-section'>
       <div className='max-w-content mx-auto px-4 text-center'>
         <h3 className='text-[25px] md:text-[45px] font-semibold normal-case not-italic no-underline leading-[1.2em] tracking-[0px] text-[#1C244B] mb-6'>
           Below are our resources
@@ -64,18 +64,23 @@ const Resources: React.FC = () => {
 
         <div className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6'>
           {resources.map((resource) => (
-            <div key={resource.id} className='text-center'>
-              <div className='w-full aspect-[4/3] shadow-md mb-3 flex items-center justify-center bg-gray-100'>
-                <Image
-                  src={resource.image}
-                  alt={resource.name}
-                  width={320}
-                  height={240}
-                  className='object-cover w-full h-full transition-transform duration-300 hover:scale-110'
-                  priority
-                />
+            <div
+              key={resource.id}
+              className='relative w-full aspect-[4/3] rounded-[12px] overflow-hidden shadow-md group'
+            >
+              <Image
+                src={resource.image}
+                alt={resource.name}
+                width={320}
+                height={240}
+                className='object-cover w-full h-full group-hover:scale-110 transition-transform duration-300'
+                priority
+              />
+              <div className='absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center'>
+                <span className='text-white text-lg md:text-xl font-semibold px-2 text-center drop-shadow-md'>
+                  {resource.name}
+                </span>
               </div>
-              <p className='text-[#1C244B] font-bold text-lg'>{resource.name}</p>
             </div>
           ))}
         </div>

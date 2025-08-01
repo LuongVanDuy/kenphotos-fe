@@ -4,8 +4,13 @@ import Image from 'next/image'
 import React from 'react'
 
 const FreeTestFiles: React.FC = () => {
+  const services = [
+    { label: 'Service-1', value: 'service1' },
+    { label: 'Service-2', value: 'service2' },
+    { label: 'Service-3', value: 'service3' },
+  ]
   return (
-    <section className='bg-gray py-8 md:py-24' aria-labelledby='free-test-heading'>
+    <section className='bg-section py-24 relative' aria-labelledby='free-test-heading'>
       <div className='max-w-content mx-auto px-4'>
         {/* Main Heading */}
         <header className='text-center mb-12'>
@@ -20,115 +25,104 @@ const FreeTestFiles: React.FC = () => {
 
         <div className='grid md:grid-cols-2 gap-12 items-start'>
           {/* Left Section */}
-          <div className='flex justify-center items-center h-[100%]'>
-            <div className='relative w-[300px] h-[224px] shadow-file'>
-              <Image
-                src='/images/free.png'
-                alt=''
-                width={300}
-                height={224}
-                className='object-cover w-full h-full'
-                priority
-              />
-            </div>
-          </div>
+          <div className='h-[100%]'></div>
 
           {/* Right Section  */}
-          <div className='bg-white rounded-lg shadow-[12px] p-2 py-4 md:p-8'>
-            <form className='space-y-6' aria-label='Free photo editing test form'>
-              {/* Row 1 */}
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <input
-                    type='text'
-                    id='name'
-                    name='name'
-                    required
-                    className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
-                    placeholder='Your name'
-                  />
-                </div>
-                <div>
-                  <input
-                    type='email'
-                    id='email'
-                    name='email'
-                    required
-                    className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
-                    placeholder='Your email'
-                  />
-                </div>
-              </div>
+          <div className=' p-2 py-4 md:p-8'>
+            <form className='space-y-10 text-black' aria-label='Projektanfrage Formular'>
+              {/* Ihre Kontaktdaten */}
+              <div className='space-y-6'>
+                <h2 className='text-2xl md:text-3xl font-bold'>Booking services</h2>
 
-              {/* Row 2 */}
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <input
-                    type='tel'
-                    id='phone'
-                    name='phone'
-                    className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
-                    placeholder='Your number'
-                  />
-                </div>
-                <div>
-                  <input
-                    type='text'
-                    id='city'
-                    name='city'
-                    className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
-                    placeholder='Your city'
-                  />
-                </div>
-              </div>
+                <div className='space-y-4'>
+                  <div>
+                    <label htmlFor='name' className='block mb-1 text-sm font-medium'>
+                      Name
+                    </label>
+                    <input
+                      type='text'
+                      id='name'
+                      name='name'
+                      className='w-full px-4 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
+                    />
+                  </div>
 
-              {/* Row 3 */}
-              <div>
-                <input
-                  type='url'
-                  id='photoLink'
-                  name='photoLink'
-                  required
-                  className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent'
-                  placeholder='Link to your photos(Dropbox, Google Drive, Wetransfer etc...'
-                />
-              </div>
+                  <div>
+                    <label htmlFor='email' className='block mb-1 text-sm font-medium'>
+                      EMail
+                    </label>
+                    <input
+                      type='email'
+                      id='email'
+                      name='email'
+                      required
+                      className='w-full px-4 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
+                    />
+                  </div>
 
-              {/* Row 4 */}
-              <div>
-                <textarea
-                  id='request'
-                  name='request'
-                  rows={4}
-                  required
-                  className='w-full px-4 py-3 border-[2px] border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-vertical'
-                  placeholder="Request or what you want. (We will send you the tested image
-                  within 24 hours, if you don't see our email in your main
-                  mailbox, you able check at update  or spam)"
-                />
-              </div>
+                  <div>
+                    <label htmlFor='company' className='block mb-1 text-sm font-medium'>
+                      Phone Number
+                    </label>
+                    <input
+                      type='number'
+                      id='company'
+                      name='company'
+                      className='w-full px-4 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor='company' className='block mb-1 text-sm font-medium'>
+                      Your city
+                    </label>
+                    <input
+                      type='number'
+                      id='company'
+                      name='company'
+                      className='w-full px-4 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor='description' className='block mb-1 text-sm font-medium'>
+                      Description
+                    </label>
+                    <textarea
+                      id='description'
+                      name='description'
+                      rows={4}
+                      required
+                      className='w-full px-4 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500'
+                      placeholder=''
+                    />
+                  </div>
 
-              {/* File Upload Section */}
-              <div>
-                <div className='flex items-center space-x-4'>
+                  <div>
+                    <span className='block mb-2 text-sm font-medium'>Services</span>
+                    <div className='space-y-3'>
+                      {services.map((service) => (
+                        <label
+                          key={service.value}
+                          className='flex items-center gap-3 border bg-white border-gray-300 px-4 py-3 rounded-md cursor-pointer hover:border-gray-500'
+                        >
+                          <input
+                            type='radio'
+                            name='service'
+                            value={service.value}
+                            className='accent-black'
+                          />
+                          <span>{service.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
                   <button
-                    type='button'
-                    className='px-4 py-2 bg-[#0F101A]  text-white rounded-lg  transition-colors'
+                    type='submit'
+                    className='px-6 py-2 bg-black text-white font-semibold rounded-md hover:bg-gray-900 transition'
                   >
-                    [Chọn tệp]
+                    Send
                   </button>
-                  <span className='text-gray-500 text-sm'>Không có tập nào được chọn</span>
                 </div>
-              </div>
-
-              {/* Send Button */}
-              <div className='flex justify-center'>
-                <button
-                  type='submit'
-                  className='px-[45px] py-[10px] text-white  transition-all rounded-[12px] transform hover:scale-105 bg-[#0F101A] font-bold'
-                >
-                  Send
-                </button>
               </div>
             </form>
           </div>
