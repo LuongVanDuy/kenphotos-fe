@@ -183,6 +183,7 @@ const SettingsPage: React.FC = (props: any) => {
               </Tooltip>
             </Space>
           }
+          className="max-w-[500px]"
         >
           <div className="space-y-4">
             {/* Logo Preview Section */}

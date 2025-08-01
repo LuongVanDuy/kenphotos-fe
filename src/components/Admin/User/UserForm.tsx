@@ -145,7 +145,7 @@ const UserForm: React.FC<UserFormProps> = ({
           <div className="flex gap-8">
             <div className="flex-1">
               <div className="space-y-6">
-                <div className="border border-gray-300 rounded-sm bg-white ">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Basic Information
@@ -397,7 +397,7 @@ const UserForm: React.FC<UserFormProps> = ({
                         </div>
 
                         {showPasswordChange && (
-                          <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                          <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                             <Row gutter={24}>
                               <Col span={12}>
                                 <Form.Item
@@ -496,7 +496,7 @@ const UserForm: React.FC<UserFormProps> = ({
 
             <div className="w-80 flex-shrink-0">
               <div className="space-y-6">
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Profile Picture
@@ -528,7 +528,7 @@ const UserForm: React.FC<UserFormProps> = ({
                     </div>
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="p-4">
                     <div className="flex items-center space-x-2">
                       <Button

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Button,
   Tag,
@@ -10,9 +10,6 @@ import {
   Dropdown,
   Modal,
   Input,
-  Checkbox,
-  Space,
-  Tooltip,
 } from "antd";
 import {
   PlusOutlined,
@@ -36,244 +33,305 @@ import { AppDispatch, RootState } from "@/store/store";
 
 const { Option } = Select;
 
-const statusMap: Record<number, { label: string; color: string }> = {
+// Types
+interface Service {
+  id: number;
+  title: string;
+  type: number;
+  originalPrice: number;
+  discountedPrice: number;
+  rating: number;
+  orderCount: number;
+  status: number;
+  createdTime: string;
+  deleteFlg: number;
+}
+
+interface QueryParams {
+  search: string;
+  status?: number;
+  type?: number;
+  deleteFlg: number;
+  page: number;
+  itemsPerPage: number;
+  sortBy: string;
+  sortDesc: boolean;
+}
+
+// Constants
+const STATUS_MAP: Record<number, { label: string; color: string }> = {
   0: { label: "Draft", color: "orange" },
   1: { label: "Published", color: "green" },
 };
 
-const typeMap: Record<number, { label: string; color: string }> = {
+const TYPE_MAP: Record<number, { label: string; color: string }> = {
   0: { label: "Basic", color: "blue" },
   1: { label: "Premium", color: "purple" },
   2: { label: "Enterprise", color: "gold" },
 };
 
-const sortFields = [
+const SORT_FIELDS = [
   { value: "createdTime", label: "Created Time" },
   { value: "title", label: "Title" },
   { value: "price", label: "Price" },
   { value: "rating", label: "Rating" },
 ];
 
+const DEFAULT_PAGE_SIZE = 10;
+
 const ServiceListPage: React.FC = () => {
   const { data: session } = useSession();
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  // Get state from Redux store
-  const serviceList = useSelector(
-    (state: RootState) => state.services?.list || []
+  // Redux state
+  const {
+    list: serviceList = [],
+    total: serviceTotal = 0,
+    loading: serviceLoading = false,
+  } = useSelector((state: RootState) => state.services || {});
+
+  // Local state
+  const [filters, setFilters] = useState({
+    status: "all",
+    type: "all",
+    deleteFlg: 0,
+    sortBy: "createdTime",
+    sortDesc: true,
+    keyword: "",
+  });
+  const [pagination, setPagination] = useState({
+    pageNumber: 1,
+    pageSize: DEFAULT_PAGE_SIZE,
+  });
+  const [selection, setSelection] = useState({
+    selectedRowKeys: [] as React.Key[],
+    selectedServices: [] as Service[],
+  });
+
+  // Memoized query function
+  const handleQuery = useCallback(
+    (keyword: string, page = 1, itemsPerPage = DEFAULT_PAGE_SIZE) => {
+      const queryParams: QueryParams = {
+        search: keyword,
+        status: filters.status === "all" ? undefined : parseInt(filters.status),
+        type: filters.type === "all" ? undefined : parseInt(filters.type),
+        deleteFlg: filters.deleteFlg,
+        page,
+        itemsPerPage,
+        sortBy: filters.sortBy,
+        sortDesc: filters.sortDesc,
+      };
+
+      dispatch(fetchServices(queryParams, session?.accessToken || "") as any);
+      setPagination({ pageNumber: page, pageSize: itemsPerPage });
+    },
+    [dispatch, session?.accessToken, filters]
   );
-  const serviceTotal = useSelector(
-    (state: RootState) => state.services?.total || 0
-  );
-  const serviceLoading = useSelector(
-    (state: RootState) => state.services?.loading || false
-  );
 
-  const [status, setStatus] = useState<string>("all");
-  const [type, setType] = useState<string>("all");
-  const [deleteFlg, setDeleteFlg] = useState<number>(0); // 0: Active, 1: Deleted
-  const [sortBy, setSortBy] = useState<string>("createdTime");
-  const [sortDesc, setSortDesc] = useState<boolean>(true);
-  const [keyword, setKeyword] = useState("");
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [selectedServices, setSelectedServices] = useState<any[]>([]);
-
-  function handleQuery(keyword: string, page = 1, itemsPerPage = 10) {
-    const queryParams = {
-      search: keyword,
-      status: status === "all" ? undefined : parseInt(status),
-      type: type === "all" ? undefined : parseInt(type),
-      deleteFlg,
-      page,
-      itemsPerPage,
-      sortBy,
-      sortDesc,
-    };
-
-    dispatch(fetchServices(queryParams, session?.accessToken || "") as any);
-    setPageNumber(page);
-    setPageSize(itemsPerPage);
-  }
-
+  // Effects
   useEffect(() => {
     if (session?.accessToken) {
-      handleQuery(keyword);
+      handleQuery(filters.keyword);
     }
+  }, [session?.accessToken, filters, handleQuery]);
+
+  // Callback functions
+  const onSuccess = useCallback(() => {
+    message.success("Operation completed successfully");
+    setSelection({ selectedRowKeys: [], selectedServices: [] });
+    handleQuery(filters.keyword, pagination.pageNumber, pagination.pageSize);
   }, [
-    session?.accessToken,
-    deleteFlg,
-    status,
-    type,
-    pageNumber,
-    pageSize,
-    sortBy,
-    sortDesc,
+    handleQuery,
+    filters.keyword,
+    pagination.pageNumber,
+    pagination.pageSize,
   ]);
 
-  useEffect(() => {
-    handleQuery(keyword, pageNumber, pageSize);
-  }, [pageNumber, pageSize]);
+  const onFailure = useCallback((error: any) => {
+    message.error(error || "Operation failed");
+  }, []);
 
-  const handleEdit = (service: any) => {
-    router.push(`/admin/service/edit/${service.id}`);
-  };
+  const handleServiceAction = useCallback(
+    (action: string, service: Service) => {
+      const actionMap = {
+        delete: {
+          title: "Confirm",
+          content: `Are you sure you want to move "${service.title}" to trash?`,
+          okText: "Move to Trash",
+          action: () =>
+            deleteService(
+              { ids: [service.id] },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
+        },
+        restore: {
+          title: "Confirm Restore",
+          content: `Are you sure you want to restore "${service.title}"?`,
+          okText: "Restore",
+          action: () =>
+            restoreService(
+              { ids: [service.id] },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
+        },
+        permanentDelete: {
+          title: "Permanent Delete",
+          content: `Are you sure you want to permanently delete "${service.title}"? This action cannot be undone.`,
+          okText: "Delete Permanently",
+          action: () =>
+            permanentDeleteService(
+              { ids: [service.id] },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
+        },
+      };
 
-  const onSuccess = () => {
-    message.success("Operation completed successfully");
-    setSelectedRowKeys([]);
-    setSelectedServices([]);
-    handleQuery(keyword, pageNumber, pageSize);
-  };
+      const config = actionMap[action as keyof typeof actionMap];
+      if (!config) return;
 
-  const onFailure = (error: any) => {
-    message.error(error || "Failed to delete service");
-  };
+      Modal.confirm({
+        title: config.title,
+        content: config.content,
+        okText: config.okText,
+        okType:
+          action === "permanentDelete"
+            ? "danger"
+            : action === "restore"
+            ? "primary"
+            : "danger",
+        cancelText: "Cancel",
+        onOk: () => dispatch(config.action as any),
+      });
+    },
+    [dispatch, session?.accessToken, onSuccess, onFailure]
+  );
 
-  const handleDelete = (service: any) => {
-    Modal.confirm({
-      title: "Confirm",
-      content: `Are you sure you want to move "${service.title}" to trash?`,
-      okText: "Move to Trash",
-      okType: "danger",
-      cancelText: "Cancel",
-      onOk() {
-        dispatch(
-          deleteService(
-            { ids: [service.id] },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
-      },
-    });
-  };
+  const handleBulkAction = useCallback(
+    (action: string) => {
+      if (selection.selectedServices.length === 0) {
+        message.warning(`Please select services to ${action}`);
+        return;
+      }
 
-  const handleRestore = (service: any) => {
-    Modal.confirm({
-      title: "Confirm Restore",
-      content: `Are you sure you want to restore "${service.title}"?`,
-      okText: "Restore",
-      okType: "primary",
-      cancelText: "Cancel",
-      onOk() {
-        dispatch(
-          restoreService(
-            { ids: [service.id] },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
-      },
-    });
-  };
+      const ids = selection.selectedServices.map((service) => service.id);
+      const actionMap = {
+        delete: {
+          title: "Bulk Delete",
+          content: `Are you sure you want to move ${selection.selectedServices.length} service(s) to trash?`,
+          okText: "Move to Trash",
+          action: () =>
+            deleteService(
+              { ids },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
+        },
+        restore: {
+          title: "Bulk Restore",
+          content: `Are you sure you want to restore ${selection.selectedServices.length} service(s)?`,
+          okText: "Restore",
+          action: () =>
+            restoreService(
+              { ids },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
+        },
+        permanentDelete: {
+          title: "Bulk Permanent Delete",
+          content: `Are you sure you want to permanently delete ${selection.selectedServices.length} service(s)? This action cannot be undone.`,
+          okText: "Delete Permanently",
+          action: () =>
+            permanentDeleteService(
+              { ids },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
+        },
+      };
 
-  const handlePermanentDelete = (service: any) => {
-    Modal.confirm({
-      title: "Permanent Delete",
-      content: `Are you sure you want to permanently delete "${service.title}"? This action cannot be undone.`,
-      okText: "Delete Permanently",
-      okType: "danger",
-      cancelText: "Cancel",
-      onOk() {
-        dispatch(
-          permanentDeleteService(
-            { ids: [service.id] },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
-      },
-    });
-  };
+      const config = actionMap[action as keyof typeof actionMap];
+      if (!config) return;
 
-  const handleBulkDelete = () => {
-    if (selectedServices.length === 0) {
-      message.warning("Please select services to delete");
-      return;
+      Modal.confirm({
+        title: config.title,
+        content: config.content,
+        okText: config.okText,
+        okType: action === "permanentDelete" ? "danger" : "primary",
+        cancelText: "Cancel",
+        onOk: () => dispatch(config.action as any),
+      });
+    },
+    [
+      selection.selectedServices,
+      dispatch,
+      session?.accessToken,
+      onSuccess,
+      onFailure,
+    ]
+  );
+
+  const handleFilterChange = useCallback((key: string, value: any) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    if (key === "deleteFlg") {
+      setSelection({ selectedRowKeys: [], selectedServices: [] });
     }
+    setPagination((prev) => ({ ...prev, pageNumber: 1 }));
+  }, []);
 
-    Modal.confirm({
-      title: "Bulk Delete",
-      content: `Are you sure you want to move ${selectedServices.length} service(s) to trash?`,
-      okText: "Move to Trash",
-      okType: "danger",
-      cancelText: "Cancel",
-      onOk() {
-        const ids = selectedServices.map((service) => service.id);
-        dispatch(
-          deleteService(
-            { ids },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
-      },
-    });
-  };
+  const handleSearch = useCallback(
+    (value: string) => {
+      setFilters((prev) => ({ ...prev, keyword: value }));
+      setPagination((prev) => ({ ...prev, pageNumber: 1 }));
+      handleQuery(value, 1, pagination.pageSize);
+    },
+    [handleQuery, pagination.pageSize]
+  );
 
-  const handleBulkRestore = () => {
-    if (selectedServices.length === 0) {
-      message.warning("Please select services to restore");
-      return;
-    }
+  const handlePaginationChange = useCallback(
+    (page: number, pageSize: number) => {
+      handleQuery(filters.keyword, page, pageSize);
+    },
+    [handleQuery, filters.keyword]
+  );
 
-    Modal.confirm({
-      title: "Bulk Restore",
-      content: `Are you sure you want to restore ${selectedServices.length} service(s)?`,
-      okText: "Restore",
-      okType: "primary",
-      cancelText: "Cancel",
-      onOk() {
-        const ids = selectedServices.map((service) => service.id);
-        dispatch(
-          restoreService(
-            { ids },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
-      },
-    });
-  };
+  const handleSelectionChange = useCallback(
+    (selectedRowKeys: React.Key[], selectedRows: Service[]) => {
+      setSelection({ selectedRowKeys, selectedServices: selectedRows });
+    },
+    []
+  );
 
-  const handleBulkPermanentDelete = () => {
-    if (selectedServices.length === 0) {
-      message.warning("Please select services to delete permanently");
-      return;
-    }
+  // Navigation handlers
+  const handleEdit = useCallback(
+    (service: Service) => {
+      router.push(`/admin/service/edit/${service.id}`);
+    },
+    [router]
+  );
 
-    Modal.confirm({
-      title: "Bulk Permanent Delete",
-      content: `Are you sure you want to permanently delete ${selectedServices.length} service(s)? This action cannot be undone.`,
-      okText: "Delete Permanently",
-      okType: "danger",
-      cancelText: "Cancel",
-      onOk() {
-        const ids = selectedServices.map((service) => service.id);
-        dispatch(
-          permanentDeleteService(
-            { ids },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
-      },
-    });
-  };
+  const handleView = useCallback(
+    (service: Service) => {
+      router.push(`/admin/service/${service.id}`);
+    },
+    [router]
+  );
 
-  const handleView = (service: any) => {
-    router.push(`/admin/service/${service.id}`);
-  };
+  const handleCreate = useCallback(() => {
+    router.push("/admin/service/create");
+  }, [router]);
 
+  // Table columns
   const columns = [
     {
       title: "ID",
@@ -292,27 +350,27 @@ const ServiceListPage: React.FC = () => {
       dataIndex: "type",
       key: "type",
       render: (type: number) => (
-        <Tag color={typeMap[type]?.color || "default"}>
-          {typeMap[type]?.label || type}
+        <Tag color={TYPE_MAP[type]?.color || "default"}>
+          {TYPE_MAP[type]?.label || type}
         </Tag>
       ),
     },
     {
       title: "Price",
       key: "price",
-      render: (record: any) => (
+      render: (record: Service) => (
         <div>
           {record.discountedPrice > 0 ? (
             <div>
               <span className="text-red-600 font-medium">
-                ${record?.discountedPrice}
+                ${record.discountedPrice}
               </span>
               <span className="text-gray-400 line-through ml-2">
-                ${record?.originalPrice}
+                ${record.originalPrice}
               </span>
             </div>
           ) : (
-            <span className="font-medium">${record?.originalPrice}</span>
+            <span className="font-medium">${record.originalPrice}</span>
           )}
         </div>
       ),
@@ -332,15 +390,14 @@ const ServiceListPage: React.FC = () => {
       title: "Orders",
       dataIndex: "orderCount",
       key: "orderCount",
-      render: (count: number) => <span>{count}</span>,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
       render: (status: number) => (
-        <Tag color={statusMap[status]?.color || "default"}>
-          {statusMap[status]?.label || status}
+        <Tag color={STATUS_MAP[status]?.color || "default"}>
+          {STATUS_MAP[status]?.label || status}
         </Tag>
       ),
     },
@@ -361,7 +418,7 @@ const ServiceListPage: React.FC = () => {
       title: "Actions",
       key: "actions",
       width: 120,
-      render: (_: any, record: any) => {
+      render: (_: any, record: Service) => {
         const isDeleted = record.deleteFlg === 1;
 
         const menuItems = isDeleted
@@ -370,13 +427,13 @@ const ServiceListPage: React.FC = () => {
                 key: "restore",
                 label: "Restore",
                 icon: <RestOutlined />,
-                onClick: () => handleRestore(record),
+                onClick: () => handleServiceAction("restore", record),
               },
               {
                 key: "permanent-delete",
                 label: "Delete Permanently",
                 icon: <DeleteFilled />,
-                onClick: () => handlePermanentDelete(record),
+                onClick: () => handleServiceAction("permanentDelete", record),
                 danger: true,
               },
             ]
@@ -397,7 +454,7 @@ const ServiceListPage: React.FC = () => {
                 key: "delete",
                 label: "Move to Trash",
                 icon: <DeleteOutlined />,
-                onClick: () => handleDelete(record),
+                onClick: () => handleServiceAction("delete", record),
               },
             ];
 
@@ -410,29 +467,31 @@ const ServiceListPage: React.FC = () => {
     },
   ];
 
+  const isTrashView = filters.deleteFlg === 1;
+
   return (
     <div>
       <h1 className="text-4xl font-bold mb-5">
-        {deleteFlg === 1 ? "Trash" : "Services"}
+        {isTrashView ? "Trash" : "Services"}
       </h1>
 
+      {/* Filters and Actions */}
       <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
         <div className="flex flex-wrap gap-2 items-center">
           <Input.Search
             placeholder="Search services"
             allowClear
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            onSearch={(value) => {
-              setKeyword(value);
-              setPageNumber(1);
-              handleQuery(value, 1, pageSize);
-            }}
+            value={filters.keyword}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, keyword: e.target.value }))
+            }
+            onSearch={handleSearch}
             style={{ width: 200 }}
           />
+
           <Select
-            value={status}
-            onChange={setStatus}
+            value={filters.status}
+            onChange={(value) => handleFilterChange("status", value)}
             className="w-[120px] !h-[40px]"
           >
             <Option value="all">All Status</Option>
@@ -441,21 +500,17 @@ const ServiceListPage: React.FC = () => {
           </Select>
 
           <Select
-            value={deleteFlg}
-            onChange={(value) => {
-              setDeleteFlg(value);
-              setSelectedRowKeys([]);
-              setSelectedServices([]);
-              handleQuery(keyword, 1, pageSize);
-            }}
+            value={filters.deleteFlg}
+            onChange={(value) => handleFilterChange("deleteFlg", value)}
             className="w-[120px] !h-[40px]"
           >
-            <Option value={0}>Active Posts</Option>
+            <Option value={0}>Active Services</Option>
             <Option value={1}>Trash</Option>
           </Select>
+
           <Select
-            value={type}
-            onChange={setType}
+            value={filters.type}
+            onChange={(value) => handleFilterChange("type", value)}
             className="w-[120px] !h-[40px]"
           >
             <Option value="all">All Types</Option>
@@ -463,45 +518,49 @@ const ServiceListPage: React.FC = () => {
             <Option value={1}>Premium</Option>
             <Option value={2}>Enterprise</Option>
           </Select>
+
           <Select
-            value={sortBy}
-            onChange={setSortBy}
+            value={filters.sortBy}
+            onChange={(value) => handleFilterChange("sortBy", value)}
             className="w-[150px] !h-[40px]"
           >
-            {sortFields.map((f) => (
-              <Option key={f.value} value={f.value}>
-                {f.label}
+            {SORT_FIELDS.map((field) => (
+              <Option key={field.value} value={field.value}>
+                {field.label}
               </Option>
             ))}
           </Select>
+
           <Select
-            value={sortDesc}
-            onChange={(v) => setSortDesc(v)}
+            value={filters.sortDesc}
+            onChange={(value) => handleFilterChange("sortDesc", value)}
             className="w-[120px] !h-[40px]"
           >
             <Option value={false}>Ascending</Option>
             <Option value={true}>Descending</Option>
           </Select>
         </div>
+
+        {/* Action Buttons */}
         <div className="flex gap-2">
-          {deleteFlg === 1 ? (
+          {isTrashView ? (
             <>
               <Button
                 type="default"
                 icon={<RestOutlined />}
-                onClick={handleBulkRestore}
-                disabled={selectedServices.length === 0}
+                onClick={() => handleBulkAction("restore")}
+                disabled={selection.selectedServices.length === 0}
               >
-                Restore Selected ({selectedServices.length})
+                Restore Selected ({selection.selectedServices.length})
               </Button>
               <Button
                 type="primary"
                 danger
                 icon={<DeleteFilled />}
-                onClick={handleBulkPermanentDelete}
-                disabled={selectedServices.length === 0}
+                onClick={() => handleBulkAction("permanentDelete")}
+                disabled={selection.selectedServices.length === 0}
               >
-                Delete Permanently ({selectedServices.length})
+                Delete Permanently ({selection.selectedServices.length})
               </Button>
             </>
           ) : (
@@ -510,15 +569,15 @@ const ServiceListPage: React.FC = () => {
                 type="default"
                 danger
                 icon={<DeleteOutlined />}
-                onClick={handleBulkDelete}
-                disabled={selectedServices.length === 0}
+                onClick={() => handleBulkAction("delete")}
+                disabled={selection.selectedServices.length === 0}
               >
-                Move to Trash ({selectedServices.length})
+                Move to Trash ({selection.selectedServices.length})
               </Button>
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                onClick={() => router.push("/admin/service/create")}
+                onClick={handleCreate}
               >
                 Add New Service
               </Button>
@@ -527,29 +586,25 @@ const ServiceListPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Table */}
       <Table
         columns={columns}
         dataSource={serviceList}
         loading={serviceLoading}
         rowKey="id"
         rowSelection={{
-          selectedRowKeys,
-          onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedRowKeys(selectedRowKeys);
-            setSelectedServices(selectedRows);
-          },
+          selectedRowKeys: selection.selectedRowKeys,
+          onChange: handleSelectionChange,
         }}
         pagination={{
-          current: pageNumber,
-          pageSize,
+          current: pagination.pageNumber,
+          pageSize: pagination.pageSize,
           total: serviceTotal,
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total, range) =>
             `${range[0]}-${range[1]} of ${total} items`,
-          onChange: (page, pageSize) => {
-            handleQuery(keyword, page, pageSize);
-          },
+          onChange: handlePaginationChange,
         }}
       />
     </div>

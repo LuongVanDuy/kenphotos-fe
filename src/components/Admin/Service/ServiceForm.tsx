@@ -229,7 +229,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     <Input
                       placeholder="Add service title"
                       style={{ fontSize: "24px", fontWeight: "400" }}
-                      className="!rounded-none"
+                      className="!rounded-lg"
                       onChange={handleTitleChange}
                     />
                   </Form.Item>
@@ -250,7 +250,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     <Input
                       placeholder="service-url-slug"
                       size="small"
-                      className="!rounded-none"
+                      className="!rounded-lg"
                       addonBefore={process.env.NEXT_PUBLIC_LINK}
                       onChange={handleSlugChange}
                       suffix={
@@ -270,13 +270,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   )}
                 </div>
 
-                <div className="rounded-sm">
-                  <div className="bg-gray-50 px-4 py-3 border-t border-x border-gray-300 border ">
+                <div className="rounded-lg border border-gray-300 overflow-hidden">
+                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Content
                     </h3>
                   </div>
-                  <div className="bg-white ">
+                  <div className="bg-white">
                     <Form.Item
                       name="content"
                       labelCol={{ style: { width: "100%" } }}
@@ -297,7 +297,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </div>
                 </div>
 
-                <div className="border border-gray-300 rounded-sm">
+                <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Service Images
@@ -312,7 +312,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       <div>
                         <div className="grid grid-cols-2 gap-6">
                           {selectedImages.map((image, index) => (
-                            <div key={index} className={`p-5 border-2`}>
+                            <div
+                              key={index}
+                              className={`p-5 border-2 rounded-lg`}
+                            >
                               <div className="flex items-center justify-between mb-4 ">
                                 <h4 className="text-lg font-semibold text-gray-700">
                                   Image Pair {index + 1}
@@ -348,7 +351,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                     </Button>
                                   </div>
                                   {image.beforeUrl ? (
-                                    <div className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
+                                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
                                       <Image
                                         src={getImageUrl(image.beforeUrl)}
                                         alt={`Before Image ${index + 1}`}
@@ -357,7 +360,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       />
                                     </div>
                                   ) : (
-                                    <div className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                                    <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
                                       <div className="text-center">
                                         <div className="text-gray-400 mb-2">
                                           <UploadOutlined className="text-2xl" />
@@ -388,7 +391,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                     </Button>
                                   </div>
                                   {image.afterUrl ? (
-                                    <div className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
+                                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
                                       <Image
                                         src={getImageUrl(image.afterUrl)}
                                         alt={`After Image ${index + 1}`}
@@ -397,7 +400,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       />
                                     </div>
                                   ) : (
-                                    <div className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                                    <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
                                       <div className="text-center">
                                         <div className="text-gray-400 mb-2">
                                           <UploadOutlined className="text-2xl" />
@@ -429,7 +432,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </div>
                 </div>
 
-                <div className="border border-gray-300 rounded-sm">
+                <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Service Details
@@ -464,17 +467,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                             {...restField}
                                             name={[name, "label"]}
                                             className="flex-1 !mb-0"
-                                            rules={[
-                                              {
-                                                required: true,
-                                                message: "Required",
-                                              },
-                                            ]}
                                           >
-                                            <TextArea
+                                            <Input
                                               placeholder="Who is this service ideal for?"
-                                              rows={2}
-                                              className="resize-none"
+                                              className="!rounded-lg !h-[40px]"
                                             />
                                           </Form.Item>
                                           <Button
@@ -541,17 +537,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                             {...restField}
                                             name={[name, "label"]}
                                             className="flex-1 !mb-0"
-                                            rules={[
-                                              {
-                                                required: true,
-                                                message: "Required",
-                                              },
-                                            ]}
                                           >
-                                            <TextArea
+                                            <Input
                                               placeholder="What's included in this service?"
-                                              rows={2}
-                                              className="resize-none"
+                                              className="!rounded-lg !h-[40px]"
                                             />
                                           </Form.Item>
                                           <Button
@@ -611,7 +600,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       ({ key, name, ...restField }, idx) => (
                                         <div
                                           key={key}
-                                          className="flex items-center gap-3  bg-white rounded  flex items-start group"
+                                          className="flex  gap-3  bg-white "
                                         >
                                           <Row gutter={16} className="flex-1">
                                             <Col span={12}>
@@ -622,16 +611,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                                   style: { width: "100%" },
                                                 }}
                                                 className="flex-1 !mb-0"
-                                                rules={[
-                                                  {
-                                                    required: true,
-                                                    message: "Required",
-                                                  },
-                                                ]}
                                               >
-                                                <TextArea
+                                                <Input
                                                   placeholder="Add-on name"
-                                                  rows={2}
+                                                  className="!rounded-lg !h-[40px]"
                                                 />
                                               </Form.Item>
                                             </Col>
@@ -644,9 +627,9 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                                 }}
                                                 className="flex-1 !mb-0"
                                               >
-                                                <TextArea
+                                                <Input
                                                   placeholder="Add-on description"
-                                                  rows={2}
+                                                  className="!rounded-lg !h-[40px]"
                                                 />
                                               </Form.Item>
                                             </Col>
@@ -657,7 +640,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                             icon={<DeleteOutlined />}
                                             onClick={() => remove(name)}
                                             size="small"
-                                            className="text-gray-400 hover:text-red-500 mt-5"
+                                            className="text-gray-400 hover:text-red-500 "
                                           />
                                         </div>
                                       )
@@ -702,7 +685,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
             <div className="w-80 flex-shrink-0">
               <div className="space-y-6">
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Publish
@@ -753,7 +736,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Button>
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Pricing
@@ -798,7 +781,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Form.Item>
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Statistics
@@ -828,6 +811,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       <Input
                         placeholder="Order count"
                         style={{ width: "100%" }}
+                        className="!rounded-lg"
                       />
                     </Form.Item>
                   </div>
