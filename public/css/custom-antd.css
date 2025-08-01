@@ -118,3 +118,7 @@ input:-webkit-autofill {
   letter-spacing: 0.01em;
   text-transform: none;
 }
+
+.ant-select {
+  border-radius: 8px !important;
+}

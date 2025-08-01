@@ -106,7 +106,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       setOpen(false);
       form.resetFields();
 
-      // Call onSuccess callback if provided
       if (onSuccess) {
         onSuccess();
       }

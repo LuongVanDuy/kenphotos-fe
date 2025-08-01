@@ -112,17 +112,16 @@ const CustomQuill: React.FC<CustomQuillProps> = ({
         line-height: 1.6;
         color: #1e1e1e;
         background: #fff;
-        border: 1px solid #ddd;
+
         border-top: none;
-        border-radius: 0 0 4px 4px;
+
         min-height: 300px;
       }
 
       /* Toolbar styling - WordPress style */
       .ql-toolbar {
         background: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 4px 4px 0 0;
+
         padding: 8px 12px;
         display: flex;
         flex-wrap: wrap;

@@ -10,6 +10,8 @@ export const slugify = (title: string): string => {
     title
       // Convert to lowercase
       .toLowerCase()
+      // Handle Vietnamese characters
+      .replace(/[đĐ]/g, "d")
       // Remove diacritics (accents)
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")

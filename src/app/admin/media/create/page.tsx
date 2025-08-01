@@ -10,7 +10,6 @@ import {
   message,
   Progress,
   List,
-  Image,
   Typography,
   Tag,
 } from "antd";
@@ -20,11 +19,14 @@ import {
   EyeOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  EditOutlined,
+  CopyOutlined,
 } from "@ant-design/icons";
 import type { UploadProps, UploadFile } from "antd";
 import { uploadMedia } from "@/store/actions/media";
 import { getImageUrl } from "@/utils";
 import { AppDispatch } from "@/store/store";
+import Image from "next/image";
 
 const { Dragger } = Upload;
 const { Title, Text } = Typography;
@@ -131,6 +133,20 @@ const MediaCreatePage: React.FC = () => {
     }
   };
 
+  const handleCopyUrl = async (fileItem: UploadedFile) => {
+    if (fileItem.uploadedUrl) {
+      const fullUrl = getImageUrl(fileItem.uploadedUrl);
+      try {
+        await navigator.clipboard.writeText(fullUrl);
+        message.success("URL copied to clipboard!");
+      } catch (err) {
+        message.error("Failed to copy URL");
+      }
+    } else {
+      message.warning("File not uploaded yet");
+    }
+  };
+
   const uploadProps: UploadProps = {
     fileList: file ? [file] : [],
     multiple: false,
@@ -150,65 +166,72 @@ const MediaCreatePage: React.FC = () => {
   };
 
   const renderFileItem = (fileItem: UploadedFile) => (
-    <List.Item
-      key={fileItem.uid}
-      actions={[
-        <Button
-          key="preview"
-          type="text"
-          icon={<EyeOutlined />}
-          onClick={() => handlePreview(fileItem)}
-          disabled={!fileItem.type?.startsWith("image/")}
-        />,
-        <Button
-          key="remove"
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={handleRemove}
-        />,
-      ]}
-    >
-      <List.Item.Meta
-        avatar={<span className="text-2xl">🖼️</span>}
-        title={
-          <div className="flex items-center gap-2">
-            <span>{fileItem.name}</span>
-            {fileItem.status === "done" && (
-              <CheckCircleOutlined className="text-green-500" />
-            )}
-            {fileItem.status === "error" && (
-              <CloseCircleOutlined className="text-red-500" />
-            )}
+    <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+      {/* Thumbnail */}
+      <div className="flex-shrink-0">
+        {fileItem.status === "done" && fileItem.uploadedUrl ? (
+          <Image
+            src={getImageUrl(fileItem.uploadedUrl)}
+            alt={fileItem.name}
+            width={100}
+            height={100}
+            className="rounded"
+            style={{ objectFit: "cover" }}
+          />
+        ) : fileItem.type?.startsWith("image/") && fileItem.originFileObj ? (
+          <Image
+            src={URL.createObjectURL(fileItem.originFileObj)}
+            alt={fileItem.name}
+            width={100}
+            height={100}
+            className="rounded"
+            style={{ objectFit: "cover" }}
+          />
+        ) : (
+          <div className="w-[100px] h-[100px] bg-gray-200 rounded flex items-center justify-center">
+            <span className="text-2xl">🖼️</span>
           </div>
-        }
-        description={
-          <div>
-            <div className="text-sm text-gray-500">
-              {Math.round((fileItem.size || 0) / 1024)} KB • {fileItem.type}
-            </div>
-            {fileItem.status === "uploading" && (
-              <Progress
-                percent={fileItem.percent || 0}
-                size="small"
-                status="active"
-              />
-            )}
-            {fileItem.status === "done" && fileItem.uploadedUrl && (
-              <Image
-                src={getImageUrl(fileItem.uploadedUrl)}
-                alt={fileItem.name}
-                width={100}
-                height={100}
-                className="mt-2 rounded"
-                style={{ objectFit: "cover" }}
-                preview={false}
-              />
-            )}
+        )}
+      </div>
+
+      {/* File Info */}
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium text-gray-900 truncate">
+          {fileItem.name?.replace(/\.[^/.]+$/, "")}
+        </div>
+        <div className="text-sm text-gray-500">{fileItem.name}</div>
+        {fileItem.status === "uploading" && (
+          <Progress
+            percent={fileItem.percent || 0}
+            size="small"
+            status="active"
+            className="mt-2"
+          />
+        )}
+        {fileItem.status === "done" && (
+          <div className="mt-3">
+            <Button
+              type="default"
+              size="small"
+              icon={<CopyOutlined />}
+              onClick={() => handleCopyUrl(fileItem)}
+              disabled={fileItem.status !== "done"}
+              className="border-blue-300 text-blue-600 hover:border-blue-400 hover:text-blue-700"
+            >
+              Copy URL to clipboard
+            </Button>
           </div>
-        }
-      />
-    </List.Item>
+        )}
+        {fileItem.status === "error" && (
+          <div className="flex items-center gap-1 mt-1">
+            <CloseCircleOutlined className="text-red-500 text-sm" />
+            <span className="text-xs text-red-600">Upload failed</span>
+          </div>
+        )}
+      </div>
+
+      {/* Action Buttons */}
+    </div>
   );
 
   return (
@@ -232,16 +255,7 @@ const MediaCreatePage: React.FC = () => {
           </p>
         </Dragger>
 
-        {file && (
-          <div className="mt-4">
-            <Button onClick={() => setFile(null)}>Clear</Button>
-            <List
-              dataSource={[file]}
-              renderItem={renderFileItem}
-              className="mt-4"
-            />
-          </div>
-        )}
+        {file && <div className="mt-4">{renderFileItem(file)}</div>}
       </Card>
     </div>
   );

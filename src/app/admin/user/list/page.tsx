@@ -125,15 +125,10 @@ const UserListPage: React.FC = () => {
           {record.avatarUrl ? (
             <Avatar
               src={getImageUrl(record.avatarUrl)}
-              style={{ width: 60, height: 40 }}
-              shape="square"
+              style={{ width: 60, height: 60 }}
             />
           ) : (
-            <Avatar
-              style={{ width: 60, height: 40 }}
-              icon={<UserOutlined />}
-              shape="square"
-            />
+            <Avatar style={{ width: 60, height: 60 }} icon={<UserOutlined />} />
           )}
           <div>
             <div className="font-medium">
@@ -241,14 +236,6 @@ const UserListPage: React.FC = () => {
                 {f.label}
               </Option>
             ))}
-          </Select>
-          <Select
-            value={sortDesc}
-            onChange={(v) => setSortDesc(v)}
-            className="!h-[40px] w-40"
-          >
-            <Option value={false}>Ascending</Option>
-            <Option value={true}>Descending</Option>
           </Select>
         </div>
         <Button

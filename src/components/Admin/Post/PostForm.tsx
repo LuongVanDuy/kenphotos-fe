@@ -137,12 +137,10 @@ const PostForm: React.FC<PostFormProps> = ({
   return (
     <>
       <div>
-        <div className="flex items-center justify-between mb-7">
-          <div className="flex items-center space-x-4">
-            <Title level={4} className="!mb-0">
-              {mode === "edit" ? "Edit Post" : "Add New Post"}
-            </Title>
-          </div>
+        <div className="flex items-center justify-between mb-5">
+          <h1 className="text-4xl font-bold ">
+            {mode === "edit" ? "Edit Post" : "Add New Post"}
+          </h1>
         </div>
         <Form
           form={form}
@@ -162,7 +160,6 @@ const PostForm: React.FC<PostFormProps> = ({
                 <div>
                   <Form.Item
                     name="title"
-                    label="Title"
                     labelCol={{ style: { width: "100%" } }}
                     rules={[
                       { required: true, message: "Please enter the title" },
@@ -171,6 +168,7 @@ const PostForm: React.FC<PostFormProps> = ({
                   >
                     <Input
                       placeholder="Add title"
+                      className="!rounded-lg"
                       style={{ fontSize: "24px", fontWeight: "400" }}
                       onChange={handleTitleChange}
                     />
@@ -191,6 +189,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     <Input
                       placeholder="post-url-slug"
                       size="small"
+                      className="!rounded-lg"
                       addonBefore={process.env.NEXT_PUBLIC_LINK}
                       onChange={handleSlugChange}
                       suffix={
@@ -210,13 +209,13 @@ const PostForm: React.FC<PostFormProps> = ({
                   )}
                 </div>
 
-                <div className="rounded-sm">
-                  <div className="bg-gray-50 px-4 py-3 border-t border-x border-gray-300 border ">
+                <div className="rounded-lg border border-gray-300 overflow-hidden">
+                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Content
                     </h3>
                   </div>
-                  <div className="bg-white ">
+                  <div className="bg-white">
                     <Form.Item
                       name="content"
                       labelCol={{ style: { width: "100%" } }}
@@ -236,7 +235,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     </Form.Item>
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-sm">
+                <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Excerpt
@@ -256,6 +255,7 @@ const PostForm: React.FC<PostFormProps> = ({
                         placeholder="Write an excerpt (optional)"
                         rows={4}
                         size="small"
+                        className="!rounded-lg"
                       />
                     </Form.Item>
                   </div>
@@ -264,7 +264,7 @@ const PostForm: React.FC<PostFormProps> = ({
             </div>
             <div className="w-80 flex-shrink-0">
               <div className="space-y-6">
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Publish
@@ -298,7 +298,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     </Button>
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Featured Image
@@ -313,7 +313,7 @@ const PostForm: React.FC<PostFormProps> = ({
                               src={getImageUrl(selectedImage.slug)}
                               alt={selectedImage.title || "Featured Image"}
                               fill
-                              className="object-cover rounded"
+                              className="object-cover rounded-lg"
                             />
                           </div>
                           <div className="absolute top-1 right-1">
@@ -347,8 +347,8 @@ const PostForm: React.FC<PostFormProps> = ({
                     )}
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-lg bg-white">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300 rounded-t-lg">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
+                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Categories
                     </h3>

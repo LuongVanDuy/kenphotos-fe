@@ -9,6 +9,7 @@ import {
   LogoutOutlined,
   AppstoreOutlined,
   FolderOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { signOut } from "next-auth/react";
 import { ReactNode } from "react";
@@ -90,28 +91,6 @@ export const adminMenuConfig: MenuItemConfig[] = [
     ],
   },
   {
-    key: "user",
-    icon: <UserOutlined />,
-    label: "Users",
-    breadcrumbTitle: "Users",
-    children: [
-      {
-        key: "user-list",
-        icon: <UnorderedListOutlined />,
-        label: "All Users",
-        path: "/admin/user/list",
-        breadcrumbTitle: "List",
-      },
-      {
-        key: "user-create",
-        icon: <PlusOutlined />,
-        label: "Add New",
-        path: "/admin/user/create",
-        breadcrumbTitle: "Create New",
-      },
-    ],
-  },
-  {
     key: "service",
     icon: <AppstoreOutlined />,
     label: "Services",
@@ -129,6 +108,50 @@ export const adminMenuConfig: MenuItemConfig[] = [
         icon: <PlusOutlined />,
         label: "Add New",
         path: "/admin/service/create",
+        breadcrumbTitle: "Create New",
+      },
+    ],
+  },
+  {
+    key: "order",
+    icon: <ShoppingCartOutlined />,
+    label: "Orders",
+    breadcrumbTitle: "Orders",
+    children: [
+      {
+        key: "order-list",
+        icon: <UnorderedListOutlined />,
+        label: "All Orders",
+        path: "/admin/order/list",
+        breadcrumbTitle: "List",
+      },
+      {
+        key: "order-create",
+        icon: <PlusOutlined />,
+        label: "Add New",
+        path: "/admin/order/create",
+        breadcrumbTitle: "Create New",
+      },
+    ],
+  },
+  {
+    key: "user",
+    icon: <UserOutlined />,
+    label: "Users",
+    breadcrumbTitle: "Users",
+    children: [
+      {
+        key: "user-list",
+        icon: <UnorderedListOutlined />,
+        label: "All Users",
+        path: "/admin/user/list",
+        breadcrumbTitle: "List",
+      },
+      {
+        key: "user-create",
+        icon: <PlusOutlined />,
+        label: "Add New",
+        path: "/admin/user/create",
         breadcrumbTitle: "Create New",
       },
     ],
@@ -154,10 +177,10 @@ const handleLogout = () => {
     onOk: async () => {
       try {
         // Xóa session và redirect về frontend
-        await signOut({ 
-          redirect: false 
+        await signOut({
+          redirect: false,
         });
-        
+
         // Redirect thủ công về trang login của frontend
         const loginUrl = `${window.location.origin}/auth/login`;
         console.log("Redirecting to:", loginUrl);
@@ -239,9 +262,7 @@ export class AdminMenuHelper {
 
   // Tạo breadcrumbs động
   static getBreadcrumbs(pathname: string): BreadcrumbConfig[] {
-    const breadcrumbs: BreadcrumbConfig[] = [
-      { title: "Dashboard", path: "/admin" },
-    ];
+    const breadcrumbs: BreadcrumbConfig[] = [{ title: "Dashboard", path: "/admin" }];
 
     const pathSegments = pathname.split("/").filter(Boolean);
 
@@ -249,9 +270,7 @@ export class AdminMenuHelper {
       const section = pathSegments[1];
 
       // Tìm section trong menu config
-      const sectionConfig = adminMenuConfig.find(
-        (item) => item.key === section
-      );
+      const sectionConfig = adminMenuConfig.find((item) => item.key === section);
       if (sectionConfig) {
         breadcrumbs.push({
           title: sectionConfig.breadcrumbTitle || sectionConfig.label,
@@ -261,9 +280,7 @@ export class AdminMenuHelper {
         // Nếu có action (như list, create)
         if (pathSegments.length > 2) {
           const action = pathSegments[2];
-          const actionConfig = sectionConfig.children?.find((child) =>
-            child.path?.includes(`/${action}`)
-          );
+          const actionConfig = sectionConfig.children?.find((child) => child.path?.includes(`/${action}`));
 
           if (actionConfig) {
             breadcrumbs.push({
@@ -278,18 +295,13 @@ export class AdminMenuHelper {
   }
 
   // Convert config thành Ant Design menu items
-  static convertToAntdMenuItems(
-    items: MenuItemConfig[],
-    handleNavigation: (path: any) => void
-  ): any[] {
+  static convertToAntdMenuItems(items: MenuItemConfig[], handleNavigation: (path: any) => void): any[] {
     return items.map((item) => ({
       key: item.key,
       icon: item.icon,
       label: item.label,
       onClick: item.path ? () => handleNavigation(item.path) : undefined,
-      children: item.children
-        ? this.convertToAntdMenuItems(item.children, handleNavigation)
-        : undefined,
+      children: item.children ? this.convertToAntdMenuItems(item.children, handleNavigation) : undefined,
     }));
   }
 

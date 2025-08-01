@@ -11,6 +11,7 @@ import {
   Modal,
   Checkbox,
   Typography,
+  Divider,
 } from "antd";
 import { Option } from "antd/es/mentions";
 import { useRouter } from "next/navigation";
@@ -19,10 +20,15 @@ import {
   UploadOutlined,
   UserOutlined,
   CameraOutlined,
+  LockOutlined,
 } from "@ant-design/icons";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
 import { getImageUrl } from "@/utils";
 import Title from "antd/es/typography/Title";
+import { useDispatch } from "react-redux";
+import { changePassword } from "@/store/actions/users";
+import { customMessage } from "@/utils/messageHelper";
+import { getAccessToken } from "@/utils/getAccessToken";
 
 const { Title: AntTitle, Text } = Typography;
 
@@ -31,6 +37,7 @@ interface UserFormProps {
   onFinish: (values: any) => void;
   mode: "create" | "edit";
   loading: boolean;
+  userId?: number;
 }
 
 const UserForm: React.FC<UserFormProps> = ({
@@ -38,10 +45,14 @@ const UserForm: React.FC<UserFormProps> = ({
   onFinish,
   mode,
   loading,
+  userId,
 }) => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   const countryOptions = [
     { value: "AI", label: "AI Anguilla" },
@@ -77,39 +88,64 @@ const UserForm: React.FC<UserFormProps> = ({
     setIsMediaModalOpen(false);
   };
 
+  const handlePasswordChange = async (values: {
+    newPassword: string;
+    confirmPassword: string;
+  }) => {
+    if (!userId) {
+      customMessage.error("User ID is required");
+      return;
+    }
+
+    if (values.newPassword !== values.confirmPassword) {
+      customMessage.error("Passwords do not match");
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      const accessToken = await getAccessToken();
+
+      dispatch(
+        changePassword(
+          userId,
+          {
+            newPassword: values.newPassword,
+            confirmPassword: values.confirmPassword,
+          },
+          accessToken,
+          () => {
+            customMessage.success("Password changed successfully");
+            setShowPasswordChange(false);
+            form?.setFieldsValue({ newPassword: "", confirmPassword: "" });
+            setPasswordLoading(false);
+          },
+          (error: string) => {
+            customMessage.error(error || "Failed to change password");
+            setPasswordLoading(false);
+          }
+        ) as any
+      );
+    } catch (error) {
+      customMessage.error("Authentication required");
+      setPasswordLoading(false);
+    }
+  };
+
   return (
     <>
       <div>
-        <div className="flex items-center justify-between mb-7">
-          <div className="flex items-center space-x-4">
-            <Title level={4} className="!mb-0">
-              {mode === "create" ? "Create New User" : "Edit User Profile"}
-            </Title>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              onClick={() => router.back()}
-              className="!h-[40px] px-8 rounded-lg font-medium border-gray-300 hover:border-gray-400 transition-colors"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              onClick={() => form?.submit()}
-              className="bg-blue-600 border-blue-600 hover:bg-blue-700 !h-[40px] px-8 rounded-lg font-medium shadow-sm transition-colors"
-            >
-              {loading ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
+        <div className="flex items-center justify-between mb-5">
+          <h1 className="text-4xl font-bold ">
+            {mode === "create" ? "Create New User" : "Edit User Profile"}
+          </h1>
         </div>
 
         <Form form={form} layout="vertical" onFinish={onFinish}>
           <div className="flex gap-8">
             <div className="flex-1">
               <div className="space-y-6">
-                <div className="border border-gray-300 rounded-sm bg-white ">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Basic Information
@@ -337,6 +373,118 @@ const UserForm: React.FC<UserFormProps> = ({
                         </Form.Item>
                       </div>
                     )}
+
+                    {mode === "edit" && (
+                      <div className="">
+                        <Divider />
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-2">
+                            <LockOutlined className="text-gray-600" />
+                            <Text className="text-gray-700 font-medium">
+                              Password Management
+                            </Text>
+                          </div>
+                          <Button
+                            type="default"
+                            size="small"
+                            onClick={() =>
+                              setShowPasswordChange(!showPasswordChange)
+                            }
+                            className="!h-[32px] px-4 rounded-lg font-medium border-gray-300 hover:border-blue-400 transition-colors"
+                          >
+                            {showPasswordChange ? "Cancel" : "Change Password"}
+                          </Button>
+                        </div>
+
+                        {showPasswordChange && (
+                          <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                            <Row gutter={24}>
+                              <Col span={12}>
+                                <Form.Item
+                                  name="newPassword"
+                                  label="New Password"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Please enter new password",
+                                    },
+                                    {
+                                      min: 6,
+                                      message:
+                                        "Password must be at least 6 characters",
+                                    },
+                                  ]}
+                                  className="!mb-0"
+                                >
+                                  <Input.Password
+                                    placeholder="Enter new password"
+                                    className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col span={12}>
+                                <Form.Item
+                                  name="confirmPassword"
+                                  label="Confirm Password"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Please confirm password",
+                                    },
+                                    ({ getFieldValue }) => ({
+                                      validator(_, value) {
+                                        if (
+                                          !value ||
+                                          getFieldValue("newPassword") === value
+                                        ) {
+                                          return Promise.resolve();
+                                        }
+                                        return Promise.reject(
+                                          new Error("Passwords do not match")
+                                        );
+                                      },
+                                    }),
+                                  ]}
+                                  className="!mb-0"
+                                >
+                                  <Input.Password
+                                    placeholder="Confirm new password"
+                                    className="!h-[40px] border-gray-300 hover:border-blue-400 focus:border-blue-500 rounded-lg transition-colors"
+                                  />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                            <div className="flex justify-end">
+                              <Button
+                                type="primary"
+                                loading={passwordLoading}
+                                onClick={() => {
+                                  const newPassword =
+                                    form?.getFieldValue("newPassword");
+                                  const confirmPassword =
+                                    form?.getFieldValue("confirmPassword");
+                                  if (newPassword && confirmPassword) {
+                                    handlePasswordChange({
+                                      newPassword,
+                                      confirmPassword,
+                                    });
+                                  } else {
+                                    customMessage.error(
+                                      "Please fill in both password fields"
+                                    );
+                                  }
+                                }}
+                                className="bg-blue-600 border-blue-600 hover:bg-blue-700 !h-[40px] px-6 rounded-lg font-medium shadow-sm transition-colors"
+                              >
+                                {passwordLoading
+                                  ? "Changing..."
+                                  : "Change Password"}
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -348,7 +496,7 @@ const UserForm: React.FC<UserFormProps> = ({
 
             <div className="w-80 flex-shrink-0">
               <div className="space-y-6">
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Profile Picture
@@ -377,6 +525,27 @@ const UserForm: React.FC<UserFormProps> = ({
                           )}
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
+                  <div className="p-4">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        onClick={() => router.back()}
+                        className="!h-[40px] flex-1 px-8 rounded-lg font-medium border-gray-300 hover:border-gray-400 transition-colors"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        onClick={() => form?.submit()}
+                        className="bg-blue-600 flex-1 border-blue-600 hover:bg-blue-700 !h-[40px] px-8 rounded-lg font-medium shadow-sm transition-colors"
+                      >
+                        {loading ? "Saving..." : "Save Changes"}
+                      </Button>
                     </div>
                   </div>
                 </div>

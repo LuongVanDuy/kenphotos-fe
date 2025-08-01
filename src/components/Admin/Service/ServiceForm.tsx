@@ -14,22 +14,23 @@ import {
   Upload,
   message,
   Image,
+  Tabs,
 } from "antd";
 import {
   PlusOutlined,
   MinusCircleOutlined,
   UploadOutlined,
   DeleteOutlined,
+  UserOutlined,
+  CheckCircleOutlined,
+  GiftOutlined,
 } from "@ant-design/icons";
 import CustomQuill from "@/components/UI/CustomQuill";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
-import Title from "antd/es/typography/Title";
 import { getImageUrl } from "@/utils";
 import { slugify } from "@/utils/slugify";
 
 const { TextArea } = Input;
-const { Option } = Select;
-const { Title: AntTitle } = Typography;
 
 interface ServiceFormProps {
   form?: any;
@@ -53,6 +54,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
   const [slugDebounceTimer, setSlugDebounceTimer] =
     useState<NodeJS.Timeout | null>(null);
+  const [currentImageType, setCurrentImageType] = useState<"before" | "after">(
+    "before"
+  );
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(-1);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -63,7 +68,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     };
   }, [slugDebounceTimer]);
 
-  // Auto-generate slug from title (WordPress style)
   const handleTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const title = e.target.value;
@@ -86,7 +90,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     [form, isSlugManuallyEdited, slugDebounceTimer]
   );
 
-  // Handle manual slug editing
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const slug = e.target.value;
     setIsSlugManuallyEdited(true);
@@ -98,12 +101,20 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     }
   };
 
-  // Reset slug manual edit flag when form is reset
   useEffect(() => {
     if (mode === "create") {
       setIsSlugManuallyEdited(false);
     }
   }, [mode]);
+
+  useEffect(() => {
+    if (initialValues?.images && mode === "edit") {
+      setSelectedImages(initialValues.images);
+    } else if (mode === "create") {
+      setSelectedImages([{ beforeUrl: "", afterUrl: "" }]);
+      form.setFieldsValue({ images: [{ beforeUrl: "", afterUrl: "" }] });
+    }
+  }, [initialValues, mode, form]);
 
   const statusOptions = [
     { value: 0, label: "Draft" },
@@ -111,16 +122,25 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   ];
 
   const typeOptions = [
-    { value: 0, label: "Basic" },
-    { value: 1, label: "Premium" },
-    { value: 2, label: "Enterprise" },
+    { value: 0, label: "1" },
+    { value: 1, label: "2" },
+    { value: 2, label: "3" },
   ];
 
   const handleMediaSelect = (media: any) => {
-    const newImages = [...selectedImages, media];
+    const newImages = [...selectedImages];
+
+    // Updating existing image
+    if (currentImageType === "before") {
+      newImages[currentImageIndex].beforeUrl = media.url || media.slug;
+    } else {
+      newImages[currentImageIndex].afterUrl = media.url || media.slug;
+    }
+
     setSelectedImages(newImages);
     form.setFieldsValue({ images: newImages });
     setIsModalMediaOpen(false);
+    setCurrentImageIndex(-1);
   };
 
   const handleRemoveImage = (index: number) => {
@@ -129,12 +149,37 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     form.setFieldsValue({ images: newImages });
   };
 
+  const handleSelectImage = (type: "before" | "after", index: number) => {
+    setCurrentImageType(type);
+    setCurrentImageIndex(index);
+    setIsModalMediaOpen(true);
+  };
+
+  const handleAddImagePair = () => {
+    const newImages = [...selectedImages, { beforeUrl: "", afterUrl: "" }];
+    setSelectedImages(newImages);
+    form.setFieldsValue({ images: newImages });
+  };
+
   const handleFinish = (values: any) => {
     // Validate required arrays
     if (!values.images || values.images.length === 0) {
-      message.error("Please add at least one image");
+      message.error("Please add at least one image pair");
       return;
     }
+
+    // Validate that at least one image pair has both before and after images
+    const hasValidImagePair = values.images.some(
+      (image: any) => image.beforeUrl && image.afterUrl
+    );
+
+    if (!hasValidImagePair) {
+      message.error(
+        "Please add at least one complete image pair (both before and after images)"
+      );
+      return;
+    }
+
     onFinish(values);
   };
 
@@ -145,12 +190,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   return (
     <>
       <div>
-        <div className="flex items-center justify-between mb-7">
-          <div className="flex items-center space-x-4">
-            <Title level={4} className="!mb-0">
-              {mode === "edit" ? "Edit Service" : "Add New Service"}
-            </Title>
-          </div>
+        <div className="flex items-center justify-between mb-5">
+          <h1 className="text-4xl font-bold ">
+            {mode === "edit" ? "Edit Service" : "Add New Service"}
+          </h1>
         </div>
 
         <Form
@@ -158,18 +201,16 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
           layout="vertical"
           onFinish={handleFinish}
           initialValues={{
-            status: 1, // Published by default
+            status: 1,
             type: 0,
             rating: 0,
-            orderCount: 0,
+            orderCount: "",
             originalPrice: 0,
             discountedPrice: 0,
             images: [],
-            styles: [],
-            steps: [],
-            idealFors: [],
-            includes: [],
-            addOns: [],
+            idealFors: [{ label: "" }],
+            includes: [{ label: "" }],
+            addOns: [{ title: "", description: "" }],
             ...initialValues,
           }}
         >
@@ -179,16 +220,16 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                 <div>
                   <Form.Item
                     name="title"
-                    label="Title"
                     labelCol={{ style: { width: "100%" } }}
                     rules={[
                       { required: true, message: "Please enter the title" },
                     ]}
-                    className="!mb-0"
+                    className="!mb-0 "
                   >
                     <Input
                       placeholder="Add service title"
                       style={{ fontSize: "24px", fontWeight: "400" }}
+                      className="!rounded-lg"
                       onChange={handleTitleChange}
                     />
                   </Form.Item>
@@ -209,6 +250,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     <Input
                       placeholder="service-url-slug"
                       size="small"
+                      className="!rounded-lg"
                       addonBefore={process.env.NEXT_PUBLIC_LINK}
                       onChange={handleSlugChange}
                       suffix={
@@ -228,13 +270,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   )}
                 </div>
 
-                <div className="rounded-sm">
-                  <div className="bg-gray-50 px-4 py-3 border-t border-x border-gray-300 border ">
+                <div className="rounded-lg border border-gray-300 overflow-hidden">
+                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Content
                     </h3>
                   </div>
-                  <div className="bg-white ">
+                  <div className="bg-white">
                     <Form.Item
                       name="content"
                       labelCol={{ style: { width: "100%" } }}
@@ -255,405 +297,387 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </div>
                 </div>
 
-                <div className="border border-gray-300 rounded-sm">
+                <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Service Images
                     </h3>
                   </div>
-                  <div className="bg-white p-4">
+                  <div className="bg-white p-6">
                     <Form.Item
                       name="images"
-                      label="Images"
                       labelCol={{ style: { width: "100%" } }}
                       className="!mb-0"
                     >
                       <div>
-                        <Button
-                          type="primary"
-                          size="large"
-                          icon={<UploadOutlined />}
-                          onClick={() => setIsModalMediaOpen(true)}
-                          className="w-full"
-                        >
-                          Add Images
-                        </Button>
-
-                        {selectedImages.length > 0 && (
-                          <div className="grid grid-cols-3 gap-4 mt-4">
-                            {selectedImages.map((image, index) => (
-                              <div key={index} className="relative">
-                                <Image
-                                  src={getImageUrl(image.url || image.slug)}
-                                  alt={image.title || `Image ${index + 1}`}
-                                  className="w-full h-24 object-cover rounded"
-                                />
-                                <div className="absolute top-1 right-1">
+                        <div className="grid grid-cols-2 gap-6">
+                          {selectedImages.map((image, index) => (
+                            <div
+                              key={index}
+                              className={`p-5 border-2 rounded-lg`}
+                            >
+                              <div className="flex items-center justify-between mb-4 ">
+                                <h4 className="text-lg font-semibold text-gray-700">
+                                  Image Pair {index + 1}
+                                </h4>
+                                {selectedImages.length > 1 && (
                                   <Button
                                     type="text"
                                     icon={<DeleteOutlined />}
                                     onClick={() => handleRemoveImage(index)}
                                     size="small"
+                                    className="ml-2 text-gray-400 hover:text-red-500"
+                                    style={{ marginTop: 2 }}
                                   />
+                                )}
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-6">
+                                {/* Before Image */}
+                                <div className="bg-white rounded-lg">
+                                  <div className="flex items-center justify-between mb-3">
+                                    <span className="text-sm font-medium text-gray-600">
+                                      Before Image
+                                    </span>
+                                    <Button
+                                      type="primary"
+                                      size="small"
+                                      onClick={() =>
+                                        handleSelectImage("before", index)
+                                      }
+                                      className="text-blue-600 hover:text-blue-700"
+                                    >
+                                      Select Image
+                                    </Button>
+                                  </div>
+                                  {image.beforeUrl ? (
+                                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
+                                      <Image
+                                        src={getImageUrl(image.beforeUrl)}
+                                        alt={`Before Image ${index + 1}`}
+                                        className="object-cover w-full h-full"
+                                        sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                                      <div className="text-center">
+                                        <div className="text-gray-400 mb-2">
+                                          <UploadOutlined className="text-2xl" />
+                                        </div>
+                                        <span className="text-xs text-gray-500">
+                                          No image selected
+                                        </span>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* After Image */}
+                                <div className="bg-white rounded-lg ">
+                                  <div className="flex items-center justify-between mb-3">
+                                    <span className="text-sm font-medium text-gray-600">
+                                      After Image
+                                    </span>
+                                    <Button
+                                      type="primary"
+                                      size="small"
+                                      onClick={() =>
+                                        handleSelectImage("after", index)
+                                      }
+                                      className="text-blue-600 hover:text-blue-700"
+                                    >
+                                      Select Image
+                                    </Button>
+                                  </div>
+                                  {image.afterUrl ? (
+                                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
+                                      <Image
+                                        src={getImageUrl(image.afterUrl)}
+                                        alt={`After Image ${index + 1}`}
+                                        className="object-cover w-full h-full"
+                                        sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                                      <div className="text-center">
+                                        <div className="text-gray-400 mb-2">
+                                          <UploadOutlined className="text-2xl" />
+                                        </div>
+                                        <span className="text-xs text-gray-500">
+                                          No image selected
+                                        </span>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        )}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex justify-center items-center mt-6">
+                          <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={handleAddImagePair}
+                            className="hover:border-blue-500"
+                            size="large"
+                          >
+                            Add Image Pair
+                          </Button>
+                        </div>
                       </div>
                     </Form.Item>
                   </div>
                 </div>
 
-                {/* Các trường động đều label width 100% */}
-                <div className="border border-gray-300 rounded-sm">
+                <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
-                      Styles
+                      Service Details
                     </h3>
                   </div>
-                  <div className="bg-white p-4">
-                    <Form.List name="styles">
-                      {(fields, { add, remove }) => (
-                        <>
-                          {fields.map(({ key, name, ...restField }) => (
-                            <div
-                              key={key}
-                              className="border border-gray-200 p-4 rounded mb-4"
-                            >
-                              <Row gutter={16}>
-                                <Col span={12}>
-                                  <Form.Item
-                                    {...restField}
-                                    name={[name, "name"]}
-                                    label="Style Name"
-                                    labelCol={{ style: { width: "100%" } }}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "Missing style name",
-                                      },
-                                    ]}
-                                  >
-                                    <Input placeholder="Style name" />
-                                  </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                  <Form.Item
-                                    {...restField}
-                                    name={[name, "description"]}
-                                    label="Description"
-                                    labelCol={{ style: { width: "100%" } }}
-                                  >
-                                    <Input placeholder="Style description" />
-                                  </Form.Item>
-                                </Col>
-                              </Row>
-                              <Button
-                                type="text"
-                                icon={<MinusCircleOutlined />}
-                                onClick={() => remove(name)}
-                                danger
-                              >
-                                Remove Style
-                              </Button>
+                  <div className="bg-white">
+                    <Tabs
+                      defaultActiveKey="idealFor"
+                      tabPosition="left"
+                      style={{ minHeight: 400 }}
+                      className="service-details-tabs"
+                      items={[
+                        {
+                          key: "idealFor",
+                          label: (
+                            <span>
+                              <UserOutlined className="mr-2" /> Ideal For
+                            </span>
+                          ),
+                          children: (
+                            <div className="rounded-r-lg h-full relative p-5">
+                              <Form.List name="idealFors">
+                                {(fields, { add, remove }) => (
+                                  <div className="space-y-5">
+                                    {fields.map(
+                                      ({ key, name, ...restField }, idx) => (
+                                        <div
+                                          key={key}
+                                          className="  bg-white rounded  flex items-start group"
+                                        >
+                                          <Form.Item
+                                            {...restField}
+                                            name={[name, "label"]}
+                                            className="flex-1 !mb-0"
+                                          >
+                                            <Input
+                                              placeholder="Who is this service ideal for?"
+                                              className="!rounded-lg !h-[40px]"
+                                            />
+                                          </Form.Item>
+                                          <Button
+                                            type="text"
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => remove(name)}
+                                            size="small"
+                                            className="ml-2 text-gray-400 hover:text-red-500"
+                                            style={{ marginTop: 2 }}
+                                          />
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                )}
+                              </Form.List>
+
+                              <div className="flex justify-end mt-5">
+                                <Button
+                                  type="primary"
+                                  icon={<PlusOutlined />}
+                                  onClick={() =>
+                                    form.getFieldValue("idealFors")?.length <
+                                      10 &&
+                                    form.getFieldValue("idealFors").length >=
+                                      0 &&
+                                    form.setFieldsValue({
+                                      idealFors: [
+                                        ...(form.getFieldValue("idealFors") ||
+                                          []),
+                                        { label: "" },
+                                      ],
+                                    })
+                                  }
+                                  className="ml-2 hover:border-blue-500"
+                                  size="large"
+                                >
+                                  Add
+                                </Button>
+                              </div>
                             </div>
-                          ))}
-                          <Button
-                            type="dashed"
-                            onClick={() => add()}
-                            icon={<PlusOutlined />}
-                            style={{ width: "100%" }}
-                          >
-                            Add Style
-                          </Button>
-                        </>
-                      )}
-                    </Form.List>
-                  </div>
-                </div>
-                <div className="border border-gray-300 rounded-sm">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Service Steps
-                    </h3>
-                  </div>
-                  <div className="bg-white p-4">
-                    <Form.List name="steps">
-                      {(fields, { add, remove }) => (
-                        <>
-                          {fields.map(({ key, name, ...restField }) => (
-                            <div
-                              key={key}
-                              className="border border-gray-200 p-4 rounded mb-4"
-                            >
-                              <Row gutter={16}>
-                                <Col span={8}>
-                                  <Form.Item
-                                    {...restField}
-                                    name={[name, "stepNumber"]}
-                                    label="Step Number"
-                                    labelCol={{ style: { width: "100%" } }}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "Missing step number",
-                                      },
-                                    ]}
-                                  >
-                                    <InputNumber
-                                      min={1}
-                                      placeholder="1"
-                                      style={{ width: "100%" }}
-                                    />
-                                  </Form.Item>
-                                </Col>
-                                <Col span={16}>
-                                  <Form.Item
-                                    {...restField}
-                                    name={[name, "title"]}
-                                    label="Step Title"
-                                    labelCol={{ style: { width: "100%" } }}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "Missing step title",
-                                      },
-                                    ]}
-                                  >
-                                    <Input placeholder="Step title" />
-                                  </Form.Item>
-                                </Col>
-                              </Row>
-                              <Form.Item
-                                {...restField}
-                                name={[name, "description"]}
-                                label="Description"
-                                labelCol={{ style: { width: "100%" } }}
-                              >
-                                <TextArea
-                                  placeholder="Step description"
-                                  rows={3}
-                                />
-                              </Form.Item>
-                              <Button
-                                type="text"
-                                icon={<MinusCircleOutlined />}
-                                onClick={() => remove(name)}
-                                danger
-                              >
-                                Remove Step
-                              </Button>
+                          ),
+                        },
+                        {
+                          key: "includes",
+                          label: (
+                            <span>
+                              <CheckCircleOutlined className="mr-2" /> What's
+                              Included
+                            </span>
+                          ),
+                          children: (
+                            <div className="rounded-r-lg h-full relative p-5">
+                              <Form.List name="includes">
+                                {(fields, { add, remove }) => (
+                                  <div className="space-y-5">
+                                    {fields.map(
+                                      ({ key, name, ...restField }, idx) => (
+                                        <div
+                                          key={key}
+                                          className="  bg-white rounded  flex items-start group"
+                                        >
+                                          <Form.Item
+                                            {...restField}
+                                            name={[name, "label"]}
+                                            className="flex-1 !mb-0"
+                                          >
+                                            <Input
+                                              placeholder="What's included in this service?"
+                                              className="!rounded-lg !h-[40px]"
+                                            />
+                                          </Form.Item>
+                                          <Button
+                                            type="text"
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => remove(name)}
+                                            size="small"
+                                            className="ml-2 text-gray-400 hover:text-red-500"
+                                            style={{ marginTop: 2 }}
+                                          />
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                )}
+                              </Form.List>
+
+                              <div className="flex justify-end items-center mt-5">
+                                <Button
+                                  type="primary"
+                                  icon={<PlusOutlined />}
+                                  onClick={() =>
+                                    form.getFieldValue("includes")?.length <
+                                      10 &&
+                                    form.getFieldValue("includes").length >=
+                                      0 &&
+                                    form.setFieldsValue({
+                                      includes: [
+                                        ...(form.getFieldValue("includes") ||
+                                          []),
+                                        { label: "" },
+                                      ],
+                                    })
+                                  }
+                                  className="ml-2 hover:border-blue-500"
+                                  size="large"
+                                >
+                                  Add
+                                </Button>
+                              </div>
                             </div>
-                          ))}
-                          <Button
-                            type="dashed"
-                            onClick={() => add()}
-                            icon={<PlusOutlined />}
-                            style={{ width: "100%" }}
-                          >
-                            Add Step
-                          </Button>
-                        </>
-                      )}
-                    </Form.List>
-                  </div>
-                </div>
-                <div className="border border-gray-300 rounded-sm">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Ideal For
-                    </h3>
-                  </div>
-                  <div className="bg-white p-4">
-                    <Form.List name="idealFors">
-                      {(fields, { add, remove }) => (
-                        <>
-                          {fields.map(({ key, name, ...restField }) => (
-                            <div
-                              key={key}
-                              className="border border-gray-200 p-4 rounded mb-4"
-                            >
-                              <Form.Item
-                                {...restField}
-                                name={[name, "description"]}
-                                label="Ideal For"
-                                labelCol={{ style: { width: "100%" } }}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Missing description",
-                                  },
-                                ]}
-                              >
-                                <TextArea
-                                  placeholder="Who is this service ideal for?"
-                                  rows={2}
-                                />
-                              </Form.Item>
-                              <Button
-                                type="text"
-                                icon={<MinusCircleOutlined />}
-                                onClick={() => remove(name)}
-                                danger
-                              >
-                                Remove
-                              </Button>
+                          ),
+                        },
+                        {
+                          key: "addOns",
+                          label: (
+                            <span>
+                              <GiftOutlined className="mr-2" /> Add-ons
+                            </span>
+                          ),
+                          children: (
+                            <div className="rounded-r-lg h-full relative p-5">
+                              <Form.List name="addOns">
+                                {(fields, { add, remove }) => (
+                                  <div className="space-y-5">
+                                    {fields.map(
+                                      ({ key, name, ...restField }, idx) => (
+                                        <div
+                                          key={key}
+                                          className="flex  gap-3  bg-white "
+                                        >
+                                          <Row gutter={16} className="flex-1">
+                                            <Col span={12}>
+                                              <Form.Item
+                                                {...restField}
+                                                name={[name, "title"]}
+                                                labelCol={{
+                                                  style: { width: "100%" },
+                                                }}
+                                                className="flex-1 !mb-0"
+                                              >
+                                                <Input
+                                                  placeholder="Add-on name"
+                                                  className="!rounded-lg !h-[40px]"
+                                                />
+                                              </Form.Item>
+                                            </Col>
+                                            <Col span={12}>
+                                              <Form.Item
+                                                {...restField}
+                                                name={[name, "description"]}
+                                                labelCol={{
+                                                  style: { width: "100%" },
+                                                }}
+                                                className="flex-1 !mb-0"
+                                              >
+                                                <Input
+                                                  placeholder="Add-on description"
+                                                  className="!rounded-lg !h-[40px]"
+                                                />
+                                              </Form.Item>
+                                            </Col>
+                                          </Row>
+
+                                          <Button
+                                            type="text"
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => remove(name)}
+                                            size="small"
+                                            className="text-gray-400 hover:text-red-500 "
+                                          />
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                )}
+                              </Form.List>
+
+                              <div className="flex justify-end items-center mb-4">
+                                <Button
+                                  type="primary"
+                                  icon={<PlusOutlined />}
+                                  onClick={() =>
+                                    form.getFieldValue("addOns")?.length < 10 &&
+                                    form.getFieldValue("addOns").length >= 0 &&
+                                    form.setFieldsValue({
+                                      addOns: [
+                                        ...(form.getFieldValue("addOns") || []),
+                                        {
+                                          title: "",
+                                          price: 0,
+                                          description: "",
+                                        },
+                                      ],
+                                    })
+                                  }
+                                  className="mt-5"
+                                  size="large"
+                                >
+                                  Add
+                                </Button>
+                              </div>
                             </div>
-                          ))}
-                          <Button
-                            type="dashed"
-                            onClick={() => add()}
-                            icon={<PlusOutlined />}
-                            style={{ width: "100%" }}
-                          >
-                            Add Ideal For
-                          </Button>
-                        </>
-                      )}
-                    </Form.List>
-                  </div>
-                </div>
-                <div className="border border-gray-300 rounded-sm">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      What's Included
-                    </h3>
-                  </div>
-                  <div className="bg-white p-4">
-                    <Form.List name="includes">
-                      {(fields, { add, remove }) => (
-                        <>
-                          {fields.map(({ key, name, ...restField }) => (
-                            <div
-                              key={key}
-                              className="border border-gray-200 p-4 rounded mb-4"
-                            >
-                              <Form.Item
-                                {...restField}
-                                name={[name, "item"]}
-                                label="Included Item"
-                                labelCol={{ style: { width: "100%" } }}
-                                rules={[
-                                  { required: true, message: "Missing item" },
-                                ]}
-                              >
-                                <Input placeholder="What's included in this service?" />
-                              </Form.Item>
-                              <Button
-                                type="text"
-                                icon={<MinusCircleOutlined />}
-                                onClick={() => remove(name)}
-                                danger
-                              >
-                                Remove
-                              </Button>
-                            </div>
-                          ))}
-                          <Button
-                            type="dashed"
-                            onClick={() => add()}
-                            icon={<PlusOutlined />}
-                            style={{ width: "100%" }}
-                          >
-                            Add Included Item
-                          </Button>
-                        </>
-                      )}
-                    </Form.List>
-                  </div>
-                </div>
-                <div className="border border-gray-300 rounded-sm">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Add-ons
-                    </h3>
-                  </div>
-                  <div className="bg-white p-4">
-                    <Form.List name="addOns">
-                      {(fields, { add, remove }) => (
-                        <>
-                          {fields.map(({ key, name, ...restField }) => (
-                            <div
-                              key={key}
-                              className="border border-gray-200 p-4 rounded mb-4"
-                            >
-                              <Row gutter={16}>
-                                <Col span={12}>
-                                  <Form.Item
-                                    {...restField}
-                                    name={[name, "name"]}
-                                    label="Add-on Name"
-                                    labelCol={{ style: { width: "100%" } }}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "Missing add-on name",
-                                      },
-                                    ]}
-                                  >
-                                    <Input placeholder="Add-on name" />
-                                  </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                  <Form.Item
-                                    {...restField}
-                                    name={[name, "price"]}
-                                    label="Price"
-                                    labelCol={{ style: { width: "100%" } }}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "Missing price",
-                                      },
-                                    ]}
-                                  >
-                                    <InputNumber
-                                      min={0}
-                                      placeholder="0.00"
-                                      style={{ width: "100%" }}
-                                      formatter={(value) =>
-                                        `$ ${value}`.replace(
-                                          /\B(?=(\d{3})+(?!\d))/g,
-                                          ","
-                                        )
-                                      }
-                                    />
-                                  </Form.Item>
-                                </Col>
-                              </Row>
-                              <Form.Item
-                                {...restField}
-                                name={[name, "description"]}
-                                label="Description"
-                                labelCol={{ style: { width: "100%" } }}
-                              >
-                                <TextArea
-                                  placeholder="Add-on description"
-                                  rows={2}
-                                />
-                              </Form.Item>
-                              <Button
-                                type="text"
-                                icon={<MinusCircleOutlined />}
-                                onClick={() => remove(name)}
-                                danger
-                              >
-                                Remove Add-on
-                              </Button>
-                            </div>
-                          ))}
-                          <Button
-                            type="dashed"
-                            onClick={() => add()}
-                            icon={<PlusOutlined />}
-                            style={{ width: "100%" }}
-                          >
-                            Add Add-on
-                          </Button>
-                        </>
-                      )}
-                    </Form.List>
+                          ),
+                        },
+                      ]}
+                    />
                   </div>
                 </div>
               </div>
@@ -661,7 +685,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
             <div className="w-80 flex-shrink-0">
               <div className="space-y-6">
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Publish
@@ -712,7 +736,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Button>
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Pricing
@@ -757,7 +781,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Form.Item>
                   </div>
                 </div>
-                <div className="border border-gray-300 rounded-sm bg-white">
+                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Statistics
@@ -784,10 +808,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       labelCol={{ style: { width: "100%" } }}
                       className="!mb-0"
                     >
-                      <InputNumber
-                        min={0}
-                        placeholder="0"
+                      <Input
+                        placeholder="Order count"
                         style={{ width: "100%" }}
+                        className="!rounded-lg"
                       />
                     </Form.Item>
                   </div>

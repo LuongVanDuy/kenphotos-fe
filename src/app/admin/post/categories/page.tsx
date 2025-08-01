@@ -10,6 +10,7 @@ import {
   Dropdown,
   Space,
   message,
+  Switch,
 } from "antd";
 import { PlusOutlined, FolderOutlined, MoreOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -42,6 +43,7 @@ export type TableListItem = {
   id: number;
   name: string;
   description: string;
+  isDefault?: boolean;
   action: any;
 };
 
@@ -116,12 +118,13 @@ const CategoryPage: React.FC = () => {
       key: "isDefault",
       align: "center",
       width: 100,
-      render: (isDefault: boolean) =>
-        isDefault ? (
-          <span style={{ color: "#52c41a", fontWeight: 600 }}>Default</span>
-        ) : (
-          <span style={{ color: "#aaa" }}>—</span>
-        ),
+      render: (isDefault: boolean, record: any) => (
+        <Switch
+          checked={isDefault}
+          onChange={(checked) => handleSetDefault(record, checked)}
+          size="small"
+        />
+      ),
     },
     {
       title: "Actions",
@@ -129,12 +132,6 @@ const CategoryPage: React.FC = () => {
       width: 120,
       render: (_: any, record: any) => {
         const menuItems = [
-          {
-            key: "view",
-            label: "View",
-            icon: <EyeOutlined />,
-            onClick: () => handleView(record),
-          },
           {
             key: "edit",
             label: "Edit",
@@ -147,12 +144,6 @@ const CategoryPage: React.FC = () => {
             icon: <DeleteOutlined />,
             onClick: () => handleDelete(record),
             danger: true,
-          },
-          {
-            key: "setDefault",
-            label: "Set Default",
-            icon: <StarOutlined />,
-            onClick: () => handleSetDefault(record),
             disabled: record.isDefault,
           },
         ];
@@ -193,6 +184,13 @@ const CategoryPage: React.FC = () => {
   };
 
   const handleDelete = (cat: any) => {
+    if (cat.isDefault) {
+      message.warning(
+        "Cannot delete default category. Please set another category as default first."
+      );
+      return;
+    }
+
     Modal.confirm({
       title: "Confirm Delete",
       content: `Are you sure you want to delete "${cat.name}"? This action cannot be undone.`,
@@ -223,6 +221,17 @@ const CategoryPage: React.FC = () => {
       return;
     }
 
+    // Check if any selected category is default
+    const defaultCategories = selectedCategories.filter((cat) => cat.isDefault);
+    if (defaultCategories.length > 0) {
+      message.warning(
+        `Cannot delete default category(ies): ${defaultCategories
+          .map((cat) => cat.name)
+          .join(", ")}. Please set another category as default first.`
+      );
+      return;
+    }
+
     Modal.confirm({
       title: "Bulk Delete",
       content: `Are you sure you want to delete ${selectedCategories.length} category(ies)? This action cannot be undone.`,
@@ -248,10 +257,6 @@ const CategoryPage: React.FC = () => {
     });
   };
 
-  const handleView = (record: any) => {
-    setSelectedCategory(record);
-  };
-
   const handleEdit = (record: any) => {
     setEditingId(record.id);
     setModalMode("edit");
@@ -259,27 +264,50 @@ const CategoryPage: React.FC = () => {
     setSelectedCategory(null);
   };
 
-  const handleSetDefault = (cat: any) => {
-    Modal.confirm({
-      title: "Set as Default",
-      content: `Are you sure you want to set "${cat.name}" as the default category?`,
-      okText: "Set Default",
-      okType: "primary",
-      cancelText: "Cancel",
-      onOk() {
-        dispatch(
-          updateCategoryDefault(
-            { id: cat.id, data: { isDefault: true } },
-            session?.accessToken || "",
-            () => {
-              message.success("Set as default successfully");
-              handleQuery(keyword, pageNumber, pageSize);
-            },
-            (error) => message.error(error || "Failed to set default")
-          ) as any
-        );
-      },
-    });
+  const handleSetDefault = (cat: any, checked: boolean) => {
+    if (checked) {
+      Modal.confirm({
+        title: "Set as Default",
+        content: `Are you sure you want to set "${cat.name}" as the default category?`,
+        okText: "Set Default",
+        okType: "primary",
+        cancelText: "Cancel",
+        onOk() {
+          dispatch(
+            updateCategoryDefault(
+              { id: cat.id, data: { isDefault: true } },
+              session?.accessToken || "",
+              () => {
+                message.success("Set as default successfully");
+                handleQuery(keyword, pageNumber, pageSize);
+              },
+              (error) => message.error(error || "Failed to set default")
+            ) as any
+          );
+        },
+      });
+    } else {
+      Modal.confirm({
+        title: "Remove Default",
+        content: `Are you sure you want to remove "${cat.name}" as the default category?`,
+        okText: "Remove Default",
+        okType: "danger",
+        cancelText: "Cancel",
+        onOk() {
+          dispatch(
+            updateCategoryDefault(
+              { id: cat.id, data: { isDefault: false } },
+              session?.accessToken || "",
+              () => {
+                message.success("Removed default successfully");
+                handleQuery(keyword, pageNumber, pageSize);
+              },
+              (error) => message.error(error || "Failed to remove default")
+            ) as any
+          );
+        },
+      });
+    }
   };
 
   return (
@@ -364,6 +392,9 @@ const CategoryPage: React.FC = () => {
             setSelectedRowKeys(selectedRowKeys);
             setSelectedCategories(selectedRows);
           },
+          getCheckboxProps: (record) => ({
+            disabled: record.isDefault,
+          }),
         }}
         pagination={{
           current: pageNumber,

@@ -30,20 +30,25 @@
   gap: 12px;
   max-height: 400px;
   overflow-y: auto;
+  padding: 8px;
 }
 
-.media-grid .ant-card {
+.media-item {
   cursor: pointer;
   transition: all 0.2s ease;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.media-grid .ant-card:hover {
+.media-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.media-grid .ant-card-body {
-  padding: 8px;
+.media-item.selected {
+  border: 2px solid #1890ff;
+  background-color: #f0f8ff;
 }
 
 /* Upload Area Styles */
@@ -99,6 +104,11 @@
   border-top: 1px solid #f0f0f0;
 }
 
+.ant-tabs-content , .ant-tabs-tabpane {
+  height: 100% !important;
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .media-filters-row {
@@ -113,6 +123,14 @@
   .media-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 8px;
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .media-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 6px;
   }
 }
 
@@ -142,12 +160,6 @@
   color: #fa8c16;
 }
 
-/* Selected State */
-.media-item.selected {
-  border: 2px solid #1890ff;
-  background-color: #f0f8ff;
-}
-
 /* Empty State */
 .media-empty {
   text-align: center;
@@ -158,4 +170,17 @@
 .media-empty .anticon {
   font-size: 48px;
   margin-bottom: 16px;
+}
+
+/* Image container styles */
+.media-item .relative {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.media-item img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
 }
