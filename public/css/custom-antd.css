@@ -22,7 +22,7 @@
 /* Default button */
 .ant-btn-default {
   background: #fff !important;
-  color: #2563eb !important;
+  color: black !important;
   box-shadow: none !important;
   transition: background 0.2s, border 0.2s;
 }
@@ -121,4 +121,12 @@ input:-webkit-autofill {
 
 .ant-select {
   border-radius: 8px !important;
+}
+
+.ant-tabs-tab-btn {
+  color: #18181b !important;
+}
+
+.ant-tabs-ink-bar {
+  background: #18181b !important;
 }

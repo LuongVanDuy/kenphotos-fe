@@ -77,13 +77,13 @@ const UserListPage: React.FC = () => {
   };
 
   const onSuccess = () => {
-    message.success("Post deleted successfully");
+    message.success("User deleted successfully");
     handleQuery(keyword, pageNumber, pageSize);
   };
 
   const onFailure = (error: any) => {
     message.error(error);
-    message.error(error || "Failed to delete post");
+    message.error(error || "Failed to delete user");
   };
 
   const handleDelete = async (user: any) => {
@@ -121,20 +121,27 @@ const UserListPage: React.FC = () => {
       title: "User",
       key: "user",
       render: (_: any, record: any) => (
-        <Space>
-          {record.avatarUrl ? (
-            <Avatar
-              src={getImageUrl(record.avatarUrl)}
-              style={{ width: 60, height: 60 }}
-            />
-          ) : (
-            <Avatar style={{ width: 60, height: 60 }} icon={<UserOutlined />} />
-          )}
-          <div>
-            <div className="font-medium">
-              {record.firstName} {record.lastName}
+        <Space direction="vertical" size="small" className="w-full">
+          <div className="flex items-center gap-2">
+            {record.avatarUrl ? (
+              <Avatar
+                src={getImageUrl(record.avatarUrl)}
+                style={{ width: 50, height: 50 }}
+              />
+            ) : (
+              <Avatar
+                style={{ width: 50, height: 50 }}
+                icon={<UserOutlined />}
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm lg:text-base truncate">
+                {record.firstName} {record.lastName}
+              </div>
+              <div className="text-xs lg:text-sm text-gray-500 truncate">
+                {record.email}
+              </div>
             </div>
-            <div className="text-sm text-gray-500">{record.email}</div>
           </div>
         </Space>
       ),
@@ -144,8 +151,10 @@ const UserListPage: React.FC = () => {
       key: "business",
       render: (_: any, record: any) => (
         <div>
-          <div className="font-medium">{record.businessName}</div>
-          <div className="text-sm text-gray-500">{record.country}</div>
+          <div className="font-medium text-sm truncate">
+            {record.businessName}
+          </div>
+          <div className="text-xs text-gray-500">{record.country}</div>
         </div>
       ),
     },
@@ -155,7 +164,9 @@ const UserListPage: React.FC = () => {
       render: (_: any, record: any) => (
         <div>
           <div className="text-sm">{record.phoneNumber}</div>
-          <div className="text-xs text-gray-500">{record.timezone}</div>
+          <div className="text-xs text-gray-500 truncate">
+            {record.timezone}
+          </div>
         </div>
       ),
     },
@@ -175,7 +186,7 @@ const UserListPage: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      width: 120,
+      width: 80,
       render: (_: any, record: any) => (
         <Dropdown
           menu={{
@@ -202,7 +213,7 @@ const UserListPage: React.FC = () => {
           }}
           trigger={["click"]}
         >
-          <Button type="text" icon={<MoreOutlined />} />
+          <Button type="text" icon={<MoreOutlined />} size="small" />
         </Dropdown>
       ),
     },
@@ -210,10 +221,10 @@ const UserListPage: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-5">Users</h1>
+      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">Users</h1>
 
-      <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
-        <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-col lg:flex-row gap-3 lg:gap-2 mb-4 lg:mb-6 items-start lg:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full lg:w-auto">
           <Input.Search
             placeholder="Search users"
             allowClear
@@ -224,12 +235,15 @@ const UserListPage: React.FC = () => {
               setPageNumber(1);
               handleQuery(value, 1, pageSize);
             }}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: "300px" }}
+            size="middle"
           />
           <Select
             value={sortBy}
             onChange={setSortBy}
-            className="w-40 !h-[40px]"
+            className="flex-1 sm:flex-none"
+            style={{ minWidth: "150px" }}
+            size="middle"
           >
             {sortFields.map((f) => (
               <Option key={f.value} value={f.value}>
@@ -242,29 +256,36 @@ const UserListPage: React.FC = () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => router.push("/admin/user/create")}
+          size="middle"
+          block={window.innerWidth < 640}
         >
           Add New User
         </Button>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={userList}
-        loading={userLoading}
-        rowKey="id"
-        pagination={{
-          current: pageNumber,
-          pageSize,
-          total: userTotal,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
-          onChange: (page, pageSize) => {
-            handleQuery(keyword, page, pageSize);
-          },
-        }}
-      />
+      <div className="overflow-x-auto">
+        <Table
+          columns={columns}
+          dataSource={userList}
+          loading={userLoading}
+          rowKey="id"
+          pagination={{
+            current: pageNumber,
+            pageSize,
+            total: userTotal,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) => {
+              handleQuery(keyword, page, pageSize);
+            },
+            responsive: true,
+            size: "small",
+          }}
+          scroll={{ x: 800 }}
+        />
+      </div>
     </div>
   );
 };

@@ -42,17 +42,8 @@ const UpdateUser: React.FC = () => {
 
   useEffect(() => {
     if (formField && Object.keys(formField).length) {
-      form.setFieldsValue({
-        firstName: formField.firstName,
-        lastName: formField.lastName,
-        email: formField.email,
-        phoneNumber: formField.phoneNumber,
-        businessName: formField.businessName,
-        country: formField.country,
-        timezone: formField.timezone,
-        postalCode: formField.postalCode,
-        businessWebsite: formField.businessWebsite,
-      });
+      form.setFieldsValue(formField);
+      console.log(formField);
     }
   }, [formField]);
 

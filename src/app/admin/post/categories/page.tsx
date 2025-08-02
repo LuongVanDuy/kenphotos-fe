@@ -11,6 +11,7 @@ import {
   Space,
   message,
   Switch,
+  Tag,
 } from "antd";
 import { PlusOutlined, FolderOutlined, MoreOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -91,10 +92,13 @@ const CategoryPage: React.FC = () => {
       render: (text: any, record: any) => {
         const prefix = Array(record.level).fill("—").join(" ");
         return (
-          <span style={{ fontWeight: "500", color: "#2271b1" }}>
-            {prefix ? `${prefix} ` : ""}
-            {text}
-          </span>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+            <span style={{ fontWeight: "500", color: "#2271b1" }}>
+              {prefix ? `${prefix} ` : ""}
+              {text}
+            </span>
+            {record.isDefault && <Tag color="blue">Default</Tag>}
+          </div>
         );
       },
     },
@@ -104,12 +108,13 @@ const CategoryPage: React.FC = () => {
       key: "description",
       search: false,
       width: "40%",
+      responsive: ["md"],
       render: (text: any) => {
         if (!text) return null;
         const plainText = stripHtml(text);
         const truncated =
-          plainText.length > 200 ? plainText.slice(0, 200) + "..." : plainText;
-        return <span>{truncated}</span>;
+          plainText.length > 100 ? plainText.slice(0, 100) + "..." : plainText;
+        return <span className="text-sm">{truncated}</span>;
       },
     },
     {
@@ -118,6 +123,7 @@ const CategoryPage: React.FC = () => {
       key: "isDefault",
       align: "center",
       width: 100,
+      responsive: ["lg"],
       render: (isDefault: boolean, record: any) => (
         <Switch
           checked={isDefault}
@@ -129,7 +135,7 @@ const CategoryPage: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      width: 120,
+      width: 80,
       render: (_: any, record: any) => {
         const menuItems = [
           {
@@ -149,7 +155,7 @@ const CategoryPage: React.FC = () => {
         ];
         return (
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
-            <Button type="text" icon={<MoreOutlined />} />
+            <Button type="text" icon={<MoreOutlined />} size="small" />
           </Dropdown>
         );
       },
@@ -200,12 +206,10 @@ const CategoryPage: React.FC = () => {
       onOk() {
         dispatch(
           permanentDeleteCategory(
-            { ids: [cat.id] },
+            cat.id,
             session?.accessToken || "",
             () => {
               message.success("Category deleted successfully");
-              setSelectedRowKeys([]);
-              setSelectedCategories([]);
               handleQuery(keyword, pageNumber, pageSize);
             },
             (error) => message.error(error || "Failed to delete category")
@@ -221,13 +225,10 @@ const CategoryPage: React.FC = () => {
       return;
     }
 
-    // Check if any selected category is default
-    const defaultCategories = selectedCategories.filter((cat) => cat.isDefault);
-    if (defaultCategories.length > 0) {
+    const hasDefault = selectedCategories.some((cat) => cat.isDefault);
+    if (hasDefault) {
       message.warning(
-        `Cannot delete default category(ies): ${defaultCategories
-          .map((cat) => cat.name)
-          .join(", ")}. Please set another category as default first.`
+        "Cannot delete default category. Please set another category as default first."
       );
       return;
     }
@@ -239,20 +240,22 @@ const CategoryPage: React.FC = () => {
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        const ids = selectedCategories.map((cat) => cat.id);
-        dispatch(
-          permanentDeleteCategory(
-            { ids },
-            session?.accessToken || "",
-            () => {
-              message.success("Categories deleted successfully");
-              setSelectedRowKeys([]);
-              setSelectedCategories([]);
-              handleQuery(keyword, pageNumber, pageSize);
-            },
-            (error) => message.error(error || "Failed to delete categories")
-          ) as any
+        const promises = selectedCategories.map((cat) =>
+          dispatch(
+            permanentDeleteCategory(
+              cat.id,
+              session?.accessToken || "",
+              () => {},
+              (error) => message.error(error || "Failed to delete category")
+            ) as any
+          )
         );
+        Promise.all(promises).then(() => {
+          message.success("Categories deleted successfully");
+          setSelectedRowKeys([]);
+          setSelectedCategories([]);
+          handleQuery(keyword, pageNumber, pageSize);
+        });
       },
     });
   };
@@ -261,7 +264,6 @@ const CategoryPage: React.FC = () => {
     setEditingId(record.id);
     setModalMode("edit");
     setShowModal(true);
-    setSelectedCategory(null);
   };
 
   const handleSetDefault = (cat: any, checked: boolean) => {
@@ -269,19 +271,19 @@ const CategoryPage: React.FC = () => {
       Modal.confirm({
         title: "Set as Default",
         content: `Are you sure you want to set "${cat.name}" as the default category?`,
-        okText: "Set Default",
+        okText: "Yes",
         okType: "primary",
-        cancelText: "Cancel",
+        cancelText: "No",
         onOk() {
           dispatch(
             updateCategoryDefault(
-              { id: cat.id, data: { isDefault: true } },
+              cat.id,
               session?.accessToken || "",
               () => {
-                message.success("Set as default successfully");
+                message.success("Default category updated successfully");
                 handleQuery(keyword, pageNumber, pageSize);
               },
-              (error) => message.error(error || "Failed to set default")
+              (error) => message.error(error || "Failed to update default")
             ) as any
           );
         },
@@ -290,13 +292,13 @@ const CategoryPage: React.FC = () => {
       Modal.confirm({
         title: "Remove Default",
         content: `Are you sure you want to remove "${cat.name}" as the default category?`,
-        okText: "Remove Default",
+        okText: "Yes",
         okType: "danger",
-        cancelText: "Cancel",
+        cancelText: "No",
         onOk() {
           dispatch(
             updateCategoryDefault(
-              { id: cat.id, data: { isDefault: false } },
+              cat.id,
               session?.accessToken || "",
               () => {
                 message.success("Removed default successfully");
@@ -312,31 +314,31 @@ const CategoryPage: React.FC = () => {
 
   return (
     <div className="">
-      <h1 className="text-4xl font-bold mb-5">Categories</h1>
+      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">
+        Categories
+      </h1>
 
-      <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex items-center gap-2">
-            <Input.Search
-              placeholder="Search categories..."
-              allowClear
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              onSearch={(value) => {
-                setKeyword(value);
-                setPageNumber(1);
-                handleQuery(value, 1, pageSize);
-              }}
-              className="!w-[250px]"
-              size="large"
-            />
-          </div>
-          <div className="flex items-center gap-2">
+      <div className="flex flex-col lg:flex-row gap-3 lg:gap-2 mb-4 lg:mb-6 items-start lg:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full lg:w-auto">
+          <Input.Search
+            placeholder="Search categories..."
+            allowClear
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onSearch={(value) => {
+              setKeyword(value);
+              setPageNumber(1);
+              handleQuery(value, 1, pageSize);
+            }}
+            style={{ width: "100%", maxWidth: "300px" }}
+            size="middle"
+          />
+          <div className="flex gap-2 w-full sm:w-auto">
             <Select
               value={sortBy}
               onChange={setSortBy}
-              style={{ width: 150 }}
-              size="large"
+              style={{ minWidth: "120px" }}
+              size="middle"
             >
               {sortFields.map((f) => (
                 <Option key={f.value} value={f.value}>
@@ -347,68 +349,75 @@ const CategoryPage: React.FC = () => {
             <Select
               value={sortDesc}
               onChange={(v) => setSortDesc(v)}
-              style={{ width: 120 }}
-              size="large"
+              style={{ minWidth: "100px" }}
+              size="middle"
             >
-              <Option value={false}>Ascending</Option>
-              <Option value={true}>Descending</Option>
+              <Option value={false}>Asc</Option>
+              <Option value={true}>Desc</Option>
             </Select>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
           <Button
             type="default"
             danger
             icon={<DeleteOutlined />}
             onClick={handleBulkDelete}
             disabled={selectedCategories.length === 0}
+            size="middle"
+            block={window.innerWidth < 640}
           >
             Delete Selected ({selectedCategories.length})
           </Button>
           <Button
             type="primary"
-            size="large"
+            size="middle"
             icon={<PlusOutlined />}
             onClick={() => {
               setEditingId(null);
               setModalMode("create");
               setShowModal(true);
             }}
-            className="shadow-md"
+            block={window.innerWidth < 640}
           >
             Add New Category
           </Button>
         </div>
       </div>
 
-      <Table<TableListItem>
-        columns={columns}
-        dataSource={categoryList}
-        loading={categoryLoading}
-        rowKey="id"
-        rowSelection={{
-          selectedRowKeys,
-          onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedRowKeys(selectedRowKeys);
-            setSelectedCategories(selectedRows);
-          },
-          getCheckboxProps: (record) => ({
-            disabled: record.isDefault,
-          }),
-        }}
-        pagination={{
-          current: pageNumber,
-          pageSize,
-          total: categoryTotal,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
-          onChange: (page, pageSize) => {
-            handleQuery(keyword, page, pageSize);
-          },
-        }}
-      />
+      <div className="overflow-x-auto">
+        <Table<TableListItem>
+          columns={columns}
+          dataSource={categoryList}
+          loading={categoryLoading}
+          rowKey="id"
+          rowSelection={{
+            selectedRowKeys,
+            onChange: (selectedRowKeys, selectedRows) => {
+              setSelectedRowKeys(selectedRowKeys);
+              setSelectedCategories(selectedRows);
+            },
+            getCheckboxProps: (record) => ({
+              disabled: record.isDefault,
+            }),
+          }}
+          pagination={{
+            current: pageNumber,
+            pageSize,
+            total: categoryTotal,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) => {
+              handleQuery(keyword, page, pageSize);
+            },
+            responsive: true,
+            size: "small",
+          }}
+          scroll={{ x: 600 }}
+        />
+      </div>
 
       {selectedCategory && (
         <Modal
@@ -437,7 +446,8 @@ const CategoryPage: React.FC = () => {
               Close
             </Button>,
           ]}
-          width={600}
+          width="90%"
+          style={{ maxWidth: 600 }}
         >
           <div className="space-y-4">
             <div>
@@ -447,7 +457,7 @@ const CategoryPage: React.FC = () => {
             <div>
               <Text strong>Slug:</Text>
               <Paragraph className="!mb-0">
-                <code className="bg-gray-100 px-2 py-1 rounded">
+                <code className="bg-gray-100 px-2 py-1 rounded text-sm break-all">
                   {selectedCategory.slug}
                 </code>
               </Paragraph>

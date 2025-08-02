@@ -138,7 +138,7 @@ const PostForm: React.FC<PostFormProps> = ({
     <>
       <div>
         <div className="flex items-center justify-between mb-5">
-          <h1 className="text-4xl font-bold ">
+          <h1 className="text-2xl md:text-4xl font-bold">
             {mode === "edit" ? "Edit Post" : "Add New Post"}
           </h1>
         </div>
@@ -154,9 +154,9 @@ const PostForm: React.FC<PostFormProps> = ({
           <Form.Item name="thumbnail" style={{ display: "none" }}>
             <Input />
           </Form.Item>
-          <div className="flex gap-8">
-            <div className="flex-1">
-              <div className="space-y-6">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+            <div className="flex-1 min-w-0">
+              <div className="space-y-4 lg:space-y-6">
                 <div>
                   <Form.Item
                     name="title"
@@ -169,7 +169,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     <Input
                       placeholder="Add title"
                       className="!rounded-lg"
-                      style={{ fontSize: "24px", fontWeight: "400" }}
+                      style={{ fontSize: "18px", fontWeight: "400" }}
                       onChange={handleTitleChange}
                     />
                   </Form.Item>
@@ -194,7 +194,7 @@ const PostForm: React.FC<PostFormProps> = ({
                       onChange={handleSlugChange}
                       suffix={
                         !isSlugManuallyEdited && (
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-400 hidden sm:inline">
                             Auto-generated from title
                           </span>
                         )
@@ -210,7 +210,7 @@ const PostForm: React.FC<PostFormProps> = ({
                 </div>
 
                 <div className="rounded-lg border border-gray-300 overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Content
                     </h3>
@@ -226,7 +226,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     >
                       <CustomQuill
                         placeholder="Start writing or type / to choose a block..."
-                        style={{ minHeight: "400px" }}
+                        style={{ minHeight: "300px" }}
                         className="quill-editor"
                         onChange={(value) =>
                           form.setFieldsValue({ content: value })
@@ -236,12 +236,12 @@ const PostForm: React.FC<PostFormProps> = ({
                   </div>
                 </div>
                 <div className="border border-gray-300 rounded-lg overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Excerpt
                     </h3>
                   </div>
-                  <div className="bg-white p-4">
+                  <div className="bg-white p-3 lg:p-4">
                     <Form.Item
                       name="excerpt"
                       label="Excerpt"
@@ -262,16 +262,16 @@ const PostForm: React.FC<PostFormProps> = ({
                 </div>
               </div>
             </div>
-            <div className="w-80 flex-shrink-0">
-              <div className="space-y-6">
+            <div className="w-full lg:w-80 flex-shrink-0">
+              <div className="space-y-4 lg:space-y-6">
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Publish
                     </h3>
                   </div>
-                  <div className="p-4 space-y-4">
-                    <div className="flex justify-between items-center">
+                  <div className="p-3 lg:p-4 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                       <span className="text-sm text-gray-600">Status:</span>
                       <Form.Item
                         name="status"
@@ -283,7 +283,7 @@ const PostForm: React.FC<PostFormProps> = ({
                       >
                         <Select
                           size="small"
-                          style={{ width: 120 }}
+                          style={{ width: "100%", maxWidth: "120px" }}
                           options={statusOptions}
                         />
                       </Form.Item>
@@ -299,16 +299,16 @@ const PostForm: React.FC<PostFormProps> = ({
                   </div>
                 </div>
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Featured Image
                     </h3>
                   </div>
-                  <div className="p-4">
+                  <div className="p-3 lg:p-4">
                     {selectedImage ? (
                       <div className="space-y-3">
                         <div className="relative">
-                          <div className="relative w-full h-32">
+                          <div className="relative w-full h-24 sm:h-32">
                             <Image
                               src={getImageUrl(selectedImage.slug)}
                               alt={selectedImage.title || "Featured Image"}
@@ -330,6 +330,7 @@ const PostForm: React.FC<PostFormProps> = ({
                           size="small"
                           icon={<PictureOutlined />}
                           onClick={() => setIsModalMediaOpen(true)}
+                          block
                         >
                           Replace Image
                         </Button>
@@ -348,12 +349,12 @@ const PostForm: React.FC<PostFormProps> = ({
                   </div>
                 </div>
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Categories
                     </h3>
                   </div>
-                  <div className="p-4">
+                  <div className="p-3 lg:p-4">
                     <Form.Item
                       name="categoryIds"
                       label="Categories"

@@ -130,7 +130,7 @@ const MediaListPage: React.FC = () => {
   const renderGridView = () => (
     <div className="media-library-content">
       {/* Media Grid */}
-      <div className="media-grid grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+      <div className="media-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-4">
         {mediaList.map((item: Media) => (
           <div key={item.id} className="aspect-square">
             <MediaItem
@@ -184,8 +184,10 @@ const MediaListPage: React.FC = () => {
       key: "name",
       render: (text: string, record: Media) => (
         <div>
-          <div className="font-medium">{text}</div>
-          <div className="text-sm text-gray-500">
+          <div className="font-medium text-sm lg:text-base truncate">
+            {text}
+          </div>
+          <div className="text-xs lg:text-sm text-gray-500">
             Uploaded by {record.uploadedBy.firstName}{" "}
             {record.uploadedBy.lastName}
           </div>
@@ -204,55 +206,62 @@ const MediaListPage: React.FC = () => {
       title: "Date",
       dataIndex: "createdTime",
       key: "createdTime",
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      render: (date: string) => (
+        <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
+      ),
     },
   ];
 
   return (
     <div className="media-library-container">
       {/* Header */}
-      <div className="media-library-header">
-        <div className="flex justify-between items-center">
+      <div className="media-library-header mb-4 lg:mb-6">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 lg:justify-between lg:items-center">
           <div>
-            <Title level={2} className="mb-1">
+            <Title level={2} className="mb-1 text-xl lg:text-2xl">
               Media Library
             </Title>
-            <Text className="text-gray-600">
+            <Text className="text-gray-600 text-sm lg:text-base">
               Manage your media files and assets
             </Text>
           </div>
-          <Space>
+          <div className="flex flex-col sm:flex-row gap-2 lg:gap-0 lg:items-center">
             {selectedMedia.length > 0 && (
               <Button
                 type="default"
                 danger
                 icon={<DeleteOutlined />}
                 onClick={handleBulkDelete}
+                size="middle"
+                block={window.innerWidth < 640}
               >
                 Delete Selected ({selectedMedia.length})
               </Button>
             )}
-            <Button.Group>
+            <div className="flex gap-1">
+              <Button.Group size="middle">
+                <Button
+                  type={viewMode === "grid" ? "primary" : "default"}
+                  icon={<AppstoreOutlined />}
+                  onClick={() => setViewMode("grid")}
+                />
+                <Button
+                  type={viewMode === "list" ? "primary" : "default"}
+                  icon={<UnorderedListOutlined />}
+                  onClick={() => setViewMode("list")}
+                />
+              </Button.Group>
               <Button
-                type={viewMode === "grid" ? "primary" : "default"}
-                icon={<AppstoreOutlined />}
-                onClick={() => setViewMode("grid")}
-              />
-              <Button
-                type={viewMode === "list" ? "primary" : "default"}
-                icon={<UnorderedListOutlined />}
-                onClick={() => setViewMode("list")}
-              />
-            </Button.Group>
-            <Button
-              type="primary"
-              icon={<UploadOutlined />}
-              onClick={() => router.push("/admin/media/create")}
-              size="large"
-            >
-              Add New
-            </Button>
-          </Space>
+                type="primary"
+                icon={<UploadOutlined />}
+                onClick={() => router.push("/admin/media/create")}
+                size="middle"
+              >
+                <span className="hidden sm:inline">Add New</span>
+                <span className="sm:hidden">Add</span>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -260,27 +269,32 @@ const MediaListPage: React.FC = () => {
       {viewMode === "grid" ? (
         renderGridView()
       ) : (
-        <Table
-          columns={tableColumns}
-          dataSource={mediaList}
-          loading={mediaLoading}
-          rowKey="id"
-          rowSelection={{
-            selectedRowKeys,
-            onChange: (selectedRowKeys, selectedRows) => {
-              setSelectedRowKeys(selectedRowKeys);
-              setSelectedMedia(selectedRows);
-            },
-          }}
-          pagination={{
-            current: pageNumber,
-            pageSize,
-            total: mediaTotal,
-            onChange: (page, pageSize) => {
-              handleQuery(searchKeyword, page, pageSize);
-            },
-          }}
-        />
+        <div className="overflow-x-auto">
+          <Table
+            columns={tableColumns}
+            dataSource={mediaList}
+            loading={mediaLoading}
+            rowKey="id"
+            rowSelection={{
+              selectedRowKeys,
+              onChange: (selectedRowKeys, selectedRows) => {
+                setSelectedRowKeys(selectedRowKeys);
+                setSelectedMedia(selectedRows);
+              },
+            }}
+            pagination={{
+              current: pageNumber,
+              pageSize,
+              total: mediaTotal,
+              onChange: (page, pageSize) => {
+                handleQuery(searchKeyword, page, pageSize);
+              },
+              responsive: true,
+              size: "small",
+            }}
+            scroll={{ x: 600 }}
+          />
+        </div>
       )}
     </div>
   );

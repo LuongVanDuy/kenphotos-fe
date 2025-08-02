@@ -166,15 +166,15 @@ const MediaCreatePage: React.FC = () => {
   };
 
   const renderFileItem = (fileItem: UploadedFile) => (
-    <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
       {/* Thumbnail */}
       <div className="flex-shrink-0">
         {fileItem.status === "done" && fileItem.uploadedUrl ? (
           <Image
             src={getImageUrl(fileItem.uploadedUrl)}
             alt={fileItem.name}
-            width={100}
-            height={100}
+            width={80}
+            height={80}
             className="rounded"
             style={{ objectFit: "cover" }}
           />
@@ -182,14 +182,14 @@ const MediaCreatePage: React.FC = () => {
           <Image
             src={URL.createObjectURL(fileItem.originFileObj)}
             alt={fileItem.name}
-            width={100}
-            height={100}
+            width={80}
+            height={80}
             className="rounded"
             style={{ objectFit: "cover" }}
           />
         ) : (
-          <div className="w-[100px] h-[100px] bg-gray-200 rounded flex items-center justify-center">
-            <span className="text-2xl">🖼️</span>
+          <div className="w-[80px] h-[80px] bg-gray-200 rounded flex items-center justify-center">
+            <span className="text-xl sm:text-2xl">🖼️</span>
           </div>
         )}
       </div>
@@ -199,7 +199,9 @@ const MediaCreatePage: React.FC = () => {
         <div className="text-sm font-medium text-gray-900 truncate">
           {fileItem.name?.replace(/\.[^/.]+$/, "")}
         </div>
-        <div className="text-sm text-gray-500">{fileItem.name}</div>
+        <div className="text-xs sm:text-sm text-gray-500 truncate">
+          {fileItem.name}
+        </div>
         {fileItem.status === "uploading" && (
           <Progress
             percent={fileItem.percent || 0}
@@ -209,7 +211,7 @@ const MediaCreatePage: React.FC = () => {
           />
         )}
         {fileItem.status === "done" && (
-          <div className="mt-3">
+          <div className="mt-3 flex flex-col sm:flex-row gap-2">
             <Button
               type="default"
               size="small"
@@ -218,7 +220,8 @@ const MediaCreatePage: React.FC = () => {
               disabled={fileItem.status !== "done"}
               className="border-blue-300 text-blue-600 hover:border-blue-400 hover:text-blue-700"
             >
-              Copy URL to clipboard
+              <span className="hidden sm:inline">Copy URL to clipboard</span>
+              <span className="sm:hidden">Copy URL</span>
             </Button>
           </div>
         )}
@@ -229,16 +232,16 @@ const MediaCreatePage: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Action Buttons */}
     </div>
   );
 
   return (
     <div className="">
-      <div className="mb-6">
-        <Title level={2}>Upload Images</Title>
-        <Text type="secondary">
+      <div className="mb-4 lg:mb-6">
+        <Title level={2} className="text-xl lg:text-2xl mb-2">
+          Upload Images
+        </Title>
+        <Text type="secondary" className="text-sm lg:text-base">
           Drag & drop or click to upload. JPG, PNG, GIF, WebP, SVG supported.
           Max 2MB.
         </Text>
@@ -249,8 +252,10 @@ const MediaCreatePage: React.FC = () => {
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
-          <p className="ant-upload-text">Click or drag image to upload</p>
-          <p className="ant-upload-hint">
+          <p className="ant-upload-text text-sm lg:text-base">
+            Click or drag image to upload
+          </p>
+          <p className="ant-upload-hint text-xs lg:text-sm">
             Only image files supported. Max 2MB.
           </p>
         </Dragger>

@@ -343,7 +343,11 @@ const ServiceListPage: React.FC = () => {
       title: "Title",
       dataIndex: "title",
       key: "title",
-      render: (title: string) => <span className="font-medium">{title}</span>,
+      render: (title: string) => (
+        <span className="font-medium text-sm lg:text-base truncate">
+          {title}
+        </span>
+      ),
     },
     {
       title: "Type",
@@ -362,15 +366,15 @@ const ServiceListPage: React.FC = () => {
         <div>
           {record.discountedPrice > 0 ? (
             <div>
-              <span className="text-red-600 font-medium">
+              <span className="text-red-600 font-medium text-sm">
                 ${record.discountedPrice}
               </span>
-              <span className="text-gray-400 line-through ml-2">
+              <span className="text-gray-400 line-through ml-2 text-xs">
                 ${record.originalPrice}
               </span>
             </div>
           ) : (
-            <span className="font-medium">${record.originalPrice}</span>
+            <span className="font-medium text-sm">${record.originalPrice}</span>
           )}
         </div>
       ),
@@ -382,7 +386,7 @@ const ServiceListPage: React.FC = () => {
       render: (rating: number) => (
         <div className="flex items-center">
           <span className="text-yellow-500">★</span>
-          <span className="ml-1">{rating?.toFixed(1)}</span>
+          <span className="ml-1 text-sm">{rating?.toFixed(1)}</span>
         </div>
       ),
     },
@@ -390,6 +394,7 @@ const ServiceListPage: React.FC = () => {
       title: "Orders",
       dataIndex: "orderCount",
       key: "orderCount",
+      render: (count: number) => <span className="text-sm">{count}</span>,
     },
     {
       title: "Status",
@@ -417,7 +422,7 @@ const ServiceListPage: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      width: 120,
+      width: 80,
       render: (_: any, record: Service) => {
         const isDeleted = record.deleteFlg === 1;
 
@@ -471,13 +476,13 @@ const ServiceListPage: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-5">
+      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">
         {isTrashView ? "Trash" : "Services"}
       </h1>
 
       {/* Filters and Actions */}
-      <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
-        <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-col lg:flex-row gap-3 lg:gap-2 mb-4 lg:mb-6 items-start lg:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full lg:w-auto">
           <Input.Search
             placeholder="Search services"
             allowClear
@@ -486,63 +491,78 @@ const ServiceListPage: React.FC = () => {
               setFilters((prev) => ({ ...prev, keyword: e.target.value }))
             }
             onSearch={handleSearch}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: "300px" }}
+            size="middle"
           />
 
-          <Select
-            value={filters.status}
-            onChange={(value) => handleFilterChange("status", value)}
-            className="w-[120px] !h-[40px]"
-          >
-            <Option value="all">All Status</Option>
-            <Option value={0}>Draft</Option>
-            <Option value={1}>Published</Option>
-          </Select>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Select
+              value={filters.status}
+              onChange={(value) => handleFilterChange("status", value)}
+              className="flex-1 sm:flex-none"
+              style={{ minWidth: "120px" }}
+              size="middle"
+            >
+              <Option value="all">All Status</Option>
+              <Option value={0}>Draft</Option>
+              <Option value={1}>Published</Option>
+            </Select>
 
-          <Select
-            value={filters.deleteFlg}
-            onChange={(value) => handleFilterChange("deleteFlg", value)}
-            className="w-[120px] !h-[40px]"
-          >
-            <Option value={0}>Active Services</Option>
-            <Option value={1}>Trash</Option>
-          </Select>
+            <Select
+              value={filters.deleteFlg}
+              onChange={(value) => handleFilterChange("deleteFlg", value)}
+              className="flex-1 sm:flex-none"
+              style={{ minWidth: "120px" }}
+              size="middle"
+            >
+              <Option value={0}>Active Services</Option>
+              <Option value={1}>Trash</Option>
+            </Select>
 
-          <Select
-            value={filters.type}
-            onChange={(value) => handleFilterChange("type", value)}
-            className="w-[120px] !h-[40px]"
-          >
-            <Option value="all">All Types</Option>
-            <Option value={0}>Basic</Option>
-            <Option value={1}>Premium</Option>
-            <Option value={2}>Enterprise</Option>
-          </Select>
+            <Select
+              value={filters.type}
+              onChange={(value) => handleFilterChange("type", value)}
+              className="flex-1 sm:flex-none"
+              style={{ minWidth: "120px" }}
+              size="middle"
+            >
+              <Option value="all">All Types</Option>
+              <Option value={0}>Basic</Option>
+              <Option value={1}>Premium</Option>
+              <Option value={2}>Enterprise</Option>
+            </Select>
+          </div>
 
-          <Select
-            value={filters.sortBy}
-            onChange={(value) => handleFilterChange("sortBy", value)}
-            className="w-[150px] !h-[40px]"
-          >
-            {SORT_FIELDS.map((field) => (
-              <Option key={field.value} value={field.value}>
-                {field.label}
-              </Option>
-            ))}
-          </Select>
+          {/* <div className="flex gap-2 w-full sm:w-auto">
+            <Select
+              value={filters.sortBy}
+              onChange={(value) => handleFilterChange("sortBy", value)}
+              className="flex-1 sm:flex-none"
+              style={{ minWidth: "120px" }}
+              size="middle"
+            >
+              {SORT_FIELDS.map((field) => (
+                <Option key={field.value} value={field.value}>
+                  {field.label}
+                </Option>
+              ))}
+            </Select>
 
-          <Select
-            value={filters.sortDesc}
-            onChange={(value) => handleFilterChange("sortDesc", value)}
-            className="w-[120px] !h-[40px]"
-          >
-            <Option value={false}>Ascending</Option>
-            <Option value={true}>Descending</Option>
-          </Select>
+            <Select
+              value={filters.sortDesc}
+              onChange={(value) => handleFilterChange("sortDesc", value)}
+              className="flex-1 sm:flex-none"
+              style={{ minWidth: "100px" }}
+              size="middle"
+            >
+              <Option value={false}>Asc</Option>
+              <Option value={true}>Desc</Option>
+            </Select>
+          </div> */}
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
           {isTrashView ? (
             <>
               <Button
@@ -550,6 +570,8 @@ const ServiceListPage: React.FC = () => {
                 icon={<RestOutlined />}
                 onClick={() => handleBulkAction("restore")}
                 disabled={selection.selectedServices.length === 0}
+                size="middle"
+                block={window.innerWidth < 640}
               >
                 Restore Selected ({selection.selectedServices.length})
               </Button>
@@ -559,6 +581,8 @@ const ServiceListPage: React.FC = () => {
                 icon={<DeleteFilled />}
                 onClick={() => handleBulkAction("permanentDelete")}
                 disabled={selection.selectedServices.length === 0}
+                size="middle"
+                block={window.innerWidth < 640}
               >
                 Delete Permanently ({selection.selectedServices.length})
               </Button>
@@ -571,6 +595,8 @@ const ServiceListPage: React.FC = () => {
                 icon={<DeleteOutlined />}
                 onClick={() => handleBulkAction("delete")}
                 disabled={selection.selectedServices.length === 0}
+                size="middle"
+                block={window.innerWidth < 640}
               >
                 Move to Trash ({selection.selectedServices.length})
               </Button>
@@ -578,6 +604,8 @@ const ServiceListPage: React.FC = () => {
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={handleCreate}
+                size="middle"
+                block={window.innerWidth < 640}
               >
                 Add New Service
               </Button>
@@ -587,26 +615,31 @@ const ServiceListPage: React.FC = () => {
       </div>
 
       {/* Table */}
-      <Table
-        columns={columns}
-        dataSource={serviceList}
-        loading={serviceLoading}
-        rowKey="id"
-        rowSelection={{
-          selectedRowKeys: selection.selectedRowKeys,
-          onChange: handleSelectionChange,
-        }}
-        pagination={{
-          current: pagination.pageNumber,
-          pageSize: pagination.pageSize,
-          total: serviceTotal,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
-          onChange: handlePaginationChange,
-        }}
-      />
+      <div className="overflow-x-auto">
+        <Table
+          columns={columns}
+          dataSource={serviceList}
+          loading={serviceLoading}
+          rowKey="id"
+          rowSelection={{
+            selectedRowKeys: selection.selectedRowKeys,
+            onChange: handleSelectionChange,
+          }}
+          pagination={{
+            current: pagination.pageNumber,
+            pageSize: pagination.pageSize,
+            total: serviceTotal,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} items`,
+            onChange: handlePaginationChange,
+            responsive: true,
+            size: "small",
+          }}
+          scroll={{ x: 800 }}
+        />
+      </div>
     </div>
   );
 };

@@ -15,7 +15,7 @@ import {
 } from "antd";
 import { Option } from "antd/es/mentions";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   UploadOutlined,
   UserOutlined,
@@ -81,6 +81,17 @@ const UserForm: React.FC<UserFormProps> = ({
     { value: "Australia/Sydney", label: "Sydney (AEDT)" },
   ];
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const avatarUrl = form?.getFieldValue("avatarUrl");
+      if (avatarUrl) {
+        setAvatarUrl(getImageUrl(avatarUrl));
+      }
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [form]);
+
   const handleAvatarSelect = (media: any) => {
     const imageUrl = getImageUrl(media.slug);
     setAvatarUrl(imageUrl);
@@ -135,27 +146,27 @@ const UserForm: React.FC<UserFormProps> = ({
   return (
     <>
       <div>
-        <div className="flex items-center justify-between mb-5">
-          <h1 className="text-4xl font-bold ">
+        <div className="flex items-center justify-between mb-4 lg:mb-5">
+          <h1 className="text-2xl md:text-4xl font-bold">
             {mode === "create" ? "Create New User" : "Edit User Profile"}
           </h1>
         </div>
 
         <Form form={form} layout="vertical" onFinish={onFinish}>
-          <div className="flex gap-8">
-            <div className="flex-1">
-              <div className="space-y-6">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+            <div className="flex-1 min-w-0">
+              <div className="space-y-4 lg:space-y-6">
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Basic Information
                     </h3>
                   </div>
 
-                  <div className=" flex flex-col gap-5 p-8">
+                  <div className="flex flex-col gap-4 lg:gap-5 p-4 lg:p-8">
                     <div className="">
-                      <Row gutter={24}>
-                        <Col span={12}>
+                      <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12}>
                           <Form.Item
                             name="firstName"
                             label="First Name"
@@ -173,7 +184,7 @@ const UserForm: React.FC<UserFormProps> = ({
                             />
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                           <Form.Item
                             name="lastName"
                             label="Last Name"
@@ -194,9 +205,9 @@ const UserForm: React.FC<UserFormProps> = ({
                       </Row>
                     </div>
 
-                    <div className=" space-y-4">
-                      <Row gutter={24}>
-                        <Col span={12}>
+                    <div className="space-y-4">
+                      <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12}>
                           <Form.Item
                             name="businessName"
                             label="Business Name"
@@ -214,7 +225,7 @@ const UserForm: React.FC<UserFormProps> = ({
                             />
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                           <Form.Item
                             name="email"
                             label="Email"
@@ -235,8 +246,8 @@ const UserForm: React.FC<UserFormProps> = ({
                         </Col>
                       </Row>
 
-                      <Row gutter={24}>
-                        <Col span={12}>
+                      <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12}>
                           <Form.Item
                             name="country"
                             label="Country"
@@ -264,7 +275,7 @@ const UserForm: React.FC<UserFormProps> = ({
                             </Select>
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                           <Form.Item
                             name="phoneNumber"
                             label="Phone Number"
@@ -285,8 +296,8 @@ const UserForm: React.FC<UserFormProps> = ({
                         </Col>
                       </Row>
 
-                      <Row gutter={24}>
-                        <Col span={12}>
+                      <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12}>
                           <Form.Item
                             name="timezone"
                             label="Timezone"
@@ -314,7 +325,7 @@ const UserForm: React.FC<UserFormProps> = ({
                             </Select>
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                           <Form.Item
                             name="postalCode"
                             label="Postal Code"
@@ -377,7 +388,7 @@ const UserForm: React.FC<UserFormProps> = ({
                     {mode === "edit" && (
                       <div className="">
                         <Divider />
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                           <div className="flex items-center space-x-2">
                             <LockOutlined className="text-gray-600" />
                             <Text className="text-gray-700 font-medium">
@@ -390,16 +401,16 @@ const UserForm: React.FC<UserFormProps> = ({
                             onClick={() =>
                               setShowPasswordChange(!showPasswordChange)
                             }
-                            className="!h-[32px] px-4 rounded-lg font-medium border-gray-300 hover:border-blue-400 transition-colors"
+                            className="!h-[32px] px-4 rounded-lg font-medium"
                           >
                             {showPasswordChange ? "Cancel" : "Change Password"}
                           </Button>
                         </div>
 
                         {showPasswordChange && (
-                          <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                            <Row gutter={24}>
-                              <Col span={12}>
+                          <div className="space-y-4 p-3 lg:p-4 bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                            <Row gutter={[16, 16]}>
+                              <Col xs={24} sm={12}>
                                 <Form.Item
                                   name="newPassword"
                                   label="New Password"
@@ -422,7 +433,7 @@ const UserForm: React.FC<UserFormProps> = ({
                                   />
                                 </Form.Item>
                               </Col>
-                              <Col span={12}>
+                              <Col xs={24} sm={12}>
                                 <Form.Item
                                   name="confirmPassword"
                                   label="Confirm Password"
@@ -483,8 +494,29 @@ const UserForm: React.FC<UserFormProps> = ({
                             </div>
                           </div>
                         )}
+                        <Divider />
                       </div>
                     )}
+
+                    <div className="flex flex-col sm:flex-row justify-end gap-2">
+                      <Button
+                        onClick={() => router.back()}
+                        className="!h-[40px]"
+                        block={window.innerWidth < 640}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        onClick={() => form?.submit()}
+                        className="bg-blue-600"
+                        block={window.innerWidth < 640}
+                      >
+                        {loading ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
@@ -494,19 +526,19 @@ const UserForm: React.FC<UserFormProps> = ({
               </div>
             </div>
 
-            <div className="w-80 flex-shrink-0">
-              <div className="space-y-6">
+            <div className="w-full lg:w-80 flex-shrink-0">
+              <div className="space-y-4 lg:space-y-6">
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                  <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
                       Profile Picture
                     </h3>
                   </div>
-                  <div className="p-4">
+                  <div className="p-3 lg:p-4">
                     <div className="text-center">
                       <div className="relative inline-block">
                         <div
-                          className="w-36 h-36 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center bg-gray-50 hover:border-blue-400 transition-colors duration-200 cursor-pointer"
+                          className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center bg-gray-50 hover:border-blue-400 transition-colors duration-200 cursor-pointer"
                           onClick={() => setIsMediaModalOpen(true)}
                         >
                           {avatarUrl ? (
@@ -517,35 +549,14 @@ const UserForm: React.FC<UserFormProps> = ({
                             />
                           ) : (
                             <div className="text-center">
-                              <CameraOutlined className="text-5xl text-gray-400 mb-2" />
-                              <Text className="text-gray-500 text-sm block">
+                              <CameraOutlined className="text-3xl sm:text-4xl lg:text-5xl text-gray-400 mb-1 sm:mb-2" />
+                              <Text className="text-gray-500 text-xs sm:text-sm block">
                                 Click to upload
                               </Text>
                             </div>
                           )}
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
-                  <div className="p-4">
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        onClick={() => router.back()}
-                        className="!h-[40px] flex-1 px-8 rounded-lg font-medium border-gray-300 hover:border-gray-400 transition-colors"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={loading}
-                        onClick={() => form?.submit()}
-                        className="bg-blue-600 flex-1 border-blue-600 hover:bg-blue-700 !h-[40px] px-8 rounded-lg font-medium shadow-sm transition-colors"
-                      >
-                        {loading ? "Saving..." : "Save Changes"}
-                      </Button>
                     </div>
                   </div>
                 </div>

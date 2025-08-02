@@ -15,6 +15,8 @@ import {
   Space,
   Tooltip,
   Modal,
+  Row,
+  Col,
 } from "antd";
 import {
   SaveOutlined,
@@ -102,43 +104,37 @@ const SettingsPage: React.FC = (props: any) => {
 
   const handleSaveSettings = async (values: any, formType: string) => {
     setLoading(true);
-
-    const settingsArray = Object.entries(values).map(([key, value]) => ({
-      key,
-      value,
-    }));
-
     const payload = {
-      namespace: formType,
-      data: {
-        settings: settingsArray,
-      },
+      ...values,
+      type: formType,
     };
 
     dispatch(
-      upsertSetting(payload, session?.accessToken || "", onSuccess, onFailure)
+      upsertSetting(
+        payload,
+        session?.accessToken || "",
+        onSuccess,
+        onFailure
+      ) as any
     );
   };
 
   const handleMediaSelect = (media: any) => {
-    generalForm.setFieldsValue({ siteLogo: media.slug });
     setSelectedImage(media);
+    generalForm.setFieldsValue({ siteLogo: media.slug });
     setIsModalMediaOpen(false);
-    message.success("Logo selected successfully!");
   };
 
   const handleRemoveLogo = () => {
     Modal.confirm({
       title: "Remove Logo",
-      content:
-        "Are you sure you want to remove the current logo? This action cannot be undone.",
+      content: "Are you sure you want to remove the current logo?",
       okText: "Remove",
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
         generalForm.setFieldsValue({ siteLogo: "" });
         setSelectedImage(null);
-        message.success("Logo removed successfully!");
       },
     });
   };
@@ -183,14 +179,14 @@ const SettingsPage: React.FC = (props: any) => {
               </Tooltip>
             </Space>
           }
-          className="max-w-[500px]"
+          className="max-w-full lg:max-w-[500px]"
         >
           <div className="space-y-4">
             {/* Logo Preview Section */}
-            <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
-              <div className="flex items-start gap-6">
+            <div className="border border-gray-200 rounded-lg p-3 lg:p-6 bg-gray-50">
+              <div className="flex flex-col lg:flex-row items-start gap-4 lg:gap-6">
                 {/* Logo Preview */}
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col items-center gap-3 w-full lg:w-auto">
                   <div className="relative">
                     {getCurrentLogo() ? (
                       <div className="relative">
@@ -220,39 +216,39 @@ const SettingsPage: React.FC = (props: any) => {
                 </div>
 
                 {/* Browser Preview */}
-                <div className="flex-1">
+                <div className="flex-1 w-full lg:w-auto">
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     {/* Browser Header */}
-                    <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex items-center gap-2">
+                    <div className="bg-gray-100 px-3 lg:px-4 py-2 border-b border-gray-200 flex items-center gap-2">
                       <div className="flex gap-1">
                         <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                       </div>
-                      <div className="flex-1 bg-white rounded px-3 py-1 mx-2 text-xs text-gray-600">
+                      <div className="flex-1 bg-white rounded px-2 lg:px-3 py-1 mx-2 text-xs text-gray-600 truncate">
                         {formField?.siteUrl || "example.com"}
                       </div>
                     </div>
 
                     {/* Browser Content */}
-                    <div className="p-4">
-                      <div className="flex items-center gap-3">
+                    <div className="p-3 lg:p-4">
+                      <div className="flex items-center gap-2 lg:gap-3">
                         {getCurrentLogo() ? (
                           <Image
                             src={getImageUrl(getCurrentLogo())}
                             alt="Site Logo"
                             width={32}
                             height={32}
-                            className="rounded object-contain"
+                            className="rounded object-contain flex-shrink-0"
                           />
                         ) : (
-                          <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                          <div className="w-8 h-8 bg-gray-300 rounded flex-shrink-0"></div>
                         )}
-                        <div>
-                          <div className="font-semibold text-gray-800">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-gray-800 text-sm lg:text-base truncate">
                             {formField?.siteName || "Site Name"}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 truncate">
                             {formField?.siteDescription || "Site description"}
                           </div>
                         </div>
@@ -267,22 +263,24 @@ const SettingsPage: React.FC = (props: any) => {
             </div>
 
             {/* Logo Actions */}
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
               <Button
                 type="primary"
                 icon={<PictureOutlined />}
                 onClick={() => setIsModalMediaOpen(true)}
                 className="flex-1"
+                size="middle"
               >
                 {getCurrentLogo() ? "Change Logo" : "Select Logo"}
               </Button>
 
               {getCurrentLogo() && (
-                <>
+                <div className="flex gap-2">
                   <Tooltip title="Preview logo">
                     <Button
                       icon={<EyeOutlined />}
                       onClick={handlePreviewLogo}
+                      size="middle"
                     />
                   </Tooltip>
 
@@ -291,21 +289,35 @@ const SettingsPage: React.FC = (props: any) => {
                       danger
                       icon={<DeleteOutlined />}
                       onClick={handleRemoveLogo}
+                      size="middle"
                     />
                   </Tooltip>
-                </>
+                </div>
               )}
             </div>
           </div>
         </Form.Item>
 
-        <Form.Item
-          name="siteName"
-          label="Site Name"
-          rules={[{ required: true, message: "Please enter site name" }]}
-        >
-          <Input placeholder="Enter site name" />
-        </Form.Item>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="siteName"
+              label="Site Name"
+              rules={[{ required: true, message: "Please enter site name" }]}
+            >
+              <Input placeholder="Enter site name" size="middle" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="siteUrl"
+              label="Site URL"
+              rules={[{ required: true, message: "Please enter site URL" }]}
+            >
+              <Input placeholder="https://example.com" size="middle" />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Form.Item
           name="siteDescription"
@@ -315,20 +327,14 @@ const SettingsPage: React.FC = (props: any) => {
           <TextArea placeholder="Enter site description" rows={3} />
         </Form.Item>
 
-        <Form.Item
-          name="siteUrl"
-          label="Site URL"
-          rules={[{ required: true, message: "Please enter site URL" }]}
-        >
-          <Input placeholder="https://example.com" />
-        </Form.Item>
-
         <div style={{ marginTop: 24 }}>
           <Button
             type="primary"
             htmlType="submit"
             loading={loading}
             icon={<SaveOutlined />}
+            size="middle"
+            block={window.innerWidth < 640}
           >
             Save General Settings
           </Button>
@@ -351,76 +357,94 @@ const SettingsPage: React.FC = (props: any) => {
           adminEmail: "admin@example.com",
         }}
       >
-        <Form.Item
-          name="SMTP_HOST"
-          label="SMTP Host"
-          rules={[{ required: true, message: "Please enter SMTP host" }]}
-        >
-          <Input placeholder="smtp.gmail.com" />
-        </Form.Item>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="SMTP_HOST"
+              label="SMTP Host"
+              rules={[{ required: true, message: "Please enter SMTP host" }]}
+            >
+              <Input placeholder="smtp.gmail.com" size="middle" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="SMTP_PORT"
+              label="SMTP Port"
+              rules={[{ required: true, message: "Please enter SMTP port" }]}
+            >
+              <Input placeholder="587" size="middle" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-        <Form.Item
-          name="SMTP_PORT"
-          label="SMTP Port"
-          rules={[{ required: true, message: "Please enter SMTP port" }]}
-        >
-          <Input placeholder="587" />
-        </Form.Item>
-
-        <Form.Item
-          name="SMTP_SECURITY"
-          label="Security"
-          rules={[{ required: true, message: "Please select security type" }]}
-        >
-          <Select
-            options={[
-              { value: "none", label: "None" },
-              { value: "tls", label: "TLS" },
-              { value: "ssl", label: "SSL" },
-            ]}
-            style={{ width: "100%" }}
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="SMTP_USERNAME"
-          label="SMTP Username"
-          rules={[{ required: true, message: "Please enter SMTP username" }]}
-        >
-          <Input placeholder="your-email@gmail.com" />
-        </Form.Item>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="SMTP_SECURITY"
+              label="Security"
+              rules={[
+                { required: true, message: "Please select security type" },
+              ]}
+            >
+              <Select
+                options={[
+                  { value: "none", label: "None" },
+                  { value: "tls", label: "TLS" },
+                  { value: "ssl", label: "SSL" },
+                ]}
+                style={{ width: "100%" }}
+                size="middle"
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="SMTP_USERNAME"
+              label="SMTP Username"
+              rules={[
+                { required: true, message: "Please enter SMTP username" },
+              ]}
+            >
+              <Input placeholder="your-email@gmail.com" size="middle" />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Form.Item
           name="SMTP_PASSWORD"
           label="SMTP Password"
           rules={[{ required: true, message: "Please enter SMTP password" }]}
         >
-          <Input.Password placeholder="Enter password" />
+          <Input.Password placeholder="Enter password" size="middle" />
         </Form.Item>
 
         <Divider />
 
-        <Title level={4}>Email Settings</Title>
-        {/* 
-        <Form.Item name="ADMIN_EMAIL" label="Admin Email" rules={[{ required: true, message: "Please enter admin email" }]}>
-          <Input placeholder="admin@example.com" />
-        </Form.Item> */}
+        <Title level={4} className="text-lg lg:text-xl">
+          Email Settings
+        </Title>
 
-        <Form.Item
-          name="FROM_EMAIL"
-          label="From Email"
-          rules={[{ required: true, message: "Please enter from email" }]}
-        >
-          <Input placeholder="noreply@example.com" />
-        </Form.Item>
-
-        <Form.Item
-          name="FROM_NAME"
-          label="From Name"
-          rules={[{ required: true, message: "Please enter from name" }]}
-        >
-          <Input placeholder="Your Site Name" />
-        </Form.Item>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="FROM_EMAIL"
+              label="From Email"
+              rules={[{ required: true, message: "Please enter from email" }]}
+            >
+              <Input placeholder="noreply@example.com" size="middle" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="FROM_NAME"
+              label="From Name"
+              rules={[{ required: true, message: "Please enter from name" }]}
+            >
+              <Input placeholder="Your Site Name" size="middle" />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <div style={{ marginTop: 24 }}>
           <Button
@@ -428,6 +452,8 @@ const SettingsPage: React.FC = (props: any) => {
             htmlType="submit"
             loading={loading}
             icon={<SaveOutlined />}
+            size="middle"
+            block={window.innerWidth < 640}
           >
             Save Email Settings
           </Button>
@@ -453,14 +479,17 @@ const SettingsPage: React.FC = (props: any) => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold ">Settings</h1>
+      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-6">Settings</h1>
 
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
         items={tabItems}
         size="large"
+        tabPosition="top"
+        className="settings-tabs"
       />
+
       <MediaLibraryModal
         isOpen={isModalMediaOpen}
         onCancel={() => setIsModalMediaOpen(false)}
@@ -479,11 +508,12 @@ const SettingsPage: React.FC = (props: any) => {
               Close
             </Button>,
           ]}
-          width={600}
+          width="90%"
+          style={{ maxWidth: 600 }}
           centered
         >
           <div className="text-center space-y-4">
-            <div className="bg-gray-50 p-6 rounded-lg">
+            <div className="bg-gray-50 p-4 lg:p-6 rounded-lg">
               <Image
                 src={getImageUrl(getCurrentLogo())}
                 alt="Site Logo Preview"

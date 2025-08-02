@@ -30,17 +30,24 @@ const CategoryTreeSelector: React.FC<Props> = ({
   }, [session?.accessToken]);
 
   return (
-    <Checkbox.Group value={value} onChange={onChange} className="gap-2">
-      {categoryList.map((cat: any) => (
-        <Checkbox
-          key={cat.id}
-          value={cat.id}
-          style={{ marginLeft: cat.level * 20 }}
-        >
-          {renderCategoryLabel ? renderCategoryLabel(cat) : cat.name}
-        </Checkbox>
-      ))}
-    </Checkbox.Group>
+    <div className="max-h-60 overflow-y-auto">
+      <Checkbox.Group
+        value={value}
+        onChange={onChange}
+        className="flex flex-col gap-1"
+      >
+        {categoryList.map((cat: any) => (
+          <Checkbox
+            key={cat.id}
+            value={cat.id}
+            style={{ marginLeft: Math.min(cat.level * 16, 80) }}
+            className="text-sm"
+          >
+            {renderCategoryLabel ? renderCategoryLabel(cat) : cat.name}
+          </Checkbox>
+        ))}
+      </Checkbox.Group>
+    </div>
   );
 };
 

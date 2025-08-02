@@ -10,22 +10,6 @@ interface DecodedToken {
   [key: string]: any;
 }
 
-interface UserFromAPI {
-  id: number | string;
-  name?: string | null;
-  email?: string | null;
-  accessToken: string;
-  refreshToken: string;
-  role?: string | null;
-}
-
-interface UserToken {
-  id: number;
-  name: string;
-  email: string;
-  role?: string | null;
-}
-
 function isTokenExpired(token: string): boolean {
   try {
     const decoded = jwtDecode<DecodedToken>(token);
@@ -70,16 +54,11 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: UserFromAPI }) {
+    async jwt({ token, user }: { token: JWT; user?: any }) {
       if (user) {
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
-        token.user = {
-          id: typeof user.id === "string" ? parseInt(user.id, 10) : user.id,
-          name: user.name ?? "",
-          email: user.email ?? "",
-          role: user.role ?? null,
-        } as UserToken;
+        token.user = user;
         return token;
       }
 
@@ -105,7 +84,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }: { session: Session; token: JWT }) {
-      session.user = token.user as UserToken;
+      session.user = token.user as any;
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
       // Đảm bảo role có trong session.user

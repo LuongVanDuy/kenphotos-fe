@@ -62,11 +62,11 @@ const MediaItem: React.FC<MediaItemProps> = ({
     >
       {/* Checkbox for selection */}
       {onSelect && (
-        <div className="absolute top-2 left-2 z-10">
+        <div className="absolute top-1 left-1 sm:top-2 sm:left-2 z-10">
           <Checkbox
             checked={selected}
             onChange={(e) => onSelect(e.target.checked)}
-            className=" rounded shadow-sm"
+            className="rounded shadow-sm"
           />
         </div>
       )}
@@ -78,13 +78,23 @@ const MediaItem: React.FC<MediaItemProps> = ({
             style={{ width: "100%", height: "100%" }}
             src={getImageUrl(item)}
             className="border border-gray-300 rounded-lg shadow-sm object-cover"
+            preview={{
+              mask: (
+                <div className="flex items-center justify-center w-full h-full bg-black bg-opacity-50 text-white">
+                  <EyeOutlined className="text-lg" />
+                </div>
+              ),
+            }}
           />
         </div>
       ) : (
         <div className="aspect-square w-full flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <div className="text-4xl text-gray-400">
+          <div className="text-center p-2">
+            <div className="text-2xl sm:text-4xl text-gray-400">
               {getFileIcon(item.name)}
+            </div>
+            <div className="text-xs sm:text-sm text-gray-500 mt-1 truncate px-1">
+              {item.name.split(".").pop()?.toUpperCase()}
             </div>
           </div>
         </div>

@@ -148,6 +148,8 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       footer={null}
       maskClosable={false}
       centered
+      width="90%"
+      style={{ maxWidth: 500 }}
       // confirmLoading={loadingDetail} // ĐÃ BỎ
     >
       <Spin spinning={loadingDetail}>
@@ -157,7 +159,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             name="name"
             rules={[{ required: true, message: "Name is required" }]}
           >
-            <Input placeholder="Enter category name" />
+            <Input placeholder="Enter category name" size="middle" />
           </Form.Item>
 
           <Form.Item
@@ -165,7 +167,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             name="slug"
             rules={[{ required: true, message: "Slug is required" }]}
           >
-            <Input placeholder="Enter category slug" />
+            <Input placeholder="Enter category slug" size="middle" />
           </Form.Item>
 
           <Form.Item
@@ -173,7 +175,11 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             name="description"
             rules={[{ required: true, message: "Description is required" }]}
           >
-            <Input.TextArea placeholder="Enter category description" rows={3} />
+            <Input.TextArea
+              placeholder="Enter category description"
+              rows={3}
+              size="middle"
+            />
           </Form.Item>
 
           <Form.Item label="Parent Category" name="parentId">
@@ -183,11 +189,18 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               placeholder="Select parent category (optional)"
               allowClear
               treeDefaultExpandAll
+              size="middle"
             />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              block
+              size="middle"
+            >
               {mode === "edit" ? "Update" : "Create"} Category
             </Button>
           </Form.Item>

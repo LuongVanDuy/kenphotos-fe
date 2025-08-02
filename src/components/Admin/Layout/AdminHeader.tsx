@@ -5,27 +5,18 @@ import {
   Layout,
   Button,
   Breadcrumb,
-  Badge,
   Space,
   Typography,
-  Divider,
   Avatar,
   Dropdown,
 } from "antd";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SearchOutlined,
-  QuestionCircleOutlined,
-  SunOutlined,
-  MoonOutlined,
-  BellOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import {
-  AdminMenuHelper,
-  userMenuConfig,
-} from "@/components/Admin/Layout/AdminMenu";
+import { AdminMenuHelper } from "@/components/Admin/Layout/AdminMenu";
+import { useSession } from "next-auth/react";
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -45,20 +36,20 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   onCollapse,
   isMobile,
   pathname,
-  darkMode,
-  onDarkModeToggle,
   onNavigation,
 }) => {
-  // Mock user data
-  const user = {
-    name: "Admin User",
-    email: "admin@example.com",
-    role: "Administrator",
-    avatar: null,
-  };
+  const { data: session } = useSession();
 
   const breadcrumbs = AdminMenuHelper.getBreadcrumbs(pathname);
   const userMenuItems = AdminMenuHelper.convertUserMenuToAntd(onNavigation);
+
+  // Use session data or fallback to default values
+  const user = {
+    name: `${session?.user?.firstName} ${session?.user?.lastName}`,
+    email: session?.user?.email || "guest@example.com",
+    role: session?.user?.role || "Guest",
+    avatar: session?.user?.avatarUrl || null,
+  };
 
   return (
     <Header
@@ -80,7 +71,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
       {/* Left Section */}
       <div className="flex items-center space-x-2 sm:space-x-4">
         <Button
-          type="text"
+          type="default"
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={() => onCollapse(!collapsed)}
           style={{
@@ -129,7 +120,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
 
       {/* Right Section - Responsive */}
       <Space size={isMobile ? "small" : "middle"}>
-        {/* User Profile Dropdown */}
         <Dropdown
           menu={{ items: userMenuItems }}
           placement="bottomRight"

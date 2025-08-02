@@ -252,23 +252,41 @@ const PostListPage: React.FC = () => {
       title: "Post",
       key: "post",
       render: (_: any, record: any) => (
-        <Space>
-          {record.thumbnail ? (
-            <Avatar
-              src={getImageUrl(record.thumbnail)}
-              style={{ width: 60, height: 40 }}
-              shape="square"
-            />
-          ) : (
-            <Avatar
-              style={{ width: 60, height: 40 }}
-              icon={<PictureOutlined />}
-              shape="square"
-            />
-          )}
-          <div>
-            <div className="font-medium">{record.title}</div>
-            <div className="text-sm text-gray-500">{record.slug}</div>
+        <Space direction="vertical" size="small" className="w-full">
+          <div className="flex items-start gap-2">
+            {record.thumbnail ? (
+              <Avatar
+                src={getImageUrl(record.thumbnail)}
+                style={{ width: 50, height: 35, flexShrink: 0 }}
+                shape="square"
+              />
+            ) : (
+              <Avatar
+                style={{ width: 50, height: 35, flexShrink: 0 }}
+                icon={<PictureOutlined />}
+                shape="square"
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm lg:text-base truncate">
+                {record.title}
+              </div>
+              <div className="text-xs lg:text-sm text-gray-500 truncate">
+                {record.slug}
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            <Tag
+              color={statusMap[record.status]?.color || "default"}
+            >
+              {statusMap[record.status]?.label || record.status}
+            </Tag>
+            <Tag
+              color={deleteFlgMap[record.deleteFlg]?.color || "default"}
+            >
+              {deleteFlgMap[record.deleteFlg]?.label || "Unknown"}
+            </Tag>
           </div>
         </Space>
       ),
@@ -280,13 +298,15 @@ const PostListPage: React.FC = () => {
         <div>
           {record.author ? (
             <>
-              <div className="font-medium">
+              <div className="font-medium text-sm">
                 {record.author.firstName} {record.author.lastName}
               </div>
-              <div className="text-sm text-gray-500">{record.author.email}</div>
+              <div className="text-xs text-gray-500 truncate">
+                {record.author.email}
+              </div>
             </>
           ) : (
-            <span className="text-gray-400">No author</span>
+            <span className="text-gray-400 text-sm">No author</span>
           )}
         </div>
       ),
@@ -298,29 +318,21 @@ const PostListPage: React.FC = () => {
         <div>
           {record.categories && record.categories.length > 0 ? (
             <div className="flex flex-wrap gap-1">
-              {record.categories.map((cat: any, index: number) => (
+              {record.categories.slice(0, 2).map((cat: any, index: number) => (
                 <Tag key={index} color="blue">
                   {cat.category?.name || "Unknown"}
                 </Tag>
               ))}
+              {record.categories.length > 2 && (
+                <Tag>+{record.categories.length - 2}</Tag>
+              )}
             </div>
           ) : (
-            <span className="text-gray-400">No categories</span>
+            <span className="text-gray-400 text-sm">No categories</span>
           )}
         </div>
       ),
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status: number) => (
-        <Tag color={statusMap[status]?.color || "default"}>
-          {statusMap[status]?.label || status}
-        </Tag>
-      ),
-    },
-
     {
       title: "Created",
       dataIndex: "createdTime",
@@ -337,7 +349,7 @@ const PostListPage: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      width: 120,
+      width: 80,
       render: (_: any, record: any) => {
         const isDeleted = record.deleteFlg === 1;
 
@@ -374,7 +386,7 @@ const PostListPage: React.FC = () => {
 
         return (
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
-            <Button type="text" icon={<MoreOutlined />} />
+            <Button type="text" icon={<MoreOutlined />} size="small" />
           </Dropdown>
         );
       },
@@ -383,12 +395,12 @@ const PostListPage: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-5">
+      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">
         {deleteFlg === 1 ? "Trash" : "Posts"}
       </h1>
 
-      <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
-        <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-col lg:flex-row gap-3 lg:gap-2 mb-4 lg:mb-6 items-start lg:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full lg:w-auto">
           <Input.Search
             placeholder="Search posts"
             allowClear
@@ -399,33 +411,40 @@ const PostListPage: React.FC = () => {
               setPageNumber(1);
               handleQuery(value, 1, pageSize);
             }}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: "300px" }}
+            size="middle"
           />
-          <Select
-            value={status}
-            onChange={setStatus}
-            className="w-[120px] !h-[40px]"
-          >
-            <Option value="all">All Status</Option>
-            <Option value={0}>Draft</Option>
-            <Option value={1}>Published</Option>
-          </Select>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Select
+              value={status}
+              onChange={setStatus}
+              className="flex-1 sm:flex-none"
+              style={{ minWidth: "120px" }}
+              size="middle"
+            >
+              <Option value="all">All Status</Option>
+              <Option value={0}>Draft</Option>
+              <Option value={1}>Published</Option>
+            </Select>
 
-          <Select
-            value={deleteFlg}
-            onChange={(value) => {
-              setDeleteFlg(value);
-              setSelectedRowKeys([]);
-              setSelectedPosts([]);
-              handleQuery(keyword, 1, pageSize);
-            }}
-            className="w-[120px] !h-[40px]"
-          >
-            <Option value={0}>Active Posts</Option>
-            <Option value={1}>Trash</Option>
-          </Select>
+            <Select
+              value={deleteFlg}
+              onChange={(value) => {
+                setDeleteFlg(value);
+                setSelectedRowKeys([]);
+                setSelectedPosts([]);
+                handleQuery(keyword, 1, pageSize);
+              }}
+              className="flex-1 sm:flex-none"
+              style={{ minWidth: "120px" }}
+              size="middle"
+            >
+              <Option value={0}>Active Posts</Option>
+              <Option value={1}>Trash</Option>
+            </Select>
+          </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
           {deleteFlg === 1 ? (
             <>
               <Button
@@ -433,6 +452,8 @@ const PostListPage: React.FC = () => {
                 icon={<RestOutlined />}
                 onClick={handleBulkRestore}
                 disabled={selectedPosts.length === 0}
+                size="middle"
+                block={window.innerWidth < 640}
               >
                 Restore Selected ({selectedPosts.length})
               </Button>
@@ -442,6 +463,8 @@ const PostListPage: React.FC = () => {
                 icon={<DeleteFilled />}
                 onClick={handleBulkPermanentDelete}
                 disabled={selectedPosts.length === 0}
+                size="middle"
+                block={window.innerWidth < 640}
               >
                 Delete Permanently ({selectedPosts.length})
               </Button>
@@ -454,6 +477,8 @@ const PostListPage: React.FC = () => {
                 icon={<DeleteOutlined />}
                 onClick={handleBulkDelete}
                 disabled={selectedPosts.length === 0}
+                size="middle"
+                block={window.innerWidth < 640}
               >
                 Move to Trash ({selectedPosts.length})
               </Button>
@@ -461,6 +486,8 @@ const PostListPage: React.FC = () => {
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={() => router.push("/admin/post/create")}
+                size="middle"
+                block={window.innerWidth < 640}
               >
                 Add New Post
               </Button>
@@ -469,31 +496,35 @@ const PostListPage: React.FC = () => {
         </div>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={postList}
-        loading={postLoading}
-        rowKey="id"
-        rowSelection={{
-          selectedRowKeys,
-          onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedRowKeys(selectedRowKeys);
-            setSelectedPosts(selectedRows);
-          },
-        }}
-        pagination={{
-          current: pageNumber,
-          pageSize,
-          total: postTotal,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
-          onChange: (page, pageSize) => {
-            handleQuery(keyword, page, pageSize);
-          },
-        }}
-      />
+      <div className="overflow-x-auto">
+        <Table
+          columns={columns}
+          dataSource={postList}
+          loading={postLoading}
+          rowKey="id"
+          rowSelection={{
+            selectedRowKeys,
+            onChange: (selectedRowKeys, selectedRows) => {
+              setSelectedRowKeys(selectedRowKeys);
+              setSelectedPosts(selectedRows);
+            },
+          }}
+          pagination={{
+            current: pageNumber,
+            pageSize,
+            total: postTotal,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) => {
+              handleQuery(keyword, page, pageSize);
+            },
+            responsive: true,
+          }}
+          scroll={{ x: 800 }}
+        />
+      </div>
     </div>
   );
 };
