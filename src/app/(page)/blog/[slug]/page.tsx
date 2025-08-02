@@ -133,7 +133,7 @@ const BlogDetailPage = ({
   }
 
   return (
-    <div className="max-w-content mx-auto px-4 py-16 text-center">
+    <div className="max-w-content mx-auto px-4 pt-16 pb-24 md:pt-24 md:pb-36  text-center">
       <h1 className="text-[20px] md:text-[44px]  font-semibold  text-[#0D0D0D]">
         {postDetail.title}
       </h1>

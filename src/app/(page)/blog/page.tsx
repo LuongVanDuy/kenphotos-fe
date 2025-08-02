@@ -8,7 +8,12 @@ import BlogBlock from "@/components/Blog/BlogBlock";
 import BlogSkeleton from "@/components/Blog/BlogSkeleton";
 import BlogFilterBar from "@/components/Blog/BlogFilterBar";
 
-const BlogPage = ({ fetchPublicPosts, postList, postTotal, postLoading }: any) => {
+const BlogPage = ({
+  fetchPublicPosts,
+  postList,
+  postTotal,
+  postLoading,
+}: any) => {
   const [keyword, setKeyword] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 10;
@@ -65,15 +70,23 @@ const BlogPage = ({ fetchPublicPosts, postList, postTotal, postLoading }: any) =
       const blockIndex = Math.floor(i / 5);
       const isLoadingBlock = loadingNext && blockIndex === loadingBlockIndex;
 
-      blocks.push(<BlogBlock key={`block-${i}`} group={group} blockIndex={blockIndex} isLoadingBlock={isLoadingBlock} blockRef={blockRef} />);
+      blocks.push(
+        <BlogBlock
+          key={`block-${i}`}
+          group={group}
+          blockIndex={blockIndex}
+          isLoadingBlock={isLoadingBlock}
+          blockRef={blockRef}
+        />
+      );
     }
 
     return blocks;
   };
 
   return (
-    <div className="max-w-content px-4 py-[50px] mx-auto">
-      <div className="text-start mb-20">
+    <div className="max-w-content px-4 py-40 mx-auto">
+      <div className="text-start mb-20 ">
         <p className="text-[24px] text-gray-400 font-medium mb-4">Our blog</p>
         <h2 className="text-[32px] md:text-[48px] leading-tight font-[500] text-[#0D0D0D]">
           This is where we tell stories.

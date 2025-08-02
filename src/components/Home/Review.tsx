@@ -112,14 +112,6 @@ const Reviews: React.FC = () => {
   return (
     <section className="pt-12 pb-24  md:pt-24 md:pb-40bg-section relative">
       <span className="notch-top-left" aria-hidden="true"></span>
-      {/* <div className="text-center mx-auto">
-        <h2 className=" text-[25px] md:text-[45px] font-semibold normal-case not-italic no-underline leading-[1.2em] tracking-[0px] text-[#1C244B]">
-          Review
-        </h2>
-        <p className="mb-12">
-          Our clients love us, here are a few of their quotes.
-        </p>
-      </div> */}
 
       <div className="max-w-content px-4 mx-auto">
         <SectionTitle

@@ -1,6 +1,7 @@
 "use client";
 
 import Reviews from "@/components/Home/Review";
+import SectionTitle from "@/components/UI/SectionTitle";
 import Image from "next/image";
 
 const timelineData = [
@@ -37,8 +38,8 @@ const timelineData = [
 
 const AboutPage = () => {
   return (
-    <div className="px-[10px]">
-      <div className="min-h-[350px] bg-white">
+    <div className="">
+      <div className="min-h-[350px] bg-white pt-24">
         <div className="max-w-content mx-auto">
           <div className="flex flex-col md:flex-row gap-10">
             <div className="px-4 md:px-0 py-16 text-white text-left">
@@ -102,8 +103,9 @@ const AboutPage = () => {
         </div>
       </div>
 
-      <div className="relative">
-        <div className="max-w-content  py-8 md:py-24 mx-auto">
+      <div className="relative px-2">
+        <div className="max-w-content pt-16 pb-24 md:pt-24 md:pb-36 mx-auto">
+          <span className="notch-top-left" aria-hidden="true"></span>
           <div className="grid grid-cols-1 md:grid-cols-2 md:gap-[160px]">
             {/* Cột trái */}
             <div className="space-y-20">
@@ -216,15 +218,20 @@ const AboutPage = () => {
               </div>
             </div>
           </div>
+          <span className="notch-bottom-right" aria-hidden="true"></span>
         </div>
       </div>
 
-      <div className="py-16 md:py-24 bg-white">
+      <div className="pt-16 pb-24 md:pt-24 md:pb-36  bg-white relative">
         <div className="max-w-content mx-auto px-4">
-          <h2 className="text-start text-3xl md:text-5xl font-semibold text-gray-900 mb-16">
-            Just one week from start to finish
-          </h2>
-          <ul className="md:flex">
+          <span className="notch-top-right" aria-hidden="true"></span>
+
+          <SectionTitle
+            title="Just one week from start to finish"
+            topText="Step"
+            bottomText="Hear what our clients say about working with us"
+          />
+          <ul className="md:flex mt-16">
             {timelineData.map((item, index) => (
               <li
                 key={index}

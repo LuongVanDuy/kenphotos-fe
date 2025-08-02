@@ -19,38 +19,20 @@ const FreeTestFiles: React.FC = () => {
         <span className="notch-top-left" aria-hidden="true"></span>
         <div className="grid md:grid-cols-2 gap-12 items-start">
           {/* Left Section */}
-          {/* <div className="space-y-6 md:pr-12 md:sticky md:top-24">
-            <p className="text-sm text-[#8B6F38] font-medium">/ Kontakt</p>
-            <h2 className="text-2xl md:text-4xl font-extrabold text-black leading-tight">
-              Lassen Sie uns gemeinsam
-              <br />
-              Ihre digitale Zukunft
-              <br />
-              gestalten – Starten Sie jetzt!
+
+          <div className="space-y-10 md:pr-12 md:sticky md:top-24">
+            <p className="text-[19px] font-medium">
+              <span className="text-[#F9B02A]">/</span>{" "}
+              <span className="text-black">Kontakt</span>
+            </p>
+            <h2 className="text-2xl md:text-[43px] font-semibold text-black leading-normal">
+              Lassen Sie uns gemeinsam Ihre digitale Zukunft gestalten – Starten
+              Sie jetzt!
             </h2>
-
-            <div className="space-y-1">
-              <a
-                href="mailto:info@djumla.de"
-                className="text-[#8B6F38] underline text-[16px] md:text-[18px] block"
-              >
-                info@djumla.de
-              </a>
-              <a
-                href="tel:+49221677863520"
-                className="text-[#8B6F38] underline text-[16px] md:text-[18px] block"
-              >
-                +49 221 677 863 520
-              </a>
+            <div>
+              <p className="text-[19px] text-[#866E3D]">info@djumla.de</p>
+              <p className="text-[19px] text-[#866E3D]">+49 221 677 863 520</p>
             </div>
-          </div> */}
-
-          <div className="space-y-6 md:pr-12 md:sticky md:top-24">
-            <SectionTitle
-              title="Lassen Sie uns gemeinsam Ihre digitale Zukunft gestalten – Starten Sie jetzt!​"
-              topText="Kontakt"
-              bottomText={"info@djumla.de, \n +49 221 677 863 520"}
-            />
           </div>
 
           {/* Right Section  */}
