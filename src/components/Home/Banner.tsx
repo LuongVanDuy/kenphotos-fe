@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import SwiperCore from "swiper";
@@ -21,11 +21,11 @@ const Banner: React.FC = () => {
   const swiperRef = useRef<SwiperCore | null>(null);
 
   return (
-    <section className="w-full bg-section ">
+    <section className="w-full bg-section pt-24">
       <div className="flex flex-col md:flex-row w-full min-h-[580px] py-16 md:py-0">
         <div className="flex-1 flex items-center justify-center p-8 min-h-[200px] max-w-content">
-          <div className="text-center md:text-left max-w-xl">
-            <h1 className="text-[32px] md:text-[48px] font-semibold text-black-base leading-tight mb-6">
+          <div className="text-center md:text-left max-w-2xl">
+            <h1 className="text-[32px] md:text-[65px] font-semibold text-black-base leading-tight mb-6">
               Software design
               <br />
               and development company
@@ -36,13 +36,13 @@ const Banner: React.FC = () => {
               working with individual startups and enterprises worldwide.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <button className="px-6 py-3 bg-black text-white rounded-full text-sm font-medium hover:opacity-90 transition-all">
+              <button className="px-[30px] py-[15px] text-[16px] bg-black text-white rounded-full text-sm font-medium hover:opacity-90 transition-all">
                 Get in touch
               </button>
             </div>
           </div>
         </div>
-        <div className="w-[100%] lg:w-[50%] flex-1 h-full p-4 md:p-16">
+        <div className="w-[100%] lg:w-[50%] flex-1 h-full p-4  md:px-16 pt-16 md:pb-32">
           <Swiper
             modules={[Navigation]}
             navigation

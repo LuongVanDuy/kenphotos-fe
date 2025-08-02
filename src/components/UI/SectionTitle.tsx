@@ -11,18 +11,18 @@ const SectionTitle: React.FC<SectionTitleProps> = ({
   topText,
   bottomText,
 }) => (
-  <div className="space-y-4 text-start">
+  <div className="space-y-6 text-start">
     {topText && (
-      <p className="text-sm font-medium">
+      <p className="text-[19px] font-medium">
         <span className="text-[#F9B02A]">/</span>{" "}
         <span className="text-black">{topText}</span>
       </p>
     )}
-    <h2 className="text-2xl md:text-4xl font-semibold text-black leading-tight">
+    <h2 className="text-2xl md:text-[43px] font-semibold text-black leading-tight">
       {title}
     </h2>
     {bottomText && (
-      <p className="text-[16px] text-[#866E3D]">
+      <p className="text-[19px] text-[#866E3D]">
         {typeof bottomText === "string"
           ? bottomText.split("\n").map((line, idx, arr) => (
               <React.Fragment key={idx}>
