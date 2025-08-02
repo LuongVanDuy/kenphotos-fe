@@ -1,25 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Avatar,
-  Space,
-  message,
-  Select,
-  Input,
-  Table,
-  Dropdown,
-  Modal,
-} from "antd";
-import {
-  UserOutlined,
-  PlusOutlined,
-  MoreOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
+import { Button, Avatar, Space, message, Select, Input, Table, Dropdown, Modal } from "antd";
+import { UserOutlined, PlusOutlined, MoreOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteUser, fetchUsers } from "@/store/actions/users";
@@ -41,6 +24,14 @@ const UserListPage: React.FC = () => {
   const { data: session } = useSession();
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth < 640);
+    }
+  }, []);
 
   // Get state from Redux store
   const userList = useSelector((state: RootState) => state.users.list);
@@ -94,14 +85,7 @@ const UserListPage: React.FC = () => {
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        dispatch(
-          deleteUser(
-            user.id,
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
+        dispatch(deleteUser(user.id, session?.accessToken || "", onSuccess, onFailure) as any);
       },
     });
   };
@@ -124,23 +108,15 @@ const UserListPage: React.FC = () => {
         <Space direction="vertical" size="small" className="w-full">
           <div className="flex items-center gap-2">
             {record.avatarUrl ? (
-              <Avatar
-                src={getImageUrl(record.avatarUrl)}
-                style={{ width: 50, height: 50 }}
-              />
+              <Avatar src={getImageUrl(record.avatarUrl)} style={{ width: 50, height: 50 }} />
             ) : (
-              <Avatar
-                style={{ width: 50, height: 50 }}
-                icon={<UserOutlined />}
-              />
+              <Avatar style={{ width: 50, height: 50 }} icon={<UserOutlined />} />
             )}
             <div className="flex-1 min-w-0">
               <div className="font-medium text-sm lg:text-base truncate">
                 {record.firstName} {record.lastName}
               </div>
-              <div className="text-xs lg:text-sm text-gray-500 truncate">
-                {record.email}
-              </div>
+              <div className="text-xs lg:text-sm text-gray-500 truncate">{record.email}</div>
             </div>
           </div>
         </Space>
@@ -151,9 +127,7 @@ const UserListPage: React.FC = () => {
       key: "business",
       render: (_: any, record: any) => (
         <div>
-          <div className="font-medium text-sm truncate">
-            {record.businessName}
-          </div>
+          <div className="font-medium text-sm truncate">{record.businessName}</div>
           <div className="text-xs text-gray-500">{record.country}</div>
         </div>
       ),
@@ -164,9 +138,7 @@ const UserListPage: React.FC = () => {
       render: (_: any, record: any) => (
         <div>
           <div className="text-sm">{record.phoneNumber}</div>
-          <div className="text-xs text-gray-500 truncate">
-            {record.timezone}
-          </div>
+          <div className="text-xs text-gray-500 truncate">{record.timezone}</div>
         </div>
       ),
     },
@@ -177,9 +149,7 @@ const UserListPage: React.FC = () => {
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">
-            {new Date(date).toLocaleTimeString()}
-          </div>
+          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
         </div>
       ),
     },
@@ -238,13 +208,7 @@ const UserListPage: React.FC = () => {
             style={{ width: "100%", maxWidth: "300px" }}
             size="middle"
           />
-          <Select
-            value={sortBy}
-            onChange={setSortBy}
-            className="flex-1 sm:flex-none"
-            style={{ minWidth: "150px" }}
-            size="middle"
-          >
+          <Select value={sortBy} onChange={setSortBy} className="flex-1 sm:flex-none" style={{ minWidth: "150px" }} size="middle">
             {sortFields.map((f) => (
               <Option key={f.value} value={f.value}>
                 {f.label}
@@ -252,13 +216,7 @@ const UserListPage: React.FC = () => {
             ))}
           </Select>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => router.push("/admin/user/create")}
-          size="middle"
-          block={window.innerWidth < 640}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/user/create")} size="middle" block={isMobile}>
           Add New User
         </Button>
       </div>
@@ -275,8 +233,7 @@ const UserListPage: React.FC = () => {
             total: userTotal,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
             onChange: (page, pageSize) => {
               handleQuery(keyword, page, pageSize);
             },

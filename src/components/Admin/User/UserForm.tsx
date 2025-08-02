@@ -1,27 +1,8 @@
-import {
-  Button,
-  Col,
-  Form,
-  FormInstance,
-  Input,
-  Row,
-  Select,
-  Avatar,
-  Upload,
-  Modal,
-  Checkbox,
-  Typography,
-  Divider,
-} from "antd";
+import { Button, Col, Form, FormInstance, Input, Row, Select, Avatar, Upload, Modal, Checkbox, Typography, Divider } from "antd";
 import { Option } from "antd/es/mentions";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  UploadOutlined,
-  UserOutlined,
-  CameraOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
+import { UploadOutlined, UserOutlined, CameraOutlined, LockOutlined } from "@ant-design/icons";
 import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
 import { getImageUrl } from "@/utils";
 import Title from "antd/es/typography/Title";
@@ -40,19 +21,21 @@ interface UserFormProps {
   userId?: number;
 }
 
-const UserForm: React.FC<UserFormProps> = ({
-  form,
-  onFinish,
-  mode,
-  loading,
-  userId,
-}) => {
+const UserForm: React.FC<UserFormProps> = ({ form, onFinish, mode, loading, userId }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth < 640);
+    }
+  }, []);
 
   const countryOptions = [
     { value: "AI", label: "AI Anguilla" },
@@ -99,10 +82,7 @@ const UserForm: React.FC<UserFormProps> = ({
     setIsMediaModalOpen(false);
   };
 
-  const handlePasswordChange = async (values: {
-    newPassword: string;
-    confirmPassword: string;
-  }) => {
+  const handlePasswordChange = async (values: { newPassword: string; confirmPassword: string }) => {
     if (!userId) {
       customMessage.error("User ID is required");
       return;
@@ -147,9 +127,7 @@ const UserForm: React.FC<UserFormProps> = ({
     <>
       <div>
         <div className="flex items-center justify-between mb-4 lg:mb-5">
-          <h1 className="text-2xl md:text-4xl font-bold">
-            {mode === "create" ? "Create New User" : "Edit User Profile"}
-          </h1>
+          <h1 className="text-2xl md:text-4xl font-bold">{mode === "create" ? "Create New User" : "Edit User Profile"}</h1>
         </div>
 
         <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -158,9 +136,7 @@ const UserForm: React.FC<UserFormProps> = ({
               <div className="space-y-4 lg:space-y-6">
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Basic Information
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Basic Information</h3>
                   </div>
 
                   <div className="flex flex-col gap-4 lg:gap-5 p-4 lg:p-8">
@@ -262,9 +238,7 @@ const UserForm: React.FC<UserFormProps> = ({
                             <Select
                               placeholder="Select country"
                               className="!h-[40px]"
-                              suffixIcon={
-                                <span className="text-gray-400">▼</span>
-                              }
+                              suffixIcon={<span className="text-gray-400">▼</span>}
                               dropdownClassName="rounded-lg"
                             >
                               {countryOptions.map((option) => (
@@ -312,9 +286,7 @@ const UserForm: React.FC<UserFormProps> = ({
                             <Select
                               placeholder="Select timezone"
                               className="!h-[40px]"
-                              suffixIcon={
-                                <span className="text-gray-400">▼</span>
-                              }
+                              suffixIcon={<span className="text-gray-400">▼</span>}
                               dropdownClassName="rounded-lg"
                             >
                               {timezoneOptions.map((option) => (
@@ -348,9 +320,7 @@ const UserForm: React.FC<UserFormProps> = ({
                       <Form.Item
                         name="businessWebsite"
                         label="Business Website"
-                        rules={[
-                          { type: "url", message: "Please enter valid URL" },
-                        ]}
+                        rules={[{ type: "url", message: "Please enter valid URL" }]}
                         className="!mb-0"
                       >
                         <Input
@@ -391,16 +361,12 @@ const UserForm: React.FC<UserFormProps> = ({
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                           <div className="flex items-center space-x-2">
                             <LockOutlined className="text-gray-600" />
-                            <Text className="text-gray-700 font-medium">
-                              Password Management
-                            </Text>
+                            <Text className="text-gray-700 font-medium">Password Management</Text>
                           </div>
                           <Button
                             type="default"
                             size="small"
-                            onClick={() =>
-                              setShowPasswordChange(!showPasswordChange)
-                            }
+                            onClick={() => setShowPasswordChange(!showPasswordChange)}
                             className="!h-[32px] px-4 rounded-lg font-medium"
                           >
                             {showPasswordChange ? "Cancel" : "Change Password"}
@@ -421,8 +387,7 @@ const UserForm: React.FC<UserFormProps> = ({
                                     },
                                     {
                                       min: 6,
-                                      message:
-                                        "Password must be at least 6 characters",
+                                      message: "Password must be at least 6 characters",
                                     },
                                   ]}
                                   className="!mb-0"
@@ -444,15 +409,10 @@ const UserForm: React.FC<UserFormProps> = ({
                                     },
                                     ({ getFieldValue }) => ({
                                       validator(_, value) {
-                                        if (
-                                          !value ||
-                                          getFieldValue("newPassword") === value
-                                        ) {
+                                        if (!value || getFieldValue("newPassword") === value) {
                                           return Promise.resolve();
                                         }
-                                        return Promise.reject(
-                                          new Error("Passwords do not match")
-                                        );
+                                        return Promise.reject(new Error("Passwords do not match"));
                                       },
                                     }),
                                   ]}
@@ -470,26 +430,20 @@ const UserForm: React.FC<UserFormProps> = ({
                                 type="primary"
                                 loading={passwordLoading}
                                 onClick={() => {
-                                  const newPassword =
-                                    form?.getFieldValue("newPassword");
-                                  const confirmPassword =
-                                    form?.getFieldValue("confirmPassword");
+                                  const newPassword = form?.getFieldValue("newPassword");
+                                  const confirmPassword = form?.getFieldValue("confirmPassword");
                                   if (newPassword && confirmPassword) {
                                     handlePasswordChange({
                                       newPassword,
                                       confirmPassword,
                                     });
                                   } else {
-                                    customMessage.error(
-                                      "Please fill in both password fields"
-                                    );
+                                    customMessage.error("Please fill in both password fields");
                                   }
                                 }}
                                 className="bg-blue-600 border-blue-600 hover:bg-blue-700 !h-[40px] px-6 rounded-lg font-medium shadow-sm transition-colors"
                               >
-                                {passwordLoading
-                                  ? "Changing..."
-                                  : "Change Password"}
+                                {passwordLoading ? "Changing..." : "Change Password"}
                               </Button>
                             </div>
                           </div>
@@ -499,11 +453,7 @@ const UserForm: React.FC<UserFormProps> = ({
                     )}
 
                     <div className="flex flex-col sm:flex-row justify-end gap-2">
-                      <Button
-                        onClick={() => router.back()}
-                        className="!h-[40px]"
-                        block={window.innerWidth < 640}
-                      >
+                      <Button onClick={() => router.back()} className="!h-[40px]" block={isMobile}>
                         Cancel
                       </Button>
                       <Button
@@ -512,7 +462,7 @@ const UserForm: React.FC<UserFormProps> = ({
                         loading={loading}
                         onClick={() => form?.submit()}
                         className="bg-blue-600"
-                        block={window.innerWidth < 640}
+                        block={isMobile}
                       >
                         {loading ? "Saving..." : "Save Changes"}
                       </Button>
@@ -530,9 +480,7 @@ const UserForm: React.FC<UserFormProps> = ({
               <div className="space-y-4 lg:space-y-6">
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Profile Picture
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Profile Picture</h3>
                   </div>
                   <div className="p-3 lg:p-4">
                     <div className="text-center">
@@ -542,17 +490,11 @@ const UserForm: React.FC<UserFormProps> = ({
                           onClick={() => setIsMediaModalOpen(true)}
                         >
                           {avatarUrl ? (
-                            <Avatar
-                              size={140}
-                              src={avatarUrl}
-                              className="w-full h-full object-cover"
-                            />
+                            <Avatar size={140} src={avatarUrl} className="w-full h-full object-cover" />
                           ) : (
                             <div className="text-center">
                               <CameraOutlined className="text-3xl sm:text-4xl lg:text-5xl text-gray-400 mb-1 sm:mb-2" />
-                              <Text className="text-gray-500 text-xs sm:text-sm block">
-                                Click to upload
-                              </Text>
+                              <Text className="text-gray-500 text-xs sm:text-sm block">Click to upload</Text>
                             </div>
                           )}
                         </div>

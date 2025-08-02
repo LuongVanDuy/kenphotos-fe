@@ -1,18 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Tag,
-  message,
-  Select,
-  Table,
-  Dropdown,
-  Modal,
-  Input,
-  Space,
-  Avatar,
-} from "antd";
+import { Button, Tag, message, Select, Table, Dropdown, Modal, Input, Space, Avatar } from "antd";
 import {
   PlusOutlined,
   MoreOutlined,
@@ -25,12 +14,7 @@ import {
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchPosts,
-  deletePost,
-  restorePost,
-  permanentDeletePost,
-} from "@/store/actions/posts";
+import { fetchPosts, deletePost, restorePost, permanentDeletePost } from "@/store/actions/posts";
 import { useSession } from "next-auth/react";
 import { AppDispatch, RootState } from "@/store/store";
 import { getImageUrl } from "@/utils";
@@ -50,6 +34,14 @@ const PostListPage: React.FC = () => {
   const { data: session } = useSession();
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth < 640);
+    }
+  }, []);
 
   // Get state from Redux store
   const postList = useSelector((state: RootState) => state.posts.list);
@@ -111,14 +103,7 @@ const PostListPage: React.FC = () => {
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        dispatch(
-          deletePost(
-            { ids: [post.id] },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
+        dispatch(deletePost({ ids: [post.id] }, session?.accessToken || "", onSuccess, onFailure) as any);
       },
     });
   };
@@ -131,14 +116,7 @@ const PostListPage: React.FC = () => {
       okType: "primary",
       cancelText: "Cancel",
       onOk() {
-        dispatch(
-          restorePost(
-            { ids: [post.id] },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
+        dispatch(restorePost({ ids: [post.id] }, session?.accessToken || "", onSuccess, onFailure) as any);
       },
     });
   };
@@ -151,14 +129,7 @@ const PostListPage: React.FC = () => {
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        dispatch(
-          permanentDeletePost(
-            { ids: [post.id] },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
+        dispatch(permanentDeletePost({ ids: [post.id] }, session?.accessToken || "", onSuccess, onFailure) as any);
       },
     });
   };
@@ -177,14 +148,7 @@ const PostListPage: React.FC = () => {
       cancelText: "Cancel",
       onOk() {
         const ids = selectedPosts.map((post) => post.id);
-        dispatch(
-          deletePost(
-            { ids },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
+        dispatch(deletePost({ ids }, session?.accessToken || "", onSuccess, onFailure) as any);
       },
     });
   };
@@ -203,14 +167,7 @@ const PostListPage: React.FC = () => {
       cancelText: "Cancel",
       onOk() {
         const ids = selectedPosts.map((post) => post.id);
-        dispatch(
-          restorePost(
-            { ids },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
+        dispatch(restorePost({ ids }, session?.accessToken || "", onSuccess, onFailure) as any);
       },
     });
   };
@@ -229,14 +186,7 @@ const PostListPage: React.FC = () => {
       cancelText: "Cancel",
       onOk() {
         const ids = selectedPosts.map((post) => post.id);
-        dispatch(
-          permanentDeletePost(
-            { ids },
-            session?.accessToken || "",
-            onSuccess,
-            onFailure
-          ) as any
-        );
+        dispatch(permanentDeletePost({ ids }, session?.accessToken || "", onSuccess, onFailure) as any);
       },
     });
   };
@@ -255,38 +205,18 @@ const PostListPage: React.FC = () => {
         <Space direction="vertical" size="small" className="w-full">
           <div className="flex items-start gap-2">
             {record.thumbnail ? (
-              <Avatar
-                src={getImageUrl(record.thumbnail)}
-                style={{ width: 50, height: 35, flexShrink: 0 }}
-                shape="square"
-              />
+              <Avatar src={getImageUrl(record.thumbnail)} style={{ width: 50, height: 35, flexShrink: 0 }} shape="square" />
             ) : (
-              <Avatar
-                style={{ width: 50, height: 35, flexShrink: 0 }}
-                icon={<PictureOutlined />}
-                shape="square"
-              />
+              <Avatar style={{ width: 50, height: 35, flexShrink: 0 }} icon={<PictureOutlined />} shape="square" />
             )}
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm lg:text-base truncate">
-                {record.title}
-              </div>
-              <div className="text-xs lg:text-sm text-gray-500 truncate">
-                {record.slug}
-              </div>
+              <div className="font-medium text-sm lg:text-base truncate">{record.title}</div>
+              <div className="text-xs lg:text-sm text-gray-500 truncate">{record.slug}</div>
             </div>
           </div>
           <div className="flex flex-wrap gap-1">
-            <Tag
-              color={statusMap[record.status]?.color || "default"}
-            >
-              {statusMap[record.status]?.label || record.status}
-            </Tag>
-            <Tag
-              color={deleteFlgMap[record.deleteFlg]?.color || "default"}
-            >
-              {deleteFlgMap[record.deleteFlg]?.label || "Unknown"}
-            </Tag>
+            <Tag color={statusMap[record.status]?.color || "default"}>{statusMap[record.status]?.label || record.status}</Tag>
+            <Tag color={deleteFlgMap[record.deleteFlg]?.color || "default"}>{deleteFlgMap[record.deleteFlg]?.label || "Unknown"}</Tag>
           </div>
         </Space>
       ),
@@ -301,9 +231,7 @@ const PostListPage: React.FC = () => {
               <div className="font-medium text-sm">
                 {record.author.firstName} {record.author.lastName}
               </div>
-              <div className="text-xs text-gray-500 truncate">
-                {record.author.email}
-              </div>
+              <div className="text-xs text-gray-500 truncate">{record.author.email}</div>
             </>
           ) : (
             <span className="text-gray-400 text-sm">No author</span>
@@ -323,9 +251,7 @@ const PostListPage: React.FC = () => {
                   {cat.category?.name || "Unknown"}
                 </Tag>
               ))}
-              {record.categories.length > 2 && (
-                <Tag>+{record.categories.length - 2}</Tag>
-              )}
+              {record.categories.length > 2 && <Tag>+{record.categories.length - 2}</Tag>}
             </div>
           ) : (
             <span className="text-gray-400 text-sm">No categories</span>
@@ -340,9 +266,7 @@ const PostListPage: React.FC = () => {
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">
-            {new Date(date).toLocaleTimeString()}
-          </div>
+          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
         </div>
       ),
     },
@@ -395,9 +319,7 @@ const PostListPage: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">
-        {deleteFlg === 1 ? "Trash" : "Posts"}
-      </h1>
+      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">{deleteFlg === 1 ? "Trash" : "Posts"}</h1>
 
       <div className="flex flex-col lg:flex-row gap-3 lg:gap-2 mb-4 lg:mb-6 items-start lg:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full lg:w-auto">
@@ -415,13 +337,7 @@ const PostListPage: React.FC = () => {
             size="middle"
           />
           <div className="flex gap-2 w-full sm:w-auto">
-            <Select
-              value={status}
-              onChange={setStatus}
-              className="flex-1 sm:flex-none"
-              style={{ minWidth: "120px" }}
-              size="middle"
-            >
+            <Select value={status} onChange={setStatus} className="flex-1 sm:flex-none" style={{ minWidth: "120px" }} size="middle">
               <Option value="all">All Status</Option>
               <Option value={0}>Draft</Option>
               <Option value={1}>Published</Option>
@@ -453,7 +369,7 @@ const PostListPage: React.FC = () => {
                 onClick={handleBulkRestore}
                 disabled={selectedPosts.length === 0}
                 size="middle"
-                block={window.innerWidth < 640}
+                block={isMobile}
               >
                 Restore Selected ({selectedPosts.length})
               </Button>
@@ -464,7 +380,7 @@ const PostListPage: React.FC = () => {
                 onClick={handleBulkPermanentDelete}
                 disabled={selectedPosts.length === 0}
                 size="middle"
-                block={window.innerWidth < 640}
+                block={isMobile}
               >
                 Delete Permanently ({selectedPosts.length})
               </Button>
@@ -478,17 +394,11 @@ const PostListPage: React.FC = () => {
                 onClick={handleBulkDelete}
                 disabled={selectedPosts.length === 0}
                 size="middle"
-                block={window.innerWidth < 640}
+                block={isMobile}
               >
                 Move to Trash ({selectedPosts.length})
               </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => router.push("/admin/post/create")}
-                size="middle"
-                block={window.innerWidth < 640}
-              >
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/post/create")} size="middle" block={isMobile}>
                 Add New Post
               </Button>
             </>
@@ -515,8 +425,7 @@ const PostListPage: React.FC = () => {
             total: postTotal,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
             onChange: (page, pageSize) => {
               handleQuery(keyword, page, pageSize);
             },

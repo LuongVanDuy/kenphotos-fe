@@ -1,32 +1,11 @@
 "use client";
 
 import React, { useEffect, useCallback, useState } from "react";
-import {
-  Button,
-  Input,
-  Select,
-  Modal,
-  Table,
-  Dropdown,
-  Space,
-  message,
-  Switch,
-  Tag,
-} from "antd";
+import { Button, Input, Select, Modal, Table, Dropdown, Space, message, Switch, Tag } from "antd";
 import { PlusOutlined, FolderOutlined, MoreOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchCategories,
-  fetchCategory,
-  permanentDeleteCategory,
-  updateCategoryDefault,
-} from "@/store/actions/categories";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  StarOutlined,
-} from "@ant-design/icons";
+import { fetchCategories, fetchCategory, permanentDeleteCategory, updateCategoryDefault } from "@/store/actions/categories";
+import { EditOutlined, DeleteOutlined, EyeOutlined, StarOutlined } from "@ant-design/icons";
 import { Typography } from "antd";
 import CategoryForm from "@/components/Admin/Post/CategoryForm";
 import { useSession } from "next-auth/react";
@@ -52,14 +31,18 @@ const CategoryPage: React.FC = () => {
   const { data: session } = useSession();
   const dispatch = useDispatch<AppDispatch>();
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth < 640);
+    }
+  }, []);
+
   // Get state from Redux store
   const categoryList = useSelector((state: RootState) => state.categories.list);
-  const categoryLoading = useSelector(
-    (state: RootState) => state.categories.loading
-  );
-  const categoryTotal = useSelector(
-    (state: RootState) => state.categories.total
-  );
+  const categoryLoading = useSelector((state: RootState) => state.categories.loading);
+  const categoryTotal = useSelector((state: RootState) => state.categories.total);
 
   const [sortBy, setSortBy] = useState<string>("name");
   const [sortDesc, setSortDesc] = useState<boolean>(false);
@@ -112,8 +95,7 @@ const CategoryPage: React.FC = () => {
       render: (text: any) => {
         if (!text) return null;
         const plainText = stripHtml(text);
-        const truncated =
-          plainText.length > 100 ? plainText.slice(0, 100) + "..." : plainText;
+        const truncated = plainText.length > 100 ? plainText.slice(0, 100) + "..." : plainText;
         return <span className="text-sm">{truncated}</span>;
       },
     },
@@ -125,11 +107,7 @@ const CategoryPage: React.FC = () => {
       width: 100,
       responsive: ["lg"],
       render: (isDefault: boolean, record: any) => (
-        <Switch
-          checked={isDefault}
-          onChange={(checked) => handleSetDefault(record, checked)}
-          size="small"
-        />
+        <Switch checked={isDefault} onChange={(checked) => handleSetDefault(record, checked)} size="small" />
       ),
     },
     {
@@ -191,9 +169,7 @@ const CategoryPage: React.FC = () => {
 
   const handleDelete = (cat: any) => {
     if (cat.isDefault) {
-      message.warning(
-        "Cannot delete default category. Please set another category as default first."
-      );
+      message.warning("Cannot delete default category. Please set another category as default first.");
       return;
     }
 
@@ -227,9 +203,7 @@ const CategoryPage: React.FC = () => {
 
     const hasDefault = selectedCategories.some((cat) => cat.isDefault);
     if (hasDefault) {
-      message.warning(
-        "Cannot delete default category. Please set another category as default first."
-      );
+      message.warning("Cannot delete default category. Please set another category as default first.");
       return;
     }
 
@@ -314,9 +288,7 @@ const CategoryPage: React.FC = () => {
 
   return (
     <div className="">
-      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">
-        Categories
-      </h1>
+      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">Categories</h1>
 
       <div className="flex flex-col lg:flex-row gap-3 lg:gap-2 mb-4 lg:mb-6 items-start lg:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full lg:w-auto">
@@ -334,24 +306,14 @@ const CategoryPage: React.FC = () => {
             size="middle"
           />
           <div className="flex gap-2 w-full sm:w-auto">
-            <Select
-              value={sortBy}
-              onChange={setSortBy}
-              style={{ minWidth: "120px" }}
-              size="middle"
-            >
+            <Select value={sortBy} onChange={setSortBy} style={{ minWidth: "120px" }} size="middle">
               {sortFields.map((f) => (
                 <Option key={f.value} value={f.value}>
                   {f.label}
                 </Option>
               ))}
             </Select>
-            <Select
-              value={sortDesc}
-              onChange={(v) => setSortDesc(v)}
-              style={{ minWidth: "100px" }}
-              size="middle"
-            >
+            <Select value={sortDesc} onChange={(v) => setSortDesc(v)} style={{ minWidth: "100px" }} size="middle">
               <Option value={false}>Asc</Option>
               <Option value={true}>Desc</Option>
             </Select>
@@ -365,7 +327,7 @@ const CategoryPage: React.FC = () => {
             onClick={handleBulkDelete}
             disabled={selectedCategories.length === 0}
             size="middle"
-            block={window.innerWidth < 640}
+            block={isMobile}
           >
             Delete Selected ({selectedCategories.length})
           </Button>
@@ -378,7 +340,7 @@ const CategoryPage: React.FC = () => {
               setModalMode("create");
               setShowModal(true);
             }}
-            block={window.innerWidth < 640}
+            block={isMobile}
           >
             Add New Category
           </Button>
@@ -407,8 +369,7 @@ const CategoryPage: React.FC = () => {
             total: categoryTotal,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
             onChange: (page, pageSize) => {
               handleQuery(keyword, page, pageSize);
             },
@@ -457,38 +418,26 @@ const CategoryPage: React.FC = () => {
             <div>
               <Text strong>Slug:</Text>
               <Paragraph className="!mb-0">
-                <code className="bg-gray-100 px-2 py-1 rounded text-sm break-all">
-                  {selectedCategory.slug}
-                </code>
+                <code className="bg-gray-100 px-2 py-1 rounded text-sm break-all">{selectedCategory.slug}</code>
               </Paragraph>
             </div>
             <div>
               <Text strong>Description:</Text>
-              <Paragraph className="!mb-0">
-                {selectedCategory.description || "No description"}
-              </Paragraph>
+              <Paragraph className="!mb-0">{selectedCategory.description || "No description"}</Paragraph>
             </div>
             <div>
               <Text strong>Parent Category:</Text>
               <Paragraph className="!mb-0">
-                {selectedCategory.parentId
-                  ? categoryList.find(
-                      (p: any) => p.id === selectedCategory.parentId
-                    )?.name || "Unknown"
-                  : "Root Category"}
+                {selectedCategory.parentId ? categoryList.find((p: any) => p.id === selectedCategory.parentId)?.name || "Unknown" : "Root Category"}
               </Paragraph>
             </div>
             <div>
               <Text strong>Created:</Text>
-              <Paragraph className="!mb-0">
-                {new Date(selectedCategory.createdAt).toLocaleString()}
-              </Paragraph>
+              <Paragraph className="!mb-0">{new Date(selectedCategory.createdAt).toLocaleString()}</Paragraph>
             </div>
             <div>
               <Text strong>Last Updated:</Text>
-              <Paragraph className="!mb-0">
-                {new Date(selectedCategory.updatedAt).toLocaleString()}
-              </Paragraph>
+              <Paragraph className="!mb-0">{new Date(selectedCategory.updatedAt).toLocaleString()}</Paragraph>
             </div>
           </div>
         </Modal>
