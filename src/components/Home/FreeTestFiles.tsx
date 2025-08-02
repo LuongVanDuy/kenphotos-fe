@@ -11,10 +11,7 @@ const FreeTestFiles: React.FC = () => {
     { label: "Service-3", value: "service3" },
   ];
   return (
-    <section
-      className="bg-section pt-12 pb-24 md:pt-24 md:pb-40 relative"
-      aria-labelledby="free-test-heading"
-    >
+    <section className="bg-section pt-12 pb-24 md:pt-24 md:pb-40 relative" aria-labelledby="free-test-heading">
       <div className="max-w-content mx-auto px-4">
         <span className="notch-top-left" aria-hidden="true"></span>
         <div className="grid md:grid-cols-2 gap-12 items-start">
@@ -22,30 +19,21 @@ const FreeTestFiles: React.FC = () => {
 
           <div className="space-y-10 md:pr-12 md:sticky md:top-24">
             <p className="text-[19px] font-medium">
-              <span className="text-[#F9B02A]">/</span>{" "}
-              <span className="text-black">Kontakt</span>
+              <span className="text-[#F9B02A]">/</span> <span className="text-black">Contact</span>
             </p>
-            <h2 className="text-2xl md:text-[43px] font-semibold text-black leading-normal">
-              Lassen Sie uns gemeinsam Ihre digitale Zukunft gestalten – Starten
-              Sie jetzt!
-            </h2>
+            <h2 className="text-2xl md:text-[43px] font-semibold text-black leading-normal">Let’s shape your digital future together – Start now!</h2>
             <div>
-              <p className="text-[19px] text-[#866E3D]">info@djumla.de</p>
-              <p className="text-[19px] text-[#866E3D]">+49 221 677 863 520</p>
+              <p className="text-[19px] text-[#866E3D]">truecolorcso@gmail.com</p>
+              <p className="text-[19px] text-[#866E3D]">(+84) 339 871 448</p>
             </div>
           </div>
 
           {/* Right Section  */}
           <div className=" p-2 py-4 md:p-8">
-            <form
-              className="space-y-10 text-black"
-              aria-label="Projektanfrage Formular"
-            >
+            <form className="space-y-10 text-black" aria-label="Projektanfrage Formular">
               {/* Ihre Kontaktdaten */}
               <div className="space-y-6">
-                <h2 className="text-2xl md:text-3xl font-bold">
-                  Booking services
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold">Booking services</h2>
 
                 <div className="space-y-4">
                   <div>
@@ -117,24 +105,16 @@ const FreeTestFiles: React.FC = () => {
                           key={service.value}
                           className="flex items-center gap-3 border bg-white border-[#B1B1B1] p-4 rounded-md cursor-pointer hover:border-gray-500"
                         >
-                          <input
-                            type="radio"
-                            name="service"
-                            value={service.value}
-                            className="accent-black"
-                          />
+                          <input type="radio" name="service" value={service.value} className="accent-black" />
                           <span>{service.label}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   <p className="text-gray-700 text-[15px] leading-relaxed">
-                    Damit wir Ihr Projekt bestmöglich planen können, fragen wir
-                    vorab nach Ihrem Budget. Unser erfahrenes Team weiß, welche
-                    Ideen in welchem Kostenrahmen umsetzbar sind. So können wir
-                    direkt prüfen, ob Ihre Vorstellungen realistisch umsetzbar
-                    ist, und Ihnen im Erstgespräch bereits passende Alternativen
-                    oder Optimierungen vorschlagen.
+                    Damit wir Ihr Projekt bestmöglich planen können, fragen wir vorab nach Ihrem Budget. Unser erfahrenes Team weiß, welche Ideen in
+                    welchem Kostenrahmen umsetzbar sind. So können wir direkt prüfen, ob Ihre Vorstellungen realistisch umsetzbar ist, und Ihnen im
+                    Erstgespräch bereits passende Alternativen oder Optimierungen vorschlagen.
                   </p>
 
                   <div>
@@ -148,9 +128,7 @@ const FreeTestFiles: React.FC = () => {
                         required
                         className="form-checkbox w-5 h-5 text-[#F7B500] border-[#B1B1B1] focus:ring-0 accent-[#F7B500]"
                       />
-                      <span className="text-gray-900 font-medium">
-                        Verifiziert
-                      </span>
+                      <span className="text-gray-900 font-medium">Verifiziert</span>
                     </label>
                   </div>
 
