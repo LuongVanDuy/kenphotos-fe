@@ -2,6 +2,7 @@
 
 import React from "react";
 import { CompareSlider } from "./CompareSlider";
+import SectionTitle from "../UI/SectionTitle";
 
 const services = [
   {
@@ -38,14 +39,13 @@ const services = [
 
 const WindowViewStyles: React.FC = () => {
   return (
-    <section className="bg-white py-24 relative">
+    <section className="bg-white pt-12 pb-24  md:pt-24 md:pb-40 relative">
       <div className="max-w-content mx-auto px-4">
-        <span className="notch-top-left" aria-hidden="true"></span>
-        <h2 className="text-[#1C244B] text-[24px] md:text-[45px] font-semibold text-center pt-3 mb-6 md:mb-12 leading-[1.2em]">
-          We have what you need
-        </h2>
+        <span className="notch-top-right" aria-hidden="true"></span>
 
-        <div className="flex flex-col lg:flex-row w-full lg:items-start">
+        <SectionTitle title="We have what you need​" topText="style" />
+
+        <div className="flex flex-col lg:flex-row w-full lg:items-start mt-12">
           {/* Left - Sticky Section */}
           <div className="lg:w-2/5 flex flex-col items-center lg:items-start lg:sticky lg:top-24 lg:self-start lg:h-fit">
             <h3 className="text-[24px] md:text-[28px] font-semibold text-[#2CA6DF] mb-4 text-center lg:text-left">
@@ -79,8 +79,6 @@ const WindowViewStyles: React.FC = () => {
             ))}
           </div>
         </div>
-
-        <span className="notch-bottom-right" aria-hidden="true"></span>
       </div>
     </section>
   );
