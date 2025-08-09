@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
 import { CompareSlider } from "./CompareSlider";
-import SectionTitle from "../UI/SectionTitle";
 
 const services = [
   {
@@ -43,74 +44,65 @@ const services = [
 ];
 
 const WindowViewStyles: React.FC = () => {
-  const [activeId, setActiveId] = useState<number | null>(null);
-  const sliderRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const index = sliderRefs.current.findIndex((ref) => ref === entry.target);
-          if (entry.isIntersecting && index !== -1) {
-            setActiveId(services[index].id);
-          }
-        });
-      },
-      {
-        threshold: 0.5, // 50% in view
-      }
-    );
-
-    sliderRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
   return (
-    <section className="bg-white pt-12 pb-24 md:pt-24 md:pb-40 relative">
+    <section className="bg-[#D4EFFF] md:py-16">
       <div className="max-w-content mx-auto px-4">
-        <span className="notch-top-right" aria-hidden="true" />
+        <motion.h2
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-[#1C244B] text-[24px] md:text-[45px] font-semibold text-center pt-3 mb-6 md:mb-12 leading-[1.2em] tracking-[0px]"
+        >
+          We have what you need
+        </motion.h2>
 
-        <SectionTitle title="Your perfect window view" topText="Style options" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center items-start">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            className="flex flex-col items-center justify-center lg:items-center min-h-[220px] w-full"
+          >
+            <h3 className="text-[24px] md:text-[28px] font-semibold text-[#2CA6DF] mb-4 text-center lg:text-left">
+              Window View Style
+            </h3>
+            <ul className="text-[22px] md:text-[24px] text-[#1C244B] space-y-1 text-center lg:text-left">
+              <li>– American Style</li>
+              <li>– Canadian Style</li>
+              <li>– Scandinavian Style</li>
+              <li>– Australian Style</li>
+              <li>– Airbnb</li>
+              <li>– Classic</li>
+              <li>– Architecture</li>
+            </ul>
+          </motion.div>
 
-        <div className="flex flex-col lg:flex-row w-full lg:items-start mt-12">
-          <div className="lg:w-2/5 flex flex-col items-center lg:items-start lg:sticky lg:top-28 lg:self-start lg:h-fit">
-            <h3 className="text-[24px] md:text-[28px] font-semibold mb-[32px] text-center lg:text-left"> Window View Styles Explained</h3>
-
-            {services.map((service, index) => (
-              <div
-                key={service.id}
-                className="mb-[24px] cursor-pointer"
-                onClick={() => {
-                  sliderRefs.current[index]?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }}
-              >
-                <h4 className={`text-[20px] transition-all  font-semibold mb-[8px] ${activeId === service.id ? "text-[#F9B02A]" : "text-[#171717]"}`}>
-                  <span className="text-[#F9B02A]">{service.id}.</span> {service.title}
-                </h4>
-                <p>{service.desc}</p>
+          {services.map((service, index) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.1 * (index + 1),
+              }}
+              className="flex flex-col  w-full"
+            >
+              <div className="relative w-full h-[300px] aspect-[2/3] rounded-xl overflow-hidden shadow-xl">
+                <CompareSlider
+                  beforeImage={service.beforeImage}
+                  afterImage={service.afterImage}
+                />
               </div>
-            ))}
-          </div>
-
-          {/* Right - Sliders */}
-          <div className="lg:w-3/5 mt-8 lg:mt-0 lg:pl-10 flex flex-col gap-6">
-            {services.map((service, index) => (
-              <div key={service.id} ref={(el: any) => (sliderRefs.current[index] = el)} className="flex flex-col gap-4 mb-8 scroll-mt-32">
-                <h4 className="text-[20px] font-semibold text-[#1C244B]">{service.title}</h4>
-                <div className="relative w-full h-[300px] md:h-[500px] aspect-[2/3] rounded-xl overflow-hidden shadow-xl">
-                  <CompareSlider beforeImage={service.beforeImage} afterImage={service.afterImage} />
-                </div>
-              </div>
-            ))}
-          </div>
+              <h4 className="text-[20px] font-semibold text-[#1C244B] mt-2">
+                {service.title}
+              </h4>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

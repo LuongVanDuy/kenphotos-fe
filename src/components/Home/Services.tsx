@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { CompareSlider } from "./CompareSlider";
 import SectionTitle from "../UI/SectionTitle";
 import { ArrowRightIcon } from "../Icons";
@@ -90,49 +91,86 @@ const Services: React.FC = () => {
     <section className="bg-white pt-12 pb-24  md:pt-24 md:pb-40 relative">
       <div className="max-w-content mx-auto px-4 text-center">
         <span className="notch-top-right" aria-hidden="true"></span>
-        <SectionTitle
-          title="ALL OUR SERVICES​"
-          topText="Service"
-          bottomText="We deliver high-quality services tailored to meet your business needs and goals."
-        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-          {services.map((service) => {
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12"
+        >
+          {services.map((service, index) => {
             return (
-              <div key={service.id} className="overflow-hidden bg-white rounded-[12px] shadow-lg transition-transform transform hover:bg-gray-100">
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{
+                  duration: 0.8,
+                  ease: "easeOut",
+                  delay: 0.1 * index,
+                }}
+                whileHover={{ y: -10, scale: 1.02 }}
+                className="overflow-hidden bg-white rounded-[12px] shadow-lg transition-transform transform hover:bg-gray-100"
+              >
                 <div className="relative h-80 bg-gray-200">
-                  <CompareSlider beforeImage={service.beforeImage} afterImage={service.afterImage} />
+                  <CompareSlider
+                    beforeImage={service.beforeImage}
+                    afterImage={service.afterImage}
+                  />
                 </div>
 
                 <div className="p-6 text-start">
-                  <h3 className="text-xl font-bold text-[#1C244B] mb-3 cursor-pointer">{service.title}</h3>
+                  <h3 className="text-xl font-bold text-[#1C244B] mb-3 cursor-pointer">
+                    {service.title}
+                  </h3>
 
-                  <p className="text-gray-600 text-sm leading-relaxed mb-4">{service.description}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                    {service.description}
+                  </p>
 
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2 justify-center">
                       <div className="flex items-center">
                         <span className="text-yellow-400 text-lg">★</span>
-                        <span className="font-semibold ml-1">{service.rating}</span>
+                        <span className="font-semibold ml-1">
+                          {service.rating}
+                        </span>
                       </div>
-                      <span className="text-gray-500 text-sm">({service.orders} orders)</span>
+                      <span className="text-gray-500 text-sm">
+                        ({service.orders} orders)
+                      </span>
                     </div>
 
                     <div className="flex items-center justify-center gap-2  text-center">
-                      <span className="text-red-500 font-bold">{service.discount}</span>
-                      <span className="text-gray-400 line-through">{service.originalPrice}</span>
-                      <span className="text-green-600 font-bold text-lg">{service.newPrice}</span>
+                      <span className="text-red-500 font-bold">
+                        {service.discount}
+                      </span>
+                      <span className="text-gray-400 line-through">
+                        {service.originalPrice}
+                      </span>
+                      <span className="text-green-600 font-bold text-lg">
+                        {service.newPrice}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
-        <button className="px-[30px] py-[15px] text-[16px] mt-12 bg-black  text-white rounded-full text-sm font-medium hover:opacity-90 transition-all">
+        <motion.button
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
+          whileHover={{ scale: 1.05 }}
+          className="px-[30px] py-[15px] text-[16px] mt-12 bg-black  text-white rounded-full text-sm font-medium hover:opacity-90 transition-all"
+        >
           View all <ArrowRightIcon className="ml-2" />
-        </button>
+        </motion.button>
       </div>
     </section>
   );

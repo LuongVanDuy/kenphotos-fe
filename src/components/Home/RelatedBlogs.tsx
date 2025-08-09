@@ -74,7 +74,6 @@ const RelatedBlogs = () => {
 
         <SectionTitle
           title="Blog"
-          topText="Insights"
           bottomText="Explore ideas, tips, and stories from our team"
         />
 

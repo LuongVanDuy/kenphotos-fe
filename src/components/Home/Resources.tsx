@@ -1,89 +1,98 @@
-'use client'
-import Image from 'next/image'
-import SectionTitle from '../UI/SectionTitle'
+"use client";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import SectionTitle from "../UI/SectionTitle";
 
 const Resources: React.FC = () => {
   const resources = [
     {
       id: 1,
-      name: 'Big/small Clouds',
-      image: '/images/resource-1.jpg',
+      name: "Big/small Clouds",
+      image: "/images/resource-1.jpg",
     },
     {
       id: 2,
-      name: 'Soft clouds',
-      image: '/images/resourse-2.jpg',
+      name: "Soft clouds",
+      image: "/images/resourse-2.jpg",
     },
     {
       id: 3,
-      name: 'Clear sky',
-      image: '/images/resourse-3.jpg',
+      name: "Clear sky",
+      image: "/images/resourse-3.jpg",
     },
     {
       id: 4,
-      name: 'Sunset/Twilight',
-      image: '/images/resourse-4.jpg',
+      name: "Sunset/Twilight",
+      image: "/images/resourse-4.jpg",
     },
     {
       id: 5,
-      name: 'Dusk/Night',
-      image: '/images/resourse-5.jpg',
+      name: "Dusk/Night",
+      image: "/images/resourse-5.jpg",
     },
     {
       id: 6,
-      name: 'Grass',
-      image: '/images/resourse-6.jpg',
+      name: "Grass",
+      image: "/images/resourse-6.jpg",
     },
     {
       id: 7,
-      name: 'Fires',
-      image: '/images/resourse-7.jpg',
+      name: "Fires",
+      image: "/images/resourse-7.jpg",
     },
     {
       id: 8,
-      name: 'TV screen',
-      image: '/images/resourse-8.jpg',
+      name: "TV screen",
+      image: "/images/resourse-8.jpg",
     },
-  ]
+  ];
 
   return (
-    <section className='pt-12 pb-24  md:pt-24 md:pb-40 bg-section relative'>
-      <div className='max-w-content mx-auto px-4 text-center'>
-        <span className='notch-top-left' aria-hidden='true'></span>
+    <section className="pt-12 pb-24  md:pt-24 md:pb-40 bg-section relative">
+      <div className="max-w-content mx-auto px-4 text-center">
+        <span className="notch-top-left" aria-hidden="true"></span>
 
-        <SectionTitle
-          title=' Below are our resources​'
-          topText='resources'
-          bottomText='This resource is shared for free with everyone, you can download and
-          use it for free. The power of giving'
-        />
-
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-12'>
-          {resources.map((resource) => (
-            <div
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-12"
+        >
+          {resources.map((resource, index) => (
+            <motion.div
               key={resource.id}
-              className='relative w-full aspect-[4/3] rounded-[12px] overflow-hidden shadow-md group'
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{
+                duration: 0.6,
+                ease: "easeOut",
+                delay: 0.1 * index,
+              }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative w-full aspect-[4/3] rounded-[12px] overflow-hidden shadow-md group"
             >
               <Image
                 src={resource.image}
                 alt={resource.name}
                 width={320}
                 height={240}
-                className='object-cover w-full h-full group-hover:scale-110 transition-transform duration-300'
+                className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
                 priority
               />
 
-              <div className='absolute bottom-3 left-3'>
-                <span className='bg-gray-600/70 text-white text-sm px-3 py-1 rounded-full shadow-sm backdrop-blur-sm'>
+              <div className="absolute bottom-3 left-3">
+                <span className="bg-gray-600/70 text-white text-sm px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">
                   {resource.name}
                 </span>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Resources
+export default Resources;

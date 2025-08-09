@@ -43,6 +43,10 @@ body {
   color: #9d9dad;
 }
 .bg-section {
+  background: linear-gradient(180deg, #bee8fd 0%, rgba(204, 237, 253, 0) 100%);
+}
+
+.bg-section-2 {
   background: #faf9f7;
 }
 
@@ -358,7 +362,7 @@ body {
 }
 
 .notch-top-left {
-  background: #faf9f7;
+  background: #bee8fd;
   position: absolute;
   height: calc(32px * 2);
   display: block;
@@ -368,7 +372,7 @@ body {
   border-top-right-radius: 32px;
 }
 
-.notch-top-left::before {
+/* .notch-top-left::before {
   width: 32px;
   height: 32px;
   background-color: transparent;
@@ -381,7 +385,7 @@ body {
   bottom: 0;
   left: calc(100% - 1px);
   transform: rotate(0deg);
-}
+} */
 
 .notch-top-right {
   /* background: #ce8c08; */
