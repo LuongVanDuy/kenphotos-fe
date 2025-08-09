@@ -56,8 +56,8 @@ export const authOptions: NextAuthOptions = {
 
           if (user && user.accessToken) return user;
         } catch (error) {
-          console.error("Login error");
-          return null;
+          console.error("Login error:", error);
+          throw error;
         }
         return null;
       },

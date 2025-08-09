@@ -29,7 +29,7 @@ const FreeTestFiles: React.FC = () => {
           </div>
 
           {/* Right Section  */}
-          <div className=" p-2 py-4 md:p-8">
+          <div className="p-2 md:pl-16">
             <form className="space-y-10 text-black" aria-label="Projektanfrage Formular">
               {/* Ihre Kontaktdaten */}
               <div className="space-y-6">
