@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   Row,
@@ -29,78 +29,61 @@ import {
   ClockCircleOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import { DashboardStats, User, Post, Media } from "@/types";
+import { useDispatch, useSelector } from "react-redux";
+import { useSession } from "next-auth/react";
+import { AppDispatch, RootState } from "@/store/store";
+import { fetchUsers } from "@/store/actions/users";
+import { fetchPosts } from "@/store/actions/posts";
+import { fetchMedia } from "@/store/actions/media";
+import { fetchOrders } from "@/store/actions/orders";
+import { useRouter } from "next/navigation";
 
 const { Title, Text } = Typography;
 
 interface DashboardOverviewProps {
-  stats?: DashboardStats;
+  stats?: any;
 }
 
 const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
-  // Mock data for demonstration
-  const mockStats: DashboardStats = {
-    totalUsers: 1234,
-    totalPosts: 567,
-    totalMedia: 890,
-    totalViews: 12345,
-    recentUsers: [
-      {
-        id: "1",
-        name: "John Doe",
-        email: "john@example.com",
-        role: "admin",
-        status: "active",
-        createdAt: "2024-01-15",
-      },
-      {
-        id: "2",
-        name: "Jane Smith",
-        email: "jane@example.com",
-        role: "editor",
-        status: "active",
-        createdAt: "2024-01-14",
-      },
-    ],
-    recentPosts: [
-      {
-        id: "1",
-        title: "Getting Started with Next.js",
-        content: "Content here...",
-        status: "published",
-        author: {
-          id: "1",
-          name: "John Doe",
-          email: "john@example.com",
-          role: "admin",
-          status: "active",
-          createdAt: "2024-01-15",
-        },
-        tags: ["nextjs", "react"],
-        categories: ["tutorial"],
-        createdAt: "2024-01-15",
-        updatedAt: "2024-01-15",
-      },
-    ],
-    recentMedia: [
-      {
-        id: "1",
-        filename: "hero-image.jpg",
-        originalName: "hero-image.jpg",
-        mimeType: "image/jpeg",
-        size: 1024000,
-        url: "/images/hero-image.jpg",
-        uploadedBy: {
-          id: "1",
-          name: "John Doe",
-          email: "john@example.com",
-          role: "admin",
-          status: "active",
-          createdAt: "2024-01-15",
-        },
-        createdAt: "2024-01-15",
-      },
-    ],
+  const { data: session } = useSession();
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
+  // Get totals from Redux store
+  const userTotal = useSelector((state: RootState) => state.users.total) || 0;
+  const postTotal = useSelector((state: RootState) => state.posts.total) || 0;
+  const mediaTotal = useSelector((state: RootState) => state.media.total) || 0;
+  const orderTotal = useSelector((state: RootState) => state.orders.total) || 0;
+
+  // Get recent posts from Redux store
+  const recentPosts = useSelector((state: RootState) => state.posts.list) || [];
+
+  // Fetch data on component mount
+  useEffect(() => {
+    if (session?.accessToken) {
+      // Fetch minimal data to get totals
+      dispatch(
+        fetchUsers({ page: 1, itemsPerPage: 1 }, session.accessToken) as any
+      );
+      dispatch(
+        fetchPosts({ page: 1, itemsPerPage: 5 }, session.accessToken) as any
+      );
+      dispatch(
+        fetchMedia({ page: 1, itemsPerPage: 1 }, session.accessToken) as any
+      );
+      dispatch(
+        fetchOrders({ page: 1, itemsPerPage: 1 }, session.accessToken) as any
+      );
+    }
+  }, [session?.accessToken, dispatch]);
+
+  // Mock data for recent items (keeping this for now)
+  const mockStats: any = {
+    totalUsers: userTotal,
+    totalPosts: postTotal,
+    totalMedia: mediaTotal,
+    totalViews: orderTotal,
+    recentPosts: recentPosts,
   };
 
   const currentStats = stats || mockStats;
@@ -112,8 +95,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       icon: <TeamOutlined />,
       color: "#1677ff",
       bgColor: "#e6f7ff",
-      trend: { value: 12, isPositive: true },
-      description: "Active users this month",
+      description: "Registered users",
     },
     {
       title: "Total Posts",
@@ -121,7 +103,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       icon: <FileTextOutlined />,
       color: "#52c41a",
       bgColor: "#f6ffed",
-      trend: { value: 8, isPositive: true },
       description: "Published content",
     },
     {
@@ -130,17 +111,15 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       icon: <PictureOutlined />,
       color: "#faad14",
       bgColor: "#fffbe6",
-      trend: { value: 3, isPositive: false },
-      description: "Images and videos",
+      description: "Images uploaded",
     },
     {
-      title: "Total Views",
+      title: "Total Orders",
       value: currentStats.totalViews,
       icon: <EyeOutlined />,
       color: "#2f54eb",
       bgColor: "#f0f5ff",
-      trend: { value: 15, isPositive: true },
-      description: "Page views today",
+      description: "Customer orders",
     },
   ];
 
@@ -153,12 +132,12 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
     },
     {
       title: "Author",
-      dataIndex: "author",
       key: "author",
-      render: (author: User) => (
+      render: (_: any, record: any) => (
         <Space>
-          <Avatar size="small" icon={<UserOutlined />} />
-          {author.name}
+          {record.author
+            ? `${record.author.firstName} ${record.author.lastName}`
+            : "Unknown"}
         </Space>
       ),
     },
@@ -166,24 +145,22 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => (
-        <Tag
-          color={
-            status === "published"
-              ? "green"
-              : status === "draft"
-              ? "orange"
-              : "red"
-          }
-        >
-          {status.toUpperCase()}
-        </Tag>
-      ),
+      render: (status: number) => {
+        const statusMap: Record<number, { label: string; color: string }> = {
+          0: { label: "Draft", color: "orange" },
+          1: { label: "Published", color: "green" },
+        };
+        return (
+          <Tag color={statusMap[status]?.color || "default"}>
+            {statusMap[status]?.label || status}
+          </Tag>
+        );
+      },
     },
     {
       title: "Created",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      dataIndex: "createdTime",
+      key: "createdTime",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
   ];
@@ -216,32 +193,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
               Welcome back! Here's what's happening with your site today.
             </Text>
           </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-            <Button
-              icon={<CalendarOutlined />}
-              style={{
-                borderRadius: 12,
-                height: "40px",
-                border: `1px solid #d9d9d9`,
-              }}
-              className="admin-touch-target"
-            >
-              <span className="hidden sm:inline">Last 30 days</span>
-              <span className="sm:hidden">30 days</span>
-            </Button>
-            <Button
-              icon={<EyeOutlined />}
-              style={{
-                borderRadius: 12,
-                height: "40px",
-                border: `1px solid #d9d9d9`,
-              }}
-              className="admin-touch-target"
-            >
-              <span className="hidden sm:inline">View Analytics</span>
-              <span className="sm:hidden">Analytics</span>
-            </Button>
-          </div>
         </div>
       </div>
 
@@ -258,20 +209,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                 overflow: "hidden",
               }}
             >
-              {/* Background Pattern */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: "-20px",
-                  right: "-20px",
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "50%",
-                  background: `${card.color}10`,
-                  zIndex: 0,
-                }}
-              />
-
               <div style={{ position: "relative", zIndex: 1 }}>
                 <div className="flex items-start justify-between mb-4">
                   <div
@@ -284,25 +221,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                     {React.cloneElement(card.icon, {
                       style: { fontSize: "20px", color: "#ffffff" },
                     })}
-                  </div>
-                  <div className="flex items-center">
-                    {card.trend.isPositive ? (
-                      <ArrowUpOutlined
-                        style={{ color: "#52c41a", fontSize: "14px" }}
-                      />
-                    ) : (
-                      <ArrowDownOutlined
-                        style={{ color: "#ff4d4f", fontSize: "14px" }}
-                      />
-                    )}
-                    <span
-                      className="text-sm font-medium ml-1"
-                      style={{
-                        color: card.trend.isPositive ? "#52c41a" : "#ff4d4f",
-                      }}
-                    >
-                      {card.trend.value}%
-                    </span>
                   </div>
                 </div>
 
@@ -373,7 +291,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
             style={{ height: "fit-content" }}
           >
             <Table
-              dataSource={currentStats.recentPosts}
+              dataSource={recentPosts}
               columns={recentPostsColumns}
               pagination={false}
               size="middle"
@@ -412,112 +330,20 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                   block
                   icon={<PlusOutlined />}
                   style={{ height: "48px" }}
+                  onClick={() => router.push("/admin/post/create")}
                 >
                   Create New Post
                 </Button>
-                <Button
-                  block
-                  icon={<PlusOutlined />}
-                  style={{ height: "48px" }}
-                >
-                  Upload Media
-                </Button>
+
                 <Button
                   block
                   icon={<UserOutlined />}
                   style={{ height: "48px" }}
+                  onClick={() => router.push("/admin/user/create")}
                 >
                   Add User
                 </Button>
               </Space>
-            </Card>
-
-            {/* Recent Users */}
-            <Card
-              title={
-                <Text
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: 600,
-                    color: "#595959",
-                  }}
-                >
-                  Recent Users
-                </Text>
-              }
-            >
-              <List
-                dataSource={currentStats.recentUsers}
-                renderItem={(user) => (
-                  <List.Item style={{ padding: "12px 0" }}>
-                    <List.Item.Meta
-                      avatar={
-                        <Avatar
-                          icon={<UserOutlined />}
-                          style={{
-                            background: `linear-gradient(135deg, #1677ff, #4096ff)`,
-                          }}
-                        />
-                      }
-                      title={
-                        <Text style={{ fontWeight: 500, color: "#595959" }}>
-                          {user.name}
-                        </Text>
-                      }
-                      description={
-                        <Text style={{ color: "#595959" }}>{user.email}</Text>
-                      }
-                    />
-                    <Badge status={user.status as any} />
-                  </List.Item>
-                )}
-              />
-            </Card>
-
-            {/* Storage Usage */}
-            <Card
-              title={
-                <Text
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: 600,
-                    color: "#595959",
-                  }}
-                >
-                  Storage Usage
-                </Text>
-              }
-            >
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <Text style={{ fontWeight: 500, color: "#595959" }}>
-                      Media Files
-                    </Text>
-                    <Text style={{ color: "#595959" }}>2.4 GB / 10 GB</Text>
-                  </div>
-                  <Progress
-                    percent={24}
-                    size="small"
-                    strokeColor="#1677ff"
-                    trailColor="#d9d9d9"
-                  />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <Text style={{ fontWeight: 500, color: "#595959" }}>
-                      Database
-                    </Text>
-                    <Text style={{ color: "#595959" }}>156 MB / 1 GB</Text>
-                  </div>
-                  <Progress
-                    percent={15}
-                    size="small"
-                    strokeColor="#52c41a"
-                    trailColor="#d9d9d9"
-                  />
-                </div>
-              </div>
             </Card>
           </Space>
         </Col>

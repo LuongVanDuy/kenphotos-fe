@@ -40,6 +40,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
 }) => {
   const { data: session } = useSession();
 
+
   const breadcrumbs = AdminMenuHelper.getBreadcrumbs(pathname);
   const userMenuItems = AdminMenuHelper.convertUserMenuToAntd(onNavigation);
 

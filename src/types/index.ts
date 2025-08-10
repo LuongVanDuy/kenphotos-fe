@@ -82,16 +82,6 @@ export interface Media {
   };
 }
 
-export interface DashboardStats {
-  totalUsers: number;
-  totalPosts: number;
-  totalMedia: number;
-  totalViews: number;
-  recentUsers: User[];
-  recentPosts: Post[];
-  recentMedia: Media[];
-}
-
 export interface MenuItem {
   key: string;
   icon?: React.ReactNode;

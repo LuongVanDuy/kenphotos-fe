@@ -1,11 +1,33 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Button, Tag, message, Select, Table, Dropdown, Modal, Input } from "antd";
-import { PlusOutlined, MoreOutlined, EditOutlined, DeleteOutlined, EyeOutlined, RestOutlined, DeleteFilled } from "@ant-design/icons";
+import {
+  Button,
+  Tag,
+  message,
+  Select,
+  Table,
+  Dropdown,
+  Modal,
+  Input,
+} from "antd";
+import {
+  PlusOutlined,
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  RestOutlined,
+  DeleteFilled,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchServices, deleteService, restoreService, permanentDeleteService } from "@/store/actions/services";
+import {
+  fetchServices,
+  deleteService,
+  restoreService,
+  permanentDeleteService,
+} from "@/store/actions/services";
 import { useSession } from "next-auth/react";
 import { AppDispatch, RootState } from "@/store/store";
 
@@ -15,20 +37,18 @@ const { Option } = Select;
 interface Service {
   id: number;
   title: string;
-  type: number;
   originalPrice: number;
   discountedPrice: number;
+  orderCount: string; // Changed from number to string as per API response
   rating: number;
-  orderCount: number;
-  status: number;
   createdTime: string;
   deleteFlg: number;
+  status: number;
 }
 
 interface QueryParams {
   search: string;
   status?: number;
-  type?: number;
   deleteFlg: number;
   page: number;
   itemsPerPage: number;
@@ -41,19 +61,6 @@ const STATUS_MAP: Record<number, { label: string; color: string }> = {
   0: { label: "Draft", color: "orange" },
   1: { label: "Published", color: "green" },
 };
-
-const TYPE_MAP: Record<number, { label: string; color: string }> = {
-  0: { label: "Basic", color: "blue" },
-  1: { label: "Premium", color: "purple" },
-  2: { label: "Enterprise", color: "gold" },
-};
-
-const SORT_FIELDS = [
-  { value: "createdTime", label: "Created Time" },
-  { value: "title", label: "Title" },
-  { value: "price", label: "Price" },
-  { value: "rating", label: "Rating" },
-];
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -80,7 +87,6 @@ const ServiceListPage: React.FC = () => {
   // Local state
   const [filters, setFilters] = useState({
     status: "all",
-    type: "all",
     deleteFlg: 0,
     sortBy: "createdTime",
     sortDesc: true,
@@ -101,7 +107,6 @@ const ServiceListPage: React.FC = () => {
       const queryParams: QueryParams = {
         search: keyword,
         status: filters.status === "all" ? undefined : parseInt(filters.status),
-        type: filters.type === "all" ? undefined : parseInt(filters.type),
         deleteFlg: filters.deleteFlg,
         page,
         itemsPerPage,
@@ -127,7 +132,12 @@ const ServiceListPage: React.FC = () => {
     message.success("Operation completed successfully");
     setSelection({ selectedRowKeys: [], selectedServices: [] });
     handleQuery(filters.keyword, pagination.pageNumber, pagination.pageSize);
-  }, [handleQuery, filters.keyword, pagination.pageNumber, pagination.pageSize]);
+  }, [
+    handleQuery,
+    filters.keyword,
+    pagination.pageNumber,
+    pagination.pageSize,
+  ]);
 
   const onFailure = useCallback((error: any) => {
     message.error(error || "Operation failed");
@@ -140,19 +150,37 @@ const ServiceListPage: React.FC = () => {
           title: "Confirm",
           content: `Are you sure you want to move "${service.title}" to trash?`,
           okText: "Move to Trash",
-          action: () => deleteService({ ids: [service.id] }, session?.accessToken || "", onSuccess, onFailure),
+          action: () =>
+            deleteService(
+              { ids: [service.id] },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
         },
         restore: {
           title: "Confirm Restore",
           content: `Are you sure you want to restore "${service.title}"?`,
           okText: "Restore",
-          action: () => restoreService({ ids: [service.id] }, session?.accessToken || "", onSuccess, onFailure),
+          action: () =>
+            restoreService(
+              { ids: [service.id] },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
         },
         permanentDelete: {
           title: "Permanent Delete",
           content: `Are you sure you want to permanently delete "${service.title}"? This action cannot be undone.`,
           okText: "Delete Permanently",
-          action: () => permanentDeleteService({ ids: [service.id] }, session?.accessToken || "", onSuccess, onFailure),
+          action: () =>
+            permanentDeleteService(
+              { ids: [service.id] },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
         },
       };
 
@@ -163,7 +191,12 @@ const ServiceListPage: React.FC = () => {
         title: config.title,
         content: config.content,
         okText: config.okText,
-        okType: action === "permanentDelete" ? "danger" : action === "restore" ? "primary" : "danger",
+        okType:
+          action === "permanentDelete"
+            ? "danger"
+            : action === "restore"
+            ? "primary"
+            : "danger",
         cancelText: "Cancel",
         onOk: () => dispatch(config.action as any),
       });
@@ -184,19 +217,37 @@ const ServiceListPage: React.FC = () => {
           title: "Bulk Delete",
           content: `Are you sure you want to move ${selection.selectedServices.length} service(s) to trash?`,
           okText: "Move to Trash",
-          action: () => deleteService({ ids }, session?.accessToken || "", onSuccess, onFailure),
+          action: () =>
+            deleteService(
+              { ids },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
         },
         restore: {
           title: "Bulk Restore",
           content: `Are you sure you want to restore ${selection.selectedServices.length} service(s)?`,
           okText: "Restore",
-          action: () => restoreService({ ids }, session?.accessToken || "", onSuccess, onFailure),
+          action: () =>
+            restoreService(
+              { ids },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
         },
         permanentDelete: {
           title: "Bulk Permanent Delete",
           content: `Are you sure you want to permanently delete ${selection.selectedServices.length} service(s)? This action cannot be undone.`,
           okText: "Delete Permanently",
-          action: () => permanentDeleteService({ ids }, session?.accessToken || "", onSuccess, onFailure),
+          action: () =>
+            permanentDeleteService(
+              { ids },
+              session?.accessToken || "",
+              onSuccess,
+              onFailure
+            ),
         },
       };
 
@@ -212,7 +263,13 @@ const ServiceListPage: React.FC = () => {
         onOk: () => dispatch(config.action as any),
       });
     },
-    [selection.selectedServices, dispatch, session?.accessToken, onSuccess, onFailure]
+    [
+      selection.selectedServices,
+      dispatch,
+      session?.accessToken,
+      onSuccess,
+      onFailure,
+    ]
   );
 
   const handleFilterChange = useCallback((key: string, value: any) => {
@@ -239,9 +296,12 @@ const ServiceListPage: React.FC = () => {
     [handleQuery, filters.keyword]
   );
 
-  const handleSelectionChange = useCallback((selectedRowKeys: React.Key[], selectedRows: Service[]) => {
-    setSelection({ selectedRowKeys, selectedServices: selectedRows });
-  }, []);
+  const handleSelectionChange = useCallback(
+    (selectedRowKeys: React.Key[], selectedRows: Service[]) => {
+      setSelection({ selectedRowKeys, selectedServices: selectedRows });
+    },
+    []
+  );
 
   // Navigation handlers
   const handleEdit = useCallback(
@@ -274,13 +334,11 @@ const ServiceListPage: React.FC = () => {
       title: "Title",
       dataIndex: "title",
       key: "title",
-      render: (title: string) => <span className="font-medium text-sm lg:text-base truncate">{title}</span>,
-    },
-    {
-      title: "Type",
-      dataIndex: "type",
-      key: "type",
-      render: (type: number) => <Tag color={TYPE_MAP[type]?.color || "default"}>{TYPE_MAP[type]?.label || type}</Tag>,
+      render: (title: string) => (
+        <span className="font-medium text-sm lg:text-base truncate">
+          {title}
+        </span>
+      ),
     },
     {
       title: "Price",
@@ -289,8 +347,12 @@ const ServiceListPage: React.FC = () => {
         <div>
           {record.discountedPrice > 0 ? (
             <div>
-              <span className="text-red-600 font-medium text-sm">${record.discountedPrice}</span>
-              <span className="text-gray-400 line-through ml-2 text-xs">${record.originalPrice}</span>
+              <span className="text-red-600 font-medium text-sm">
+                ${record.discountedPrice}
+              </span>
+              <span className="text-gray-400 line-through ml-2 text-xs">
+                ${record.originalPrice}
+              </span>
             </div>
           ) : (
             <span className="font-medium text-sm">${record.originalPrice}</span>
@@ -313,13 +375,17 @@ const ServiceListPage: React.FC = () => {
       title: "Orders",
       dataIndex: "orderCount",
       key: "orderCount",
-      render: (count: number) => <span className="text-sm">{count}</span>,
+      render: (count: string) => <span className="text-sm">{count}</span>,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: number) => <Tag color={STATUS_MAP[status]?.color || "default"}>{STATUS_MAP[status]?.label || status}</Tag>,
+      render: (status: number) => (
+        <Tag color={STATUS_MAP[status]?.color || "default"}>
+          {STATUS_MAP[status]?.label || status}
+        </Tag>
+      ),
     },
     {
       title: "Created",
@@ -328,7 +394,9 @@ const ServiceListPage: React.FC = () => {
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
+          <div className="text-xs text-gray-500">
+            {new Date(date).toLocaleTimeString()}
+          </div>
         </div>
       ),
     },
@@ -389,7 +457,9 @@ const ServiceListPage: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">{isTrashView ? "Trash" : "Services"}</h1>
+      <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-5">
+        {isTrashView ? "Trash" : "Services"}
+      </h1>
 
       {/* Filters and Actions */}
       <div className="flex flex-col lg:flex-row gap-3 lg:gap-2 mb-4 lg:mb-6 items-start lg:items-center justify-between">
@@ -398,7 +468,9 @@ const ServiceListPage: React.FC = () => {
             placeholder="Search services"
             allowClear
             value={filters.keyword}
-            onChange={(e) => setFilters((prev) => ({ ...prev, keyword: e.target.value }))}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, keyword: e.target.value }))
+            }
             onSearch={handleSearch}
             style={{ width: "100%", maxWidth: "300px" }}
             size="middle"
@@ -426,19 +498,6 @@ const ServiceListPage: React.FC = () => {
             >
               <Option value={0}>Active Services</Option>
               <Option value={1}>Trash</Option>
-            </Select>
-
-            <Select
-              value={filters.type}
-              onChange={(value) => handleFilterChange("type", value)}
-              className="flex-1 sm:flex-none"
-              style={{ minWidth: "120px" }}
-              size="middle"
-            >
-              <Option value="all">All Types</Option>
-              <Option value={0}>Basic</Option>
-              <Option value={1}>Premium</Option>
-              <Option value={2}>Enterprise</Option>
             </Select>
           </div>
 
@@ -509,7 +568,13 @@ const ServiceListPage: React.FC = () => {
               >
                 Move to Trash ({selection.selectedServices.length})
               </Button>
-              <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate} size="middle" block={isMobile}>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleCreate}
+                size="middle"
+                block={isMobile}
+              >
                 Add New Service
               </Button>
             </>
@@ -534,10 +599,10 @@ const ServiceListPage: React.FC = () => {
             total: serviceTotal,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} items`,
             onChange: handlePaginationChange,
             responsive: true,
-            size: "small",
           }}
           scroll={{ x: 800 }}
         />
