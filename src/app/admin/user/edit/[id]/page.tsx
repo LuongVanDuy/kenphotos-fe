@@ -43,7 +43,6 @@ const UpdateUser: React.FC = () => {
   useEffect(() => {
     if (formField && Object.keys(formField).length) {
       form.setFieldsValue(formField);
-      console.log(formField);
     }
   }, [formField]);
 
@@ -64,14 +63,7 @@ const UpdateUser: React.FC = () => {
         ...values,
       },
     };
-    dispatch(
-      updateUser(
-        payload,
-        session?.accessToken || "",
-        onSuccess,
-        onFailure
-      ) as any
-    );
+    dispatch(updateUser(payload, session?.accessToken || "", onSuccess, onFailure) as any);
   };
 
   if (userLoading) {
@@ -90,10 +82,7 @@ const UpdateUser: React.FC = () => {
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
           <p className="text-red-600 mb-4">User not found</p>
-          <button
-            onClick={() => router.push("/admin/user/list")}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
+          <button onClick={() => router.push("/admin/user/list")} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             Back to Users
           </button>
         </div>
@@ -101,15 +90,7 @@ const UpdateUser: React.FC = () => {
     );
   }
 
-  return (
-    <UserForm
-      form={form}
-      onFinish={handleFinish}
-      mode="edit"
-      loading={loading}
-      userId={userId}
-    />
-  );
+  return <UserForm form={form} onFinish={handleFinish} mode="edit" loading={loading} userId={userId} />;
 };
 
 export default UpdateUser;

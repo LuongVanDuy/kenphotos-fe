@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import { fetchPublicPosts } from "@/store/actions/posts";
 
-import BlogBlock from "@/components/Blog/BlogBlock";
-import BlogSkeleton from "@/components/Blog/BlogSkeleton";
-import BlogFilterBar from "@/components/Blog/BlogFilterBar";
-import MainTitle from "@/components/UI/Title/MainTitle";
-import FormService from "@/components/Common/FormService";
+import BlogBlock from "@/components/Client/Blog/BlogBlock";
+import BlogSkeleton from "@/components/Client/Blog/BlogSkeleton";
+import BlogFilterBar from "@/components/Client/Blog/BlogFilterBar";
+import MainTitle from "@/components/Client/Common/Title/MainTitle";
+import FormService from "@/components/Client/Common/FormService";
 
 const BlogPage = ({ fetchPublicPosts, postList, postTotal, postLoading }: any) => {
   const [keyword, setKeyword] = useState("");

@@ -1,21 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Button,
-  Form,
-  Input,
-  Select,
-  InputNumber,
-  Card,
-  Space,
-  Divider,
-  Typography,
-  Row,
-  Col,
-  Upload,
-  message,
-  Image,
-  Tabs,
-} from "antd";
+import { Button, Form, Input, Select, InputNumber, Card, Space, Divider, Typography, Row, Col, Upload, message, Image, Tabs } from "antd";
 import {
   PlusOutlined,
   MinusCircleOutlined,
@@ -26,7 +10,7 @@ import {
   GiftOutlined,
 } from "@ant-design/icons";
 import CustomQuill from "@/components/UI/CustomQuill";
-import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
+import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
 import { getImageUrl } from "@/utils";
 import { slugify } from "@/utils/slugify";
 
@@ -41,22 +25,12 @@ interface ServiceFormProps {
   initialValues?: any;
 }
 
-const ServiceForm: React.FC<ServiceFormProps> = ({
-  form,
-  onFinish,
-  onSaveDraft,
-  mode,
-  loading,
-  initialValues,
-}) => {
+const ServiceForm: React.FC<ServiceFormProps> = ({ form, onFinish, onSaveDraft, mode, loading, initialValues }) => {
   const [isModalMediaOpen, setIsModalMediaOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
-  const [slugDebounceTimer, setSlugDebounceTimer] =
-    useState<NodeJS.Timeout | null>(null);
-  const [currentImageType, setCurrentImageType] = useState<"before" | "after">(
-    "before"
-  );
+  const [slugDebounceTimer, setSlugDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+  const [currentImageType, setCurrentImageType] = useState<"before" | "after">("before");
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(-1);
 
   // Cleanup timer on unmount
@@ -169,14 +143,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     }
 
     // Validate that at least one image pair has both before and after images
-    const hasValidImagePair = values.images.some(
-      (image: any) => image.beforeUrl && image.afterUrl
-    );
+    const hasValidImagePair = values.images.some((image: any) => image.beforeUrl && image.afterUrl);
 
     if (!hasValidImagePair) {
-      message.error(
-        "Please add at least one complete image pair (both before and after images)"
-      );
+      message.error("Please add at least one complete image pair (both before and after images)");
       return;
     }
 
@@ -191,9 +161,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     <>
       <div>
         <div className="flex items-center justify-between mb-4 lg:mb-5">
-          <h1 className="text-2xl md:text-4xl font-bold">
-            {mode === "edit" ? "Edit Service" : "Add New Service"}
-          </h1>
+          <h1 className="text-2xl md:text-4xl font-bold">{mode === "edit" ? "Edit Service" : "Add New Service"}</h1>
         </div>
 
         <Form
@@ -221,9 +189,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   <Form.Item
                     name="title"
                     labelCol={{ style: { width: "100%" } }}
-                    rules={[
-                      { required: true, message: "Please enter the title" },
-                    ]}
+                    rules={[{ required: true, message: "Please enter the title" }]}
                     className="!mb-0"
                   >
                     <Input
@@ -236,15 +202,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700">
-                    Permalink
-                  </h3>
+                  <h3 className="text-sm font-semibold text-gray-700">Permalink</h3>
                   <Form.Item
                     name="slug"
                     labelCol={{ style: { width: "100%" } }}
-                    rules={[
-                      { required: true, message: "Please enter the slug" },
-                    ]}
+                    rules={[{ required: true, message: "Please enter the slug" }]}
                     className="!mb-0"
                   >
                     <Input
@@ -253,45 +215,32 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       className="!rounded-lg"
                       addonBefore={process.env.NEXT_PUBLIC_LINK}
                       onChange={handleSlugChange}
-                      suffix={
-                        !isSlugManuallyEdited && (
-                          <span className="text-xs text-gray-400 hidden sm:inline">
-                            Auto-generated from title
-                          </span>
-                        )
-                      }
+                      suffix={!isSlugManuallyEdited && <span className="text-xs text-gray-400 hidden sm:inline">Auto-generated from title</span>}
                     />
                   </Form.Item>
                   {!isSlugManuallyEdited && (
                     <p className="text-xs text-gray-500 mt-1">
-                      The slug will be automatically generated from the title.
-                      You can edit it manually if needed.
+                      The slug will be automatically generated from the title. You can edit it manually if needed.
                     </p>
                   )}
                 </div>
 
                 <div className="rounded-lg border border-gray-300 overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Content
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Content</h3>
                   </div>
                   <div className="bg-white">
                     <Form.Item
                       name="content"
                       labelCol={{ style: { width: "100%" } }}
-                      rules={[
-                        { required: true, message: "Please enter the content" },
-                      ]}
+                      rules={[{ required: true, message: "Please enter the content" }]}
                       className="!mb-0 bg-white"
                     >
                       <CustomQuill
                         placeholder="Start writing service content..."
                         style={{ minHeight: "300px" }}
                         className="quill-editor"
-                        onChange={(value) =>
-                          form.setFieldsValue({ content: value })
-                        }
+                        onChange={(value) => form.setFieldsValue({ content: value })}
                       />
                     </Form.Item>
                   </div>
@@ -299,27 +248,16 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
                 <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Service Images
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Service Images</h3>
                   </div>
                   <div className="bg-white p-3 lg:p-6">
-                    <Form.Item
-                      name="images"
-                      labelCol={{ style: { width: "100%" } }}
-                      className="!mb-0"
-                    >
+                    <Form.Item name="images" labelCol={{ style: { width: "100%" } }} className="!mb-0">
                       <div>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                           {selectedImages.map((image, index) => (
-                            <div
-                              key={index}
-                              className={`p-3 lg:p-5 border-2 rounded-lg`}
-                            >
+                            <div key={index} className={`p-3 lg:p-5 border-2 rounded-lg`}>
                               <div className="flex items-center justify-between mb-3 lg:mb-4">
-                                <h4 className="text-base lg:text-lg font-semibold text-gray-700">
-                                  Image Pair {index + 1}
-                                </h4>
+                                <h4 className="text-base lg:text-lg font-semibold text-gray-700">Image Pair {index + 1}</h4>
                                 {selectedImages.length > 1 && (
                                   <Button
                                     type="text"
@@ -336,15 +274,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                 {/* Before Image */}
                                 <div className="bg-white rounded-lg">
                                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                    <span className="text-sm font-medium text-gray-600">
-                                      Before Image
-                                    </span>
+                                    <span className="text-sm font-medium text-gray-600">Before Image</span>
                                     <Button
                                       type="primary"
                                       size="small"
-                                      onClick={() =>
-                                        handleSelectImage("before", index)
-                                      }
+                                      onClick={() => handleSelectImage("before", index)}
                                       className="text-blue-600 hover:text-blue-700"
                                     >
                                       Select Image
@@ -365,9 +299,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                         <div className="text-gray-400 mb-2">
                                           <UploadOutlined className="text-xl lg:text-2xl" />
                                         </div>
-                                        <span className="text-xs text-gray-500">
-                                          No image selected
-                                        </span>
+                                        <span className="text-xs text-gray-500">No image selected</span>
                                       </div>
                                     </div>
                                   )}
@@ -376,15 +308,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                 {/* After Image */}
                                 <div className="bg-white rounded-lg">
                                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                    <span className="text-sm font-medium text-gray-600">
-                                      After Image
-                                    </span>
+                                    <span className="text-sm font-medium text-gray-600">After Image</span>
                                     <Button
                                       type="primary"
                                       size="small"
-                                      onClick={() =>
-                                        handleSelectImage("after", index)
-                                      }
+                                      onClick={() => handleSelectImage("after", index)}
                                       className="text-blue-600 hover:text-blue-700"
                                     >
                                       Select Image
@@ -405,9 +333,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                         <div className="text-gray-400 mb-2">
                                           <UploadOutlined className="text-xl lg:text-2xl" />
                                         </div>
-                                        <span className="text-xs text-gray-500">
-                                          No image selected
-                                        </span>
+                                        <span className="text-xs text-gray-500">No image selected</span>
                                       </div>
                                     </div>
                                   )}
@@ -417,13 +343,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                           ))}
                         </div>
                         <div className="flex justify-center items-center mt-4 lg:mt-6">
-                          <Button
-                            type="primary"
-                            icon={<PlusOutlined />}
-                            onClick={handleAddImagePair}
-                            className="hover:border-blue-500"
-                            size="middle"
-                          >
+                          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddImagePair} className="hover:border-blue-500" size="middle">
                             Add Image Pair
                           </Button>
                         </div>
@@ -434,9 +354,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
                 <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Service Details
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Service Details</h3>
                   </div>
                   <div className="bg-white">
                     <Tabs
@@ -457,33 +375,21 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                               <Form.List name="idealFors">
                                 {(fields, { add, remove }) => (
                                   <div className="space-y-5">
-                                    {fields.map(
-                                      ({ key, name, ...restField }, idx) => (
-                                        <div
-                                          key={key}
-                                          className="  bg-white rounded  flex items-start group"
-                                        >
-                                          <Form.Item
-                                            {...restField}
-                                            name={[name, "label"]}
-                                            className="flex-1 !mb-0"
-                                          >
-                                            <Input
-                                              placeholder="Who is this service ideal for?"
-                                              className="!rounded-lg !h-[40px]"
-                                            />
-                                          </Form.Item>
-                                          <Button
-                                            type="text"
-                                            icon={<DeleteOutlined />}
-                                            onClick={() => remove(name)}
-                                            size="small"
-                                            className="ml-2 text-gray-400 hover:text-red-500"
-                                            style={{ marginTop: 2 }}
-                                          />
-                                        </div>
-                                      )
-                                    )}
+                                    {fields.map(({ key, name, ...restField }, idx) => (
+                                      <div key={key} className="  bg-white rounded  flex items-start group">
+                                        <Form.Item {...restField} name={[name, "label"]} className="flex-1 !mb-0">
+                                          <Input placeholder="Who is this service ideal for?" className="!rounded-lg !h-[40px]" />
+                                        </Form.Item>
+                                        <Button
+                                          type="text"
+                                          icon={<DeleteOutlined />}
+                                          onClick={() => remove(name)}
+                                          size="small"
+                                          className="ml-2 text-gray-400 hover:text-red-500"
+                                          style={{ marginTop: 2 }}
+                                        />
+                                      </div>
+                                    ))}
                                   </div>
                                 )}
                               </Form.List>
@@ -493,16 +399,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                   type="primary"
                                   icon={<PlusOutlined />}
                                   onClick={() =>
-                                    form.getFieldValue("idealFors")?.length <
-                                      10 &&
-                                    form.getFieldValue("idealFors").length >=
-                                      0 &&
+                                    form.getFieldValue("idealFors")?.length < 10 &&
+                                    form.getFieldValue("idealFors").length >= 0 &&
                                     form.setFieldsValue({
-                                      idealFors: [
-                                        ...(form.getFieldValue("idealFors") ||
-                                          []),
-                                        { label: "" },
-                                      ],
+                                      idealFors: [...(form.getFieldValue("idealFors") || []), { label: "" }],
                                     })
                                   }
                                   className="ml-2 hover:border-blue-500"
@@ -518,8 +418,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                           key: "includes",
                           label: (
                             <span>
-                              <CheckCircleOutlined className="mr-2" /> What's
-                              Included
+                              <CheckCircleOutlined className="mr-2" /> What's Included
                             </span>
                           ),
                           children: (
@@ -527,33 +426,21 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                               <Form.List name="includes">
                                 {(fields, { add, remove }) => (
                                   <div className="space-y-5">
-                                    {fields.map(
-                                      ({ key, name, ...restField }, idx) => (
-                                        <div
-                                          key={key}
-                                          className="  bg-white rounded  flex items-start group"
-                                        >
-                                          <Form.Item
-                                            {...restField}
-                                            name={[name, "label"]}
-                                            className="flex-1 !mb-0"
-                                          >
-                                            <Input
-                                              placeholder="What's included in this service?"
-                                              className="!rounded-lg !h-[40px]"
-                                            />
-                                          </Form.Item>
-                                          <Button
-                                            type="text"
-                                            icon={<DeleteOutlined />}
-                                            onClick={() => remove(name)}
-                                            size="small"
-                                            className="ml-2 text-gray-400 hover:text-red-500"
-                                            style={{ marginTop: 2 }}
-                                          />
-                                        </div>
-                                      )
-                                    )}
+                                    {fields.map(({ key, name, ...restField }, idx) => (
+                                      <div key={key} className="  bg-white rounded  flex items-start group">
+                                        <Form.Item {...restField} name={[name, "label"]} className="flex-1 !mb-0">
+                                          <Input placeholder="What's included in this service?" className="!rounded-lg !h-[40px]" />
+                                        </Form.Item>
+                                        <Button
+                                          type="text"
+                                          icon={<DeleteOutlined />}
+                                          onClick={() => remove(name)}
+                                          size="small"
+                                          className="ml-2 text-gray-400 hover:text-red-500"
+                                          style={{ marginTop: 2 }}
+                                        />
+                                      </div>
+                                    ))}
                                   </div>
                                 )}
                               </Form.List>
@@ -563,16 +450,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                   type="primary"
                                   icon={<PlusOutlined />}
                                   onClick={() =>
-                                    form.getFieldValue("includes")?.length <
-                                      10 &&
-                                    form.getFieldValue("includes").length >=
-                                      0 &&
+                                    form.getFieldValue("includes")?.length < 10 &&
+                                    form.getFieldValue("includes").length >= 0 &&
                                     form.setFieldsValue({
-                                      includes: [
-                                        ...(form.getFieldValue("includes") ||
-                                          []),
-                                        { label: "" },
-                                      ],
+                                      includes: [...(form.getFieldValue("includes") || []), { label: "" }],
                                     })
                                   }
                                   className="ml-2 hover:border-blue-500"
@@ -596,55 +477,44 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                               <Form.List name="addOns">
                                 {(fields, { add, remove }) => (
                                   <div className="space-y-5">
-                                    {fields.map(
-                                      ({ key, name, ...restField }, idx) => (
-                                        <div
-                                          key={key}
-                                          className="flex  gap-3  bg-white "
-                                        >
-                                          <Row gutter={16} className="flex-1">
-                                            <Col span={12}>
-                                              <Form.Item
-                                                {...restField}
-                                                name={[name, "title"]}
-                                                labelCol={{
-                                                  style: { width: "100%" },
-                                                }}
-                                                className="flex-1 !mb-0"
-                                              >
-                                                <Input
-                                                  placeholder="Add-on name"
-                                                  className="!rounded-lg !h-[40px]"
-                                                />
-                                              </Form.Item>
-                                            </Col>
-                                            <Col span={12}>
-                                              <Form.Item
-                                                {...restField}
-                                                name={[name, "description"]}
-                                                labelCol={{
-                                                  style: { width: "100%" },
-                                                }}
-                                                className="flex-1 !mb-0"
-                                              >
-                                                <Input
-                                                  placeholder="Add-on description"
-                                                  className="!rounded-lg !h-[40px]"
-                                                />
-                                              </Form.Item>
-                                            </Col>
-                                          </Row>
+                                    {fields.map(({ key, name, ...restField }, idx) => (
+                                      <div key={key} className="flex  gap-3  bg-white ">
+                                        <Row gutter={16} className="flex-1">
+                                          <Col span={12}>
+                                            <Form.Item
+                                              {...restField}
+                                              name={[name, "title"]}
+                                              labelCol={{
+                                                style: { width: "100%" },
+                                              }}
+                                              className="flex-1 !mb-0"
+                                            >
+                                              <Input placeholder="Add-on name" className="!rounded-lg !h-[40px]" />
+                                            </Form.Item>
+                                          </Col>
+                                          <Col span={12}>
+                                            <Form.Item
+                                              {...restField}
+                                              name={[name, "description"]}
+                                              labelCol={{
+                                                style: { width: "100%" },
+                                              }}
+                                              className="flex-1 !mb-0"
+                                            >
+                                              <Input placeholder="Add-on description" className="!rounded-lg !h-[40px]" />
+                                            </Form.Item>
+                                          </Col>
+                                        </Row>
 
-                                          <Button
-                                            type="text"
-                                            icon={<DeleteOutlined />}
-                                            onClick={() => remove(name)}
-                                            size="small"
-                                            className="text-gray-400 hover:text-red-500 "
-                                          />
-                                        </div>
-                                      )
-                                    )}
+                                        <Button
+                                          type="text"
+                                          icon={<DeleteOutlined />}
+                                          onClick={() => remove(name)}
+                                          size="small"
+                                          className="text-gray-400 hover:text-red-500 "
+                                        />
+                                      </div>
+                                    ))}
                                   </div>
                                 )}
                               </Form.List>
@@ -687,9 +557,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
               <div className="space-y-4 lg:space-y-6">
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Publish
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Publish</h3>
                   </div>
                   <div className="p-3 lg:p-4 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
@@ -697,16 +565,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       <Form.Item
                         name="status"
                         labelCol={{ style: { width: "100%" } }}
-                        rules={[
-                          { required: true, message: "Please select status" },
-                        ]}
+                        rules={[{ required: true, message: "Please select status" }]}
                         className="!mb-0"
                       >
-                        <Select
-                          size="small"
-                          style={{ width: "100%", maxWidth: "120px" }}
-                          options={statusOptions}
-                        />
+                        <Select size="small" style={{ width: "100%", maxWidth: "120px" }} options={statusOptions} />
                       </Form.Item>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
@@ -714,33 +576,20 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       <Form.Item
                         name="type"
                         labelCol={{ style: { width: "100%" } }}
-                        rules={[
-                          { required: true, message: "Please select type" },
-                        ]}
+                        rules={[{ required: true, message: "Please select type" }]}
                         className="!mb-0"
                       >
-                        <Select
-                          size="small"
-                          style={{ width: "100%", maxWidth: "120px" }}
-                          options={typeOptions}
-                        />
+                        <Select size="small" style={{ width: "100%", maxWidth: "120px" }} options={typeOptions} />
                       </Form.Item>
                     </div>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      loading={loading}
-                      block
-                    >
+                    <Button type="primary" htmlType="submit" loading={loading} block>
                       {mode === "edit" ? "Update" : "Publish"}
                     </Button>
                   </div>
                 </div>
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Pricing
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Pricing</h3>
                   </div>
                   <div className="p-3 lg:p-4 space-y-4">
                     <Form.Item
@@ -759,60 +608,29 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                         min={0}
                         placeholder="0.00"
                         style={{ width: "100%" }}
-                        formatter={(value) =>
-                          `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        }
+                        formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       />
                     </Form.Item>
-                    <Form.Item
-                      name="discountedPrice"
-                      label="Discounted Price"
-                      labelCol={{ style: { width: "100%" } }}
-                      className="!mb-0"
-                    >
+                    <Form.Item name="discountedPrice" label="Discounted Price" labelCol={{ style: { width: "100%" } }} className="!mb-0">
                       <InputNumber
                         min={0}
                         placeholder="0.00"
                         style={{ width: "100%" }}
-                        formatter={(value) =>
-                          `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        }
+                        formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       />
                     </Form.Item>
                   </div>
                 </div>
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Statistics
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Statistics</h3>
                   </div>
                   <div className="p-3 lg:p-4 space-y-4">
-                    <Form.Item
-                      name="rating"
-                      label="Rating"
-                      labelCol={{ style: { width: "100%" } }}
-                      className="!mb-0"
-                    >
-                      <InputNumber
-                        min={0}
-                        max={5}
-                        step={0.1}
-                        placeholder="0.0"
-                        style={{ width: "100%" }}
-                      />
+                    <Form.Item name="rating" label="Rating" labelCol={{ style: { width: "100%" } }} className="!mb-0">
+                      <InputNumber min={0} max={5} step={0.1} placeholder="0.0" style={{ width: "100%" }} />
                     </Form.Item>
-                    <Form.Item
-                      name="orderCount"
-                      label="Order Count"
-                      labelCol={{ style: { width: "100%" } }}
-                      className="!mb-0"
-                    >
-                      <Input
-                        placeholder="Order count"
-                        style={{ width: "100%" }}
-                        className="!rounded-lg"
-                      />
+                    <Form.Item name="orderCount" label="Order Count" labelCol={{ style: { width: "100%" } }} className="!mb-0">
+                      <Input placeholder="Order count" style={{ width: "100%" }} className="!rounded-lg" />
                     </Form.Item>
                   </div>
                 </div>
@@ -821,12 +639,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
           </div>
         </Form>
       </div>
-      <MediaLibraryModal
-        isOpen={isModalMediaOpen}
-        onCancel={() => setIsModalMediaOpen(false)}
-        onSelect={handleMediaSelect}
-        accept="image/*"
-      />
+      <MediaLibraryModal isOpen={isModalMediaOpen} onCancel={() => setIsModalMediaOpen(false)} onSelect={handleMediaSelect} accept="image/*" />
     </>
   );
 };

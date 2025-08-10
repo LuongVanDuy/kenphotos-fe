@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { CompareSlider } from "./Old/CompareSlider";
-import MainTitle from "../UI/Title/MainTitle";
+import MainTitle from "../Common/Title/MainTitle";
+import { CompareSlider } from "../Common/CompareSlider";
 
 const services = [
   {

@@ -1,13 +1,13 @@
-import BaseLayout from '@/components/Layout/BaseLayout'
-import FormService from '@/components/Common/FormService'
+import BaseLayout from "@/components/Layout/BaseLayout";
+import FormService from "@/components/Client/Common/FormService";
 
 const PriceListPage = () => {
   return (
     <>
-      <div className='min-h-[45vh]'>PriceListPage</div>
+      <div className="min-h-[45vh]">PriceListPage</div>
       <FormService />
     </>
-  )
-}
+  );
+};
 
-export default PriceListPage
+export default PriceListPage;

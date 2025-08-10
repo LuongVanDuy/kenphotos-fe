@@ -6,9 +6,9 @@ import SwiperCore from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CompareSlider } from "../Home/Old/CompareSlider";
+import { CompareSlider } from "../Common/CompareSlider";
 import ServiceCard from "./ServiceCard";
-import MainTitle from "../UI/Title/MainTitle";
+import MainTitle from "../Common/Title/MainTitle";
 
 const Related: React.FC = () => {
   const swiperRef = useRef<SwiperCore>();

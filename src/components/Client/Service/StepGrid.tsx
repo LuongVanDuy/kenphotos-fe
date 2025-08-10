@@ -26,7 +26,7 @@ import {
   RocketOutlined,
   MinusSquareOutlined,
 } from "@ant-design/icons";
-import MainTitle from "../UI/Title/MainTitle";
+import MainTitle from "../Common/Title/MainTitle";
 
 const servicesStep = [
   {

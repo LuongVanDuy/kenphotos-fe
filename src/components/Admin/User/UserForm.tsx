@@ -3,7 +3,7 @@ import { Option } from "antd/es/mentions";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UploadOutlined, UserOutlined, CameraOutlined, LockOutlined } from "@ant-design/icons";
-import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
+import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
 import { getImageUrl } from "@/utils";
 import Title from "antd/es/typography/Title";
 import { useDispatch } from "react-redux";

@@ -1,17 +1,15 @@
-import FormService from '@/components/Common/FormService'
-import HowWeWork from '@/components/Common/HowWeWork'
-import Resources from '@/components/Home/Resources'
-import Reviews from '@/components/Common/Review'
-import Services from '@/components/Home/Services'
-import WindowViewStyles from '@/components/Home/WindowViewStyles'
-import HeroBanner from '@/components/Home/HeroBanner'
-import WhyChooseUs from '@/components/Home/Old/WhyChooseUs'
+import FormService from "@/components/Client/Common/FormService";
+import HowWeWork from "@/components/Client/Common/HowWeWork";
+import Reviews from "@/components/Client/Common/Review";
+import HeroBanner from "@/components/Client/Home/HeroBanner";
+import Resources from "@/components/Client/Home/Resources";
+import Services from "@/components/Client/Home/Services";
+import WindowViewStyles from "@/components/Client/Home/WindowViewStyles";
 
 export default function Home() {
   return (
     <>
       <HeroBanner />
-      {/* <WhyChooseUs /> */}
       <Services />
       <Resources />
       <WindowViewStyles />
@@ -19,5 +17,5 @@ export default function Home() {
       <HowWeWork />
       <FormService />
     </>
-  )
+  );
 }

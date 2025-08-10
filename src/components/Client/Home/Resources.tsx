@@ -1,8 +1,7 @@
 "use client";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import SectionTitle from "../UI/SectionTitle";
-import MainTitle from "../UI/Title/MainTitle";
+import MainTitle from "../Common/Title/MainTitle";
 
 const Resources: React.FC = () => {
   const resources = [

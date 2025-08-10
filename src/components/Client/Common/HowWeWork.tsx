@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React from "react";
 import { motion } from "framer-motion";
-import MainTitle from "../UI/Title/MainTitle";
+import MainTitle from "./Title/MainTitle";
 
 const HowWeWork = () => {
   const features = [

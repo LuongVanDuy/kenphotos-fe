@@ -1,17 +1,15 @@
-import CustomQuill from "@/components/UI/CustomQuill";
-import { PostFormData } from "@/types";
 import { getImageUrl } from "@/utils";
 import { slugify } from "@/utils/slugify";
 import { DeleteOutlined, PictureOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Select, Spin } from "antd";
+import { Button, Form, Input, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import Title from "antd/es/typography/Title";
 import Image from "next/image";
 import React, { useEffect, useState, useCallback } from "react";
-import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
+import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
 import CategoryTreeSelector from "./CategoryTreeSelector";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import CustomQuill from "../Common/CustomQuill";
 
 interface PostFormProps {
   form?: any;
@@ -22,19 +20,11 @@ interface PostFormProps {
   initialValues?: any;
 }
 
-const PostForm: React.FC<PostFormProps> = ({
-  form,
-  onFinish,
-  onSaveDraft,
-  mode,
-  loading,
-  initialValues,
-}) => {
+const PostForm: React.FC<PostFormProps> = ({ form, onFinish, onSaveDraft, mode, loading, initialValues }) => {
   const [isModalMediaOpen, setIsModalMediaOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
-  const [slugDebounceTimer, setSlugDebounceTimer] =
-    useState<NodeJS.Timeout | null>(null);
+  const [slugDebounceTimer, setSlugDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 
   const categoryList = useSelector((state: RootState) => state.categories.list);
 
@@ -67,7 +57,6 @@ const PostForm: React.FC<PostFormProps> = ({
     return () => clearTimeout(timeout);
   }, [form, selectedImage]);
 
-  // Cleanup timer on unmount
   useEffect(() => {
     return () => {
       if (slugDebounceTimer) {
@@ -76,42 +65,36 @@ const PostForm: React.FC<PostFormProps> = ({
     };
   }, [slugDebounceTimer]);
 
-  // Auto-generate slug from title (WordPress style)
   const handleTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const title = e.target.value;
 
-      // Clear existing timer
       if (slugDebounceTimer) {
         clearTimeout(slugDebounceTimer);
       }
 
-      // Set new timer for debounced slug generation
       const timer = setTimeout(() => {
         if (!isSlugManuallyEdited && title) {
           const generatedSlug = slugify(title);
           form.setFieldsValue({ slug: generatedSlug });
         }
-      }, 500); // 500ms debounce
+      }, 500);
 
       setSlugDebounceTimer(timer);
     },
     [form, isSlugManuallyEdited, slugDebounceTimer]
   );
 
-  // Handle manual slug editing
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const slug = e.target.value;
     setIsSlugManuallyEdited(true);
 
-    // Clean the slug input (remove special characters, convert to lowercase)
     const cleanedSlug = slugify(slug);
     if (cleanedSlug !== slug) {
       form.setFieldsValue({ slug: cleanedSlug });
     }
   };
 
-  // Reset slug manual edit flag when form is reset
   useEffect(() => {
     if (mode === "create") {
       setIsSlugManuallyEdited(false);
@@ -138,16 +121,14 @@ const PostForm: React.FC<PostFormProps> = ({
     <>
       <div>
         <div className="flex items-center justify-between mb-5">
-          <h1 className="text-2xl md:text-4xl font-bold">
-            {mode === "edit" ? "Edit Post" : "Add New Post"}
-          </h1>
+          <h1 className="text-2xl md:text-4xl font-bold">{mode === "edit" ? "Edit Post" : "Add New Post"}</h1>
         </div>
         <Form
           form={form}
           layout="vertical"
           onFinish={onFinish}
           initialValues={{
-            status: 1, // Published by default
+            status: 1,
             ...initialValues,
           }}
         >
@@ -161,9 +142,7 @@ const PostForm: React.FC<PostFormProps> = ({
                   <Form.Item
                     name="title"
                     labelCol={{ style: { width: "100%" } }}
-                    rules={[
-                      { required: true, message: "Please enter the title" },
-                    ]}
+                    rules={[{ required: true, message: "Please enter the title" }]}
                     className="!mb-0"
                   >
                     <Input
@@ -175,15 +154,11 @@ const PostForm: React.FC<PostFormProps> = ({
                   </Form.Item>
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700">
-                    Permalink
-                  </h3>
+                  <h3 className="text-sm font-semibold text-gray-700">Permalink</h3>
                   <Form.Item
                     name="slug"
                     labelCol={{ style: { width: "100%" } }}
-                    rules={[
-                      { required: true, message: "Please enter the slug" },
-                    ]}
+                    rules={[{ required: true, message: "Please enter the slug" }]}
                     className="!mb-0"
                   >
                     <Input
@@ -192,71 +167,49 @@ const PostForm: React.FC<PostFormProps> = ({
                       className="!rounded-lg"
                       addonBefore={process.env.NEXT_PUBLIC_LINK}
                       onChange={handleSlugChange}
-                      suffix={
-                        !isSlugManuallyEdited && (
-                          <span className="text-xs text-gray-400 hidden sm:inline">
-                            Auto-generated from title
-                          </span>
-                        )
-                      }
+                      suffix={!isSlugManuallyEdited && <span className="text-xs text-gray-400 hidden sm:inline">Auto-generated from title</span>}
                     />
                   </Form.Item>
                   {!isSlugManuallyEdited && (
                     <p className="text-xs text-gray-500 mt-1">
-                      The slug will be automatically generated from the title.
-                      You can edit it manually if needed.
+                      The slug will be automatically generated from the title. You can edit it manually if needed.
                     </p>
                   )}
                 </div>
 
                 <div className="rounded-lg border border-gray-300 overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Content
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Content</h3>
                   </div>
                   <div className="bg-white">
                     <Form.Item
                       name="content"
                       labelCol={{ style: { width: "100%" } }}
-                      rules={[
-                        { required: true, message: "Please enter the content" },
-                      ]}
+                      rules={[{ required: true, message: "Please enter the content" }]}
                       className="!mb-0 bg-white"
                     >
                       <CustomQuill
                         placeholder="Start writing or type / to choose a block..."
                         style={{ minHeight: "300px" }}
                         className="quill-editor"
-                        onChange={(value) =>
-                          form.setFieldsValue({ content: value })
-                        }
+                        onChange={(value) => form.setFieldsValue({ content: value })}
                       />
                     </Form.Item>
                   </div>
                 </div>
                 <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Excerpt
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Excerpt</h3>
                   </div>
                   <div className="bg-white p-3 lg:p-4">
                     <Form.Item
                       name="excerpt"
                       label="Excerpt"
                       labelCol={{ style: { width: "100%" } }}
-                      rules={[
-                        { required: true, message: "Please enter the excerpt" },
-                      ]}
+                      rules={[{ required: true, message: "Please enter the excerpt" }]}
                       className="!mb-0"
                     >
-                      <TextArea
-                        placeholder="Write an excerpt (optional)"
-                        rows={4}
-                        size="small"
-                        className="!rounded-lg"
-                      />
+                      <TextArea placeholder="Write an excerpt (optional)" rows={4} size="small" className="!rounded-lg" />
                     </Form.Item>
                   </div>
                 </div>
@@ -266,9 +219,7 @@ const PostForm: React.FC<PostFormProps> = ({
               <div className="space-y-4 lg:space-y-6">
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Publish
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Publish</h3>
                   </div>
                   <div className="p-3 lg:p-4 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
@@ -276,33 +227,20 @@ const PostForm: React.FC<PostFormProps> = ({
                       <Form.Item
                         name="status"
                         labelCol={{ style: { width: "100%" } }}
-                        rules={[
-                          { required: true, message: "Please select status" },
-                        ]}
+                        rules={[{ required: true, message: "Please select status" }]}
                         className="!mb-0"
                       >
-                        <Select
-                          size="small"
-                          style={{ width: "100%", maxWidth: "120px" }}
-                          options={statusOptions}
-                        />
+                        <Select size="small" style={{ width: "100%", maxWidth: "120px" }} options={statusOptions} />
                       </Form.Item>
                     </div>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      loading={loading}
-                      block
-                    >
+                    <Button type="primary" htmlType="submit" loading={loading} block>
                       {mode === "edit" ? "Update" : "Publish"}
                     </Button>
                   </div>
                 </div>
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Featured Image
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Featured Image</h3>
                   </div>
                   <div className="p-3 lg:p-4">
                     {selectedImage ? (
@@ -317,32 +255,15 @@ const PostForm: React.FC<PostFormProps> = ({
                             />
                           </div>
                           <div className="absolute top-1 right-1">
-                            <Button
-                              type="text"
-                              icon={<DeleteOutlined />}
-                              onClick={handleRemoveImage}
-                              size="small"
-                            />
+                            <Button type="text" icon={<DeleteOutlined />} onClick={handleRemoveImage} size="small" />
                           </div>
                         </div>
-                        <Button
-                          type="primary"
-                          size="small"
-                          icon={<PictureOutlined />}
-                          onClick={() => setIsModalMediaOpen(true)}
-                          block
-                        >
+                        <Button type="primary" size="small" icon={<PictureOutlined />} onClick={() => setIsModalMediaOpen(true)} block>
                           Replace Image
                         </Button>
                       </div>
                     ) : (
-                      <Button
-                        type="primary"
-                        size="large"
-                        icon={<PictureOutlined />}
-                        onClick={() => setIsModalMediaOpen(true)}
-                        className="w-full"
-                      >
+                      <Button type="primary" size="large" icon={<PictureOutlined />} onClick={() => setIsModalMediaOpen(true)} className="w-full">
                         Set Featured Image
                       </Button>
                     )}
@@ -350,9 +271,7 @@ const PostForm: React.FC<PostFormProps> = ({
                 </div>
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Categories
-                    </h3>
+                    <h3 className="text-sm font-semibold text-gray-700">Categories</h3>
                   </div>
                   <div className="p-3 lg:p-4">
                     <Form.Item
@@ -369,13 +288,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     >
                       <CategoryTreeSelector
                         renderCategoryLabel={(cat) =>
-                          cat.isDefault ? (
-                            <span style={{ color: "#1677ff", fontWeight: 600 }}>
-                              {cat.name} (Default)
-                            </span>
-                          ) : (
-                            cat.name
-                          )
+                          cat.isDefault ? <span style={{ color: "#1677ff", fontWeight: 600 }}>{cat.name} (Default)</span> : cat.name
                         }
                       />
                     </Form.Item>
@@ -386,12 +299,7 @@ const PostForm: React.FC<PostFormProps> = ({
           </div>
         </Form>
       </div>
-      <MediaLibraryModal
-        isOpen={isModalMediaOpen}
-        onCancel={() => setIsModalMediaOpen(false)}
-        onSelect={handleMediaSelect}
-        accept="image/*"
-      />
+      <MediaLibraryModal isOpen={isModalMediaOpen} onCancel={() => setIsModalMediaOpen(false)} onSelect={handleMediaSelect} accept="image/*" />
     </>
   );
 };

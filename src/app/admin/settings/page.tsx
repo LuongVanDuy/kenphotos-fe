@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchSetting, upsertSetting } from "@/store/actions/settings";
 import { getImageUrl } from "@/utils";
 import Image from "next/image";
-import MediaLibraryModal from "@/components/UI/MediaLibraryModal";
+import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;

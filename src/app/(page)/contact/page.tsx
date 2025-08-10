@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import SectionTitle from "@/components/UI/SectionTitle";
-import MainTitle from "@/components/UI/Title/MainTitle";
+import MainTitle from "@/components/Client/Common/Title/MainTitle";
 import { FacebookOutlined, HomeOutlined, MailOutlined, PhoneOutlined, SendOutlined, SkypeOutlined, WhatsAppOutlined } from "@ant-design/icons";
 
 const ContactPage = () => {
