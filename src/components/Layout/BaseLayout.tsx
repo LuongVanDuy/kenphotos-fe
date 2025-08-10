@@ -1,29 +1,19 @@
-"use client";
+'use client'
 
-import FloatingContacts from "./Contacts";
-import Navbar from "./Navbar";
-import FreeTestFiles from "../Common/FormService";
-import Footer from "./Footer";
-import { useRef } from "react";
+import FloatingContacts from './Contacts'
+import Navbar from './Navbar'
+import Footer from './Footer'
+import { useScrollToForm } from '@/utils/useScrollToForm'
 
 export default function BaseLayout({ children }: { children: React.ReactNode }) {
-  const contactRef = useRef<HTMLDivElement>(null);
-
-  const scrollToContact = () => {
-    if (contactRef.current) {
-      contactRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  const scrollToForm = useScrollToForm()
 
   return (
     <>
-      <Navbar onSendFreeTest={scrollToContact} />
+      <Navbar onSendFreeTest={scrollToForm} />
       {children}
-      {/* <div ref={contactRef}>
-        <FreeTestFiles />
-      </div> */}
-      {/* <FloatingContacts /> */}
+      <FloatingContacts />
       <Footer />
     </>
-  );
+  )
 }
