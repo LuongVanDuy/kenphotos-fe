@@ -1,18 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Button, Form, Input, Select, InputNumber, Card, Space, Divider, Typography, Row, Col, Upload, message, Image, Tabs } from "antd";
-import {
-  PlusOutlined,
-  MinusCircleOutlined,
-  UploadOutlined,
-  DeleteOutlined,
-  UserOutlined,
-  CheckCircleOutlined,
-  GiftOutlined,
-} from "@ant-design/icons";
-import CustomQuill from "@/components/UI/CustomQuill";
+import { PlusOutlined, UploadOutlined, DeleteOutlined, UserOutlined, CheckCircleOutlined, GiftOutlined } from "@ant-design/icons";
 import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
 import { getImageUrl } from "@/utils";
 import { slugify } from "@/utils/slugify";
+import CustomQuill from "../Common/CustomQuill";
 
 const { TextArea } = Input;
 
