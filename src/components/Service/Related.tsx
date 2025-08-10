@@ -6,9 +6,11 @@ import SwiperCore from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CompareSlider } from "./CompareSlider";
+import { CompareSlider } from "../Home/Old/CompareSlider";
+import ServiceCard from "./ServiceCard";
+import MainTitle from "../UI/Title/MainTitle";
 
-const ServiceSlider: React.FC = () => {
+const Related: React.FC = () => {
   const swiperRef = useRef<SwiperCore>();
 
   const services = [
@@ -119,84 +121,68 @@ const ServiceSlider: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 relative">
-      <div className="max-w-content mx-auto text-center mb-4 relative">
-        <button
-          onClick={() => swiperRef.current?.slidePrev()}
-          className="absolute left-0 md:-left-5 top-1/2 -translate-y-1/2 z-10 text-[32px] text-[#333] border border-[#eee] bg-white shadow-lg w-9 h-9 rounded-full flex items-center justify-center"
-        >
-          &lt;
-        </button>
-        <Swiper
-          modules={[Navigation]}
-          navigation={false}
-          spaceBetween={20}
-          slidesPerView={1.2}
-          loop={true}
-          allowTouchMove={false}
-          simulateTouch={false}
-          breakpoints={{
-            640: { slidesPerView: 1.5 },
-            768: { slidesPerView: 2.5 },
-            1024: { slidesPerView: 3 },
-            1280: { slidesPerView: 3 },
-          }}
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          onBeforeInit={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-        >
-          {services.map((service) => (
-            <SwiperSlide key={service.id}>
-              <div className="bg-white rounded-[12px] shadow-lg hover:bg-gray-100 transition-all overflow-hidden my-5">
-                {/* Compare slider */}
-                <div className="relative h-80 bg-gray-200">
-                  <CompareSlider
+    <section className="py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)]">
+      <div className="max-w-content mx-auto px-4">
+        <MainTitle title="Related Sevices" align="left" />
+        <div className="relative mt-12">
+          <button
+            onClick={() => swiperRef.current?.slidePrev()}
+            className="absolute left-0 md:-left-5 top-1/2 -translate-y-1/2 z-10 text-[32px] text-[#333] border border-[#eee] bg-white shadow-lg w-9 h-9 rounded-full flex items-center justify-center"
+          >
+            &lt;
+          </button>
+          <Swiper
+            modules={[Navigation]}
+            navigation={false}
+            spaceBetween={20}
+            slidesPerView={1.2}
+            loop={true}
+            allowTouchMove={false}
+            simulateTouch={false}
+            breakpoints={{
+              640: { slidesPerView: 1.5 },
+              768: { slidesPerView: 2.5 },
+              1024: { slidesPerView: 3 },
+              1280: { slidesPerView: 3 },
+            }}
+            onSwiper={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+            onBeforeInit={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+          >
+            {services.map((service, index) => {
+              return (
+                <SwiperSlide key={service.id}>
+                  <ServiceCard
+                    key={service.id}
+                    index={index}
+                    id={service.id}
                     beforeImage={service.beforeImage}
                     afterImage={service.afterImage}
-                    onDragStart={() => {
-                      if (swiperRef.current) swiperRef.current.allowTouchMove = false;
-                    }}
-                    onDragEnd={() => {
-                      if (swiperRef.current) swiperRef.current.allowTouchMove = true;
-                    }}
+                    title={service.title}
+                    description={service.description}
+                    rating={service.rating}
+                    orders={service.orders}
+                    discount={service.discount}
+                    originalPrice={service.originalPrice}
+                    newPrice={service.newPrice}
                   />
-                </div>
-
-                {/* Content */}
-                <div className="p-4 text-start">
-                  <h3 className="text-lg font-bold text-[#1C244B] mb-2">{service.title}</h3>
-                  <p className="text-gray-600 text-sm  line-clamp-3 mb-5">{service.description}</p>
-
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-1 text-yellow-500">
-                      <span className="text-lg">★</span>
-                      <span className="font-semibold text-gray-800">{service.rating}</span>
-                      <span className="text-gray-500 text-sm">({service.orders})</span>
-                    </div>
-
-                    <div className="text-right flex items-center gap-2">
-                      <div className="text-red-500 text-sm font-bold">{service.discount}</div>
-                      <div className="text-sm line-through text-gray-400">{service.originalPrice}</div>
-                      <div className="text-green-600 font-bold">{service.newPrice}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-        <button
-          onClick={() => swiperRef.current?.slideNext()}
-          className="absolute right-0 md:-right-5 top-1/2 -translate-y-1/2 z-10 text-[32px] text-[#333] shadow-lg border border-[#eee] bg-white font-thin w-9 h-9 rounded-full flex items-center justify-center"
-        >
-          &gt;
-        </button>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+          <button
+            onClick={() => swiperRef.current?.slideNext()}
+            className="absolute right-0 md:-right-5 top-1/2 -translate-y-1/2 z-10 text-[32px] text-[#333] shadow-lg border border-[#eee] bg-white font-thin w-9 h-9 rounded-full flex items-center justify-center"
+          >
+            &gt;
+          </button>
+        </div>
       </div>
     </section>
   );
 };
 
-export default ServiceSlider;
+export default Related;

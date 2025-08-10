@@ -12,7 +12,7 @@ const FormService: React.FC = () => {
     { label: "Service-3", value: "service3" },
   ];
   return (
-    <section className="py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)]" aria-labelledby="free-test-heading">
+    <section className="py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)]">
       <div className="max-w-content mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-start">
           <motion.div

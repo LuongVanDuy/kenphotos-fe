@@ -95,7 +95,7 @@ const HeroBanner: React.FC = () => {
   const swiperRef = useRef<SwiperCore | null>(null);
 
   return (
-    <section className="w-full bg-section pt-[180px]">
+    <section className="w-full bg-section pt-[100px] md:pt-[180px]">
       <div className="max-w-content mx-auto px-4">
         <div className="flex flex-col md:flex-row w-full min-h-[580px] py-16 md:py-0">
           <motion.div

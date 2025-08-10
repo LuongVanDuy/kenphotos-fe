@@ -111,7 +111,7 @@ const ReviewRow = ({ direction = "left", speed = "slow" }: { direction?: "left" 
 
 const Reviews: React.FC<ReviewsProps> = ({ className = "" }) => {
   return (
-    <section className={`py-10 py-[120px] bg-[rgba(220,237,248,0.6)] relative ${className}`}>
+    <section className={`py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)] relative ${className}`}>
       <div className="max-w-content mx-auto px-4">
         <MainTitle
           title={

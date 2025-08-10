@@ -1,7 +1,6 @@
 "use client";
 
 import FormService from "@/components/Common/FormService";
-import HowWeWork from "@/components/Common/HowWeWork";
 import MainTitle from "@/components/UI/Title/MainTitle";
 import Image from "next/image";
 
@@ -317,7 +316,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      <Reviews className="bg-[#fff]" />
+      <Reviews className="!bg-[#fff]" />
       <FormService />
     </>
   );
