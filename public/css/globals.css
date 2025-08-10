@@ -7,22 +7,21 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #161817;
   --content-width: min(100%, 1500px);
   font-family: var(--font-poppins), sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #161817;
   }
 }
 
 body {
   color: var(--foreground);
-  /* background: var(--background); */
-  background: #faf9f7;
+  background: var(--background);
   font-family: var(--font-poppins), sans-serif;
   line-height: 1.5;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";

@@ -1,86 +1,43 @@
 "use client";
 
 import Image from "next/image";
-import {
-  AddressIcon,
-  FacebookIcon,
-  MailBulkIcon,
-  SkypeIcon,
-  TelegramIcon,
-  WhatsappIcon,
-} from "@/components/Icons";
+import { AddressIcon, FacebookIcon, MailBulkIcon, SkypeIcon, TelegramIcon, WhatsappIcon } from "@/components/Icons";
 import Link from "next/link";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-[#151515] text-white pt-[20px] m-[15px] rounded-[32px] relative min-h-[500px]">
-      <div className=" max-w-content mx-auto  px-[20px] pt-[20px]  pb-[100px] md:pb-[20px]">
-        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8 min-h-[395px] pt-[10px]">
+    <footer className="bg-[#151515] text-white py-10 md:py-[120px] relative">
+      <div className=" max-w-content mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <span className="text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">
-              Leistungen
-            </span>
+            <span className="text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">Leistungen</span>
             <ul className="space-y-3 text-[#ccc] text-[16px]">
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webshops
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Barrierefreie Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webapplikationen
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                SEO
-              </li>
+              <li className="hover:text-white transition-colors cursor-pointer">Websites</li>
+              <li className="hover:text-white transition-colors cursor-pointer">Webshops</li>
+              <li className="hover:text-white transition-colors cursor-pointer">Barrierefreie Websites</li>
+              <li className="hover:text-white transition-colors cursor-pointer">Webapplikationen</li>
+              <li className="hover:text-white transition-colors cursor-pointer">SEO</li>
             </ul>
           </div>
           <div className="space-y-4">
-            <span className="text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">
-              Leistungen
-            </span>
+            <span className="text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">Leistungen</span>
             <ul className="space-y-3 text-[#ccc] text-[16px]">
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webshops
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Barrierefreie Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webapplikationen
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                SEO
-              </li>
+              <li className="hover:text-white transition-colors cursor-pointer">Websites</li>
+              <li className="hover:text-white transition-colors cursor-pointer">Webshops</li>
+              <li className="hover:text-white transition-colors cursor-pointer">Barrierefreie Websites</li>
+              <li className="hover:text-white transition-colors cursor-pointer">Webapplikationen</li>
+              <li className="hover:text-white transition-colors cursor-pointer">SEO</li>
             </ul>
           </div>
 
           <div className="space-y-4">
-            <span className="text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">
-              Leistungen
-            </span>
+            <span className="text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">Leistungen</span>
             <ul className="space-y-3 text-[#ccc] text-[16px]">
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webshops
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Barrierefreie Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webapplikationen
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                SEO
-              </li>
+              <li className="hover:text-white transition-colors cursor-pointer">Websites</li>
+              <li className="hover:text-white transition-colors cursor-pointer">Webshops</li>
+              <li className="hover:text-white transition-colors cursor-pointer">Barrierefreie Websites</li>
+              <li className="hover:text-white transition-colors cursor-pointer">Webapplikationen</li>
+              <li className="hover:text-white transition-colors cursor-pointer">SEO</li>
             </ul>
           </div>
 
@@ -204,8 +161,7 @@ const Footer: React.FC = () => {
                       rel="noopener noreferrer"
                       passHref
                     >
-                      32-33 TT02, Tay Nam Linh Dam Urban Area, Hoang Liet Ward,
-                      Hoang Mai District, Hanoi City, Viet Nam
+                      32-33 TT02, Tay Nam Linh Dam Urban Area, Hoang Liet Ward, Hoang Mai District, Hanoi City, Viet Nam
                     </Link>
                   </address>
                 </li>
@@ -214,20 +170,6 @@ const Footer: React.FC = () => {
           </div>
         </div>
       </div>
-
-      <nav className="footer-nav absolute right-0 bottom-0 bg-section-2 rounded-tl-[32px]">
-        <ul className="text-black flex justify-center items-center px-6 py-6  gap-4 md:gap-16">
-          <li className="nav-item item-228">
-            <a href="/impressum">Impressum</a>
-          </li>
-          <li className="nav-item item-229">
-            <a href="/datenschutz">Datenschutz</a>
-          </li>
-          <li className="nav-item item-230">
-            <a href="/agb">AGB</a>
-          </li>
-        </ul>
-      </nav>
     </footer>
   );
 };

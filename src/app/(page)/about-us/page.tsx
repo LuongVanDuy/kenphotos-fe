@@ -1,98 +1,73 @@
 "use client";
 
-import Reviews from "@/components/Home/Review";
-import SectionTitle from "@/components/UI/SectionTitle";
+import FormService from "@/components/Common/FormService";
+import HowWeWork from "@/components/Common/HowWeWork";
+import MainTitle from "@/components/UI/Title/MainTitle";
 import Image from "next/image";
 
-const timelineData = [
+import { StarOutlined, AimOutlined, TeamOutlined, TrophyOutlined } from "@ant-design/icons";
+import Reviews from "@/components/Common/Review";
+
+const data = [
   {
-    day: "Day 1",
-    title: "1. Faith",
-    content: `We believe that we will be happy when we develop every day. Development should not
-      just be for ourselves but should be for others: that is family, friends, colleagues,
-      community and customers, only then can we live a valuable life.`,
+    title: "Faith",
+    icon: StarOutlined,
+    content: `We believe happiness comes from daily growth. Growth should benefit not only ourselves but also family, friends, colleagues, community, and customers.`,
   },
   {
-    day: "Day 2",
-    title: "2. Mission",
-    content: `True Color strives to create an environment for each person to be proud of
-      themselves and their work, and to bring sustainable value to customers and the
-      work community.`,
+    title: "Mission",
+    icon: AimOutlined,
+    content: `True Color creates a workplace where everyone feels proud of who they are and what they do, while delivering lasting value to customers and the community.`,
   },
   {
-    day: "Day 3",
-    title: "3. Business philosophy",
-    content: `What drives us to develop is the trust of customers and partners. As long as
-      others believe in True Color's personality, True color will work as if it were for
-      itself. Trust from customers helps True Color constantly change to move forward,
-      learning every day from useful things to bring even higher value to customers.`,
+    title: "Business philosophy",
+    icon: TeamOutlined,
+    content: `Our development is built on the trust of customers and partners. This trust drives us to improve, adapt, and learn each day to bring greater value to all.`,
   },
   {
-    day: "Day 4",
-    title: "4. High quality standards",
-    content: `Quality is our biggest priority, True Color edited photos meet the highest
-      standards, satisfying the most demanding customers, we have customers who have
-      been working with us for more than 5 years.`,
+    title: "High quality standards",
+    icon: TrophyOutlined,
+    content: `Quality is our highest priority. True Color’s photos meet strict standards, pleasing even demanding clients, including those who have trusted us for years.`,
   },
 ];
 
 const AboutPage = () => {
   return (
-    <div className="">
+    <>
       <div className="min-h-[350px] bg-white pt-24">
         <div className="max-w-content mx-auto">
           <div className="flex flex-col md:flex-row gap-10">
             <div className="px-4 md:px-0 py-16 text-white text-left">
-              <p className="text-[24px] text-gray-400 font-medium mb-4">
-                About us
-              </p>
+              <p className="text-[24px] text-gray-400 font-medium mb-4">About us</p>
               <h1 className="text-[32px] md:text-[48px] leading-tight font-[500] mb-6 text-black">
                 We are True Color. A digital
                 <br className="hidden md:block" />
                 design and editing company
               </h1>
               <p className="max-w-3xl text-base md:text-lg  mb-12 text-black">
-                We help our clients build their brand identity, and design,
-                develop, launch, and support their digital products. Working
-                with startups and real estate businesses from all over the
-                world.
+                We help our clients build their brand identity, and design, develop, launch, and support their digital products. Working with startups
+                and real estate businesses from all over the world.
               </p>
 
               <div className="grid grid-cols-3 gap-4 max-w-md">
                 <div className="text-left">
-                  <p className="text-3xl md:text-4xl font-semibold text-black">
-                    150+
-                  </p>
+                  <p className="text-3xl md:text-4xl font-semibold text-black">150+</p>
                   <p className="text-sm text-gray-400 mt-1">team members</p>
                 </div>
                 <div className="text-left">
-                  <p className="text-3xl md:text-4xl font-semibold text-black">
-                    500+
-                  </p>
-                  <p className="text-sm text-gray-400 mt-1">
-                    completed projects
-                  </p>
+                  <p className="text-3xl md:text-4xl font-semibold text-black">500+</p>
+                  <p className="text-sm text-gray-400 mt-1">completed projects</p>
                 </div>
                 <div className="text-left">
-                  <p className="text-3xl md:text-4xl font-semibold text-black">
-                    10
-                  </p>
-                  <p className="text-sm text-gray-400 mt-1">
-                    years in business
-                  </p>
+                  <p className="text-3xl md:text-4xl font-semibold text-black">10</p>
+                  <p className="text-sm text-gray-400 mt-1">years in business</p>
                 </div>
               </div>
             </div>
 
             <div className="w-full md:w-1/2">
               <div className="relative w-full h-full rounded-xloverflow-hidden">
-                <video
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                >
+                <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
                   <source src="/video.webm" type="video/webm" />
                   <source src="/video.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
@@ -103,14 +78,27 @@ const AboutPage = () => {
         </div>
       </div>
 
-      <div className="relative px-2">
-        <div className="max-w-content pt-16 pb-24 md:pt-24 md:pb-36 mx-auto">
-          <span className="notch-top-left" aria-hidden="true"></span>
+      <section className="relative py-10 md:pt-[70px] md:pb-[120px]">
+        <div className="max-w-content px-4 mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 md:gap-[160px]">
-            {/* Cột trái */}
+            <div className="block md:hidden">
+              <MainTitle
+                title={
+                  <>
+                    Our{" "}
+                    <span className="inline-block bg-gradient-to-r from-[#2D6DFF] to-[#3BE5FF] bg-clip-text text-transparent -webkit-background-clip-text -webkit-text-fill-transparent">
+                      Story
+                    </span>
+                  </>
+                }
+                subTitle="Passionate About Perfecting Every Shot"
+                content="From humble beginnings to a global clientele, True Color delivers vibrant, accurate, and market-ready images that make every property shine."
+                align="left"
+              />
+            </div>
             <div className="space-y-20">
               <div>
-                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50">
+                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
                   <Image
                     src="/images/view-5.jpg"
                     alt="VPN design"
@@ -119,81 +107,89 @@ const AboutPage = () => {
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
-                <h3 className="mt-6 text-xl font-semibold text-[#0D0D0D]">
-                  Cyber VPN Mobile App Design Concept
-                </h3>
+                <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">Get Started Today</h3>
                 <p className="text-gray-600 mt-2">
-                  Built a VPN mobile app design with a touch of cyberpunk and
-                  sci-fi styles. Dark aesthetics reduce eye strain, while users
-                  enjoy fast internet connections.
+                  The way to get started is to quit talking and begin doing. At True Color, we understand that in the dynamic world of real estate,
+                  captivating visuals are paramount. We are a dedicated team committed to providing top-tier photo editing and visualization services
+                  that elevate your property listings.
                 </p>
-                <ul className="mt-3 list-disc list-inside text-gray-700 text-sm">
-                  <li>5 main screens for mobile app</li>
-                  <li>Promotional landing page</li>
-                  <li>Presentation-ready animation</li>
-                  <li>Development-ready assets</li>
-                </ul>
               </div>
 
               <div>
-                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50">
+                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
                   <Image
-                    src="/images/view-2.jpg"
-                    alt="Coin Prime UI"
+                    src="/images/view-5.jpg"
+                    alt="VPN design"
                     width={600}
                     height={400}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
-                <h3 className="mt-6 text-xl font-semibold text-[#0D0D0D]">
-                  Crypto Coin Trade Platform UI
+                <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">
+                  Passion for Perfection
                 </h3>
                 <p className="text-gray-600 mt-2">
-                  UI concept for a modern crypto trading platform with
-                  simplified trading UX and dashboard analytics.
+                  Founded with a love for real estate imagery, True Color delivers premium photo editing solutions designed to make every property
+                  shine. Our detail-oriented team transforms images with creativity and precision.
                 </p>
-                <ul className="mt-3 list-disc list-inside text-gray-700 text-sm">
-                  <li>Clean dashboard UI</li>
-                  <li>Multiple user roles</li>
-                  <li>Real-time trading simulation</li>
-                  <li>Exportable trading reports</li>
-                </ul>
-              </div>
-            </div>
-            {/* Cột phải với offset */}
-            <div className=" space-y-20 md:mt-[100px]">
-              <div className="hidden md:block">
-                <h2 className="text-[32px] md:text-[48px] leading-tight text-center font-[500]  text-black">
-                  Our Story
-                </h2>
-              </div>
-              <div>
-                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50">
-                  <Image
-                    src="/images/view-3.jpg"
-                    alt="Crypto Exchange"
-                    width={440}
-                    height={440}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-                <h3 className="mt-6 text-xl font-semibold text-[#0D0D0D]">
-                  Cryptocurrency Exchange Website & Mobile App
-                </h3>
-                <p className="text-gray-600 mt-2">
-                  Designed a cryptocurrency exchange mobile app and its promo
-                  landing page for improved marketing strategies.
-                </p>
-                <ul className="mt-3 list-disc list-inside text-gray-700 text-sm">
-                  <li>5 main screens for mobile app</li>
-                  <li>Promotional landing page</li>
-                  <li>Presentation-ready animation</li>
-                  <li>Development-ready assets</li>
-                </ul>
               </div>
 
               <div>
-                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50">
+                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
+                  <Image
+                    src="/images/view-5.jpg"
+                    alt="VPN design"
+                    width={600}
+                    height={400}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+                <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">
+                  Professional Real Estate Editing
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Whether you're an agent, photographer, or developer, we help maximize the impact of your property listings. Our expert editing
+                  showcases your properties in their best light to attract more buyers.
+                </p>
+              </div>
+
+              <div>
+                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
+                  <Image
+                    src="/images/view-5.jpg"
+                    alt="VPN design"
+                    width={600}
+                    height={400}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+                <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">
+                  High-Tech Excellence
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Using advanced software and proven techniques, our skilled team edits photos quickly and with consistent quality at competitive
+                  prices, helping thousands of clients boost their business.
+                </p>
+              </div>
+            </div>
+            <div className=" space-y-20 md:mt-[60px]">
+              <div className="hidden md:block">
+                <MainTitle
+                  title={
+                    <>
+                      Our{" "}
+                      <span className="inline-block bg-gradient-to-r from-[#2D6DFF] to-[#3BE5FF] bg-clip-text text-transparent -webkit-background-clip-text -webkit-text-fill-transparent">
+                        Story
+                      </span>
+                    </>
+                  }
+                  subTitle="Passionate About Perfecting Every Shot"
+                  content="From humble beginnings to a global clientele, True Color delivers vibrant, accurate, and market-ready images that make every property shine."
+                  align="left"
+                />
+              </div>
+              <div>
+                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
                   <Image
                     src="/images/view-3.jpg"
                     alt="Crypto Exchange"
@@ -202,88 +198,128 @@ const AboutPage = () => {
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
-                <h3 className="mt-6 text-xl font-semibold text-[#0D0D0D]">
-                  Cryptocurrency Exchange Website & Mobile App
+                <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">
+                  Over a Decade of Experience
                 </h3>
                 <p className="text-gray-600 mt-2">
-                  Designed a cryptocurrency exchange mobile app and its promo
-                  landing page for improved marketing strategies.
+                  With 10+ years in real estate photo editing, we offer services from color correction to virtual staging, day-to-dusk conversion,
+                  clutter removal, and more to enhance property appeal.
                 </p>
-                <ul className="mt-3 list-disc list-inside text-gray-700 text-sm">
-                  <li>5 main screens for mobile app</li>
-                  <li>Promotional landing page</li>
-                  <li>Presentation-ready animation</li>
-                  <li>Development-ready assets</li>
-                </ul>
+              </div>
+              <div>
+                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
+                  <Image
+                    src="/images/view-3.jpg"
+                    alt="Crypto Exchange"
+                    width={440}
+                    height={440}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+                <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">
+                  Trusted by Global Clients
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  We work with photographers, brokers, and investors worldwide. Many integrate our services into their workflow, trusting us as an
+                  essential extension of their team.
+                </p>
+              </div>
+
+              <div>
+                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
+                  <Image
+                    src="/images/view-3.jpg"
+                    alt="Crypto Exchange"
+                    width={440}
+                    height={440}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+                <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">
+                  Tailored for Faster Sales
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Our editing solutions focus on realistic, accurate colors and presentation to capture buyer interest quickly, helping accelerate the
+                  sales process for homes and luxury properties.
+                </p>
+              </div>
+
+              <div>
+                <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
+                  <Image
+                    src="/images/view-3.jpg"
+                    alt="Crypto Exchange"
+                    width={440}
+                    height={440}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+                <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">
+                  Precision Editing Techniques
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Following a rigorous 21-step process, we ensure every image meets the highest quality standards. From fixing underexposure to
+                  correcting lens flaws, we deliver flawless results every time. Hỏi ChatGPT
+                </p>
               </div>
             </div>
           </div>
-          <span className="notch-bottom-right" aria-hidden="true"></span>
         </div>
-      </div>
+      </section>
 
-      <div className="pt-16 pb-24 md:pt-24 md:pb-36  bg-white relative">
+      <section className="relative py-10 md:pt-[70px] md:pb-[120px] bg-[rgba(220,237,248,0.6)]">
         <div className="max-w-content mx-auto px-4">
-          <span className="notch-top-right" aria-hidden="true"></span>
-
-          <SectionTitle
-            title="Just one week from start to finish"
-            topText="Step"
-            bottomText="Hear what our clients say about working with us"
+          <MainTitle
+            title={
+              <>
+                Our Mission & Values
+                <br />
+                <span className="inline-block bg-gradient-to-r from-[#2D6DFF] to-[#3BE5FF] bg-clip-text text-transparent -webkit-background-clip-text -webkit-text-fill-transparent">
+                  Committed to Excellence in Pixels
+                </span>
+              </>
+            }
+            content="True Color has built a global reputation for delivering exceptional, on-time results. Clients praise our detail, clear communication, and ability to turn ordinary images into stunning, market-ready visuals."
           />
+
           <ul className="md:flex mt-16">
-            {timelineData.map((item, index) => (
-              <li
-                key={index}
-                className="md:flex-col flex-1 justify-between flex gap-10"
-              >
-                <div className="md:flex-row flex flex-col items-center gap-[12px] md:gap-[10px]">
-                  <div className="h-3 w-3 md:mx-[4px]">
-                    <svg
-                      fill="none"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      width="24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <rect
-                        height="23"
-                        rx="11.5"
-                        stroke="currentColor"
-                        width="23"
-                        x="0.5"
-                        y="0.500488"
-                      ></rect>
-                      <circle
-                        cx="12"
-                        cy="12.0005"
-                        fill="currentColor"
-                        r="6"
-                      ></circle>
-                    </svg>
+            {data.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <li key={index} className="md:flex-col flex-1 justify-between flex gap-10">
+                  <div className="md:flex-row flex flex-col items-center gap-[12px] md:gap-[10px]">
+                    <div className="h-3 w-3 md:mx-[4px]">
+                      <svg fill="none" height="24" viewBox="0 0 24 24" width="24">
+                        <rect height="23" rx="11.5" stroke="#2D6DFF" width="23" x="0.5" y="0.500488"></rect>
+                        <circle cx="12" cy="12.0005" fill="#2D6DFF" r="6"></circle>
+                      </svg>
+                    </div>
+                    {index !== data.length - 1 && <div className="md:h-[1px] md:w-full h-full w-[1px] ml-[10px] md:ml-0 md:mt-3 bg-[#2D6DFF]"></div>}
                   </div>
-                  {/* Chỉ thêm đường kẻ nếu không phải phần tử cuối */}
-                  {index !== timelineData.length - 1 && (
-                    <div className="md:h-[1px] md:w-full h-full w-[1px] ml-[10px] md:ml-0 md:mt-3 bg-black"></div>
-                  )}
-                </div>
-                <div className="md:pb-0 md:pr-5 pb-8 flex-1">
-                  <span className="mb-[8px] block text-[#9D9DAD] text-[16px]">
-                    {item.day}
-                  </span>
-                  <h3 className="mb-[16px] text-[24px] text-black">
-                    {item.title}
-                  </h3>
-                  <p className="text-black text-[16px]">{item.content}</p>
-                </div>
-              </li>
-            ))}
+
+                  <div
+                    className={`flex-1 p-6 rounded-xl ${index !== data.length - 1 ? "md:mr-[24px]" : ""}`}
+                    style={{
+                      backdropFilter: "blur(8px)",
+                      backgroundColor: "#fffc",
+                    }}
+                  >
+                    <div className="w-[50px] h-[50px] bg-[rgba(220,237,248,0.6)] flex items-center justify-center rounded-md mb-4">
+                      <Icon style={{ fontSize: 24, color: "#2D6DFF" }} />
+                    </div>
+                    <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">{item.title}</h3>
+                    <p className="text-black text-[16px]">{item.content}</p>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
-      </div>
+      </section>
 
-      <Reviews />
-    </div>
+      <Reviews className="bg-[#fff]" />
+      <FormService />
+    </>
   );
 };
 

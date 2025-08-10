@@ -3,12 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ChevronDownIcon,
-  ArrowRightIcon,
-  CloseIcon,
-  HamburgerIcon,
-} from "@/components/Icons";
+import { ChevronDownIcon, ArrowRightIcon, CloseIcon, HamburgerIcon } from "@/components/Icons";
 import { usePathname, useRouter } from "next/navigation";
 
 export interface MenuGroup {
@@ -25,6 +20,7 @@ export interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { label: "HOME", href: "/", active: true },
+  { label: "ABOUT US", href: "/about-us/" },
   {
     label: "SERVICES",
     groups: [
@@ -72,21 +68,16 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
-  { label: "CONTACT", href: "/contact/" },
-  { label: "ABOUT US", href: "/about-us/" },
   { label: "BLOG", href: "/blog/" },
+  { label: "CONTACT", href: "/contact/" },
 ];
 
-const Navbar: React.FC<{ onSendFreeTest?: () => void }> = ({
-  onSendFreeTest,
-}) => {
+const Navbar: React.FC<{ onSendFreeTest?: () => void }> = ({ onSendFreeTest }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<number | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [selectedMobileGroup, setSelectedMobileGroup] = useState<
-    MenuGroup[] | null
-  >(null);
+  const [selectedMobileGroup, setSelectedMobileGroup] = useState<MenuGroup[] | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -101,134 +92,99 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void }> = ({
 
   return (
     <div className="fixed top-0 left-0 w-full z-50">
-      {/* Overlay for MegaMenu */}
       <div
         className={`
           fixed inset-0 z-40 bg-black/50 backdrop-blur-sm
           transition-all duration-300 ease-in-out
-          ${
-            isMegaMenuOpen !== null && menuItems[isMegaMenuOpen]?.groups
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
-          }
+          ${isMegaMenuOpen !== null && menuItems[isMegaMenuOpen]?.groups ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
         `}
       />
-      {/* Overlay for Mobile */}
       <div
         className={`
           fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden
           transition-all duration-300 ease-in-out
-          ${
-            isMobileOpen
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
-          }
+          ${isMobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
         `}
       />
       <header
-        className={`
-          bg-white rounded-full shadow-2xl
-          ${isScrolled ? "max-w-[1200px]" : "max-w-[98%]"}
-          md:mx-auto mx-2 mt-4 px-6 py-3 md:py-5 flex items-center justify-between relative z-50
-          transition-all duration-300
-        `}
+        className="bg-white shadow-[0px_4px_8px_0px_rgba(21,58,160,0.1)] md:mx-auto px-4 py-3 md:py-5  relative z-50 transition-all duration-300"
         ref={containerRef}
       >
-        <Link href="/">
-          <Image
-            src="/images/logo.png"
-            alt="Logo"
-            width={130}
-            height={50}
-            className="object-contain"
-          />
-        </Link>
-        <ul className="hidden md:flex gap-6 text-sm font-medium">
-          {menuItems.map((item, idx) => (
-            <li
-              key={item.label}
-              className="relative"
-              onMouseEnter={() => setIsMegaMenuOpen(idx)}
-              onMouseLeave={() => setIsMegaMenuOpen(null)}
-            >
-              {item.groups ? (
-                <>
-                  <button className="flex items-center gap-1 hover:text-black/80 transition">
-                    {item.label} <ChevronDownIcon size={16} />
-                  </button>
+        <div className="max-w-content mx-auto px-4 flex items-center justify-between">
+          <Link href="/">
+            <Image src="/images/logo.png" alt="Logo" width={130} height={50} className="object-contain" />
+          </Link>
+          <ul className="hidden md:flex gap-6 text-sm font-medium">
+            {menuItems.map((item, idx) => (
+              <li key={item.label} className="relative" onMouseEnter={() => setIsMegaMenuOpen(idx)} onMouseLeave={() => setIsMegaMenuOpen(null)}>
+                {item.groups ? (
+                  <>
+                    <button className="text-[16px] flex items-center gap-1 hover:text-black/80 transition">
+                      {item.label} <ChevronDownIcon size={16} />
+                    </button>
 
-                  {isMegaMenuOpen === idx && (
+                    {isMegaMenuOpen === idx && (
+                      <div
+                        className="absolute top-full left-1/2 -translate-x-1/2 w-[200px] h-[40px] z-40"
+                        onMouseEnter={() => setIsMegaMenuOpen(idx)}
+                        onMouseLeave={() => setIsMegaMenuOpen(null)}
+                      ></div>
+                    )}
+
                     <div
-                      className="absolute top-full left-1/2 -translate-x-1/2 w-[200px] h-[40px] z-40"
-                      onMouseEnter={() => setIsMegaMenuOpen(idx)}
-                      onMouseLeave={() => setIsMegaMenuOpen(null)}
-                    ></div>
-                  )}
-
-                  <div
-                    className={`
+                      className={`
                       absolute top-[calc(100%+40px)] left-1/2 -translate-x-1/2
                       bg-white shadow-2xl rounded-3xl p-10 flex gap-12 z-50
                       transition-all duration-300 ease-in-out
-                      ${
-                        isMegaMenuOpen === idx
-                          ? "opacity-100 translate-y-0 pointer-events-auto"
-                          : "opacity-0 translate-y-2 pointer-events-none"
-                      }
+                      ${isMegaMenuOpen === idx ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-2 pointer-events-none"}
                     `}
-                    onMouseEnter={() => setIsMegaMenuOpen(idx)}
-                    onMouseLeave={() => setIsMegaMenuOpen(null)}
-                  >
-                    {item.groups.map((group) => (
-                      <div key={group.title} className="min-w-[200px]">
-                        <div className="font-semibold text-[#A78956] mb-3">
-                          {group.title}
+                      onMouseEnter={() => setIsMegaMenuOpen(idx)}
+                      onMouseLeave={() => setIsMegaMenuOpen(null)}
+                    >
+                      {item.groups.map((group) => (
+                        <div key={group.title} className="min-w-[200px]">
+                          <div className="font-semibold text-[#A78956] mb-3">{group.title}</div>
+                          <ul className="space-y-2">
+                            {group.items.map((sub) => (
+                              <li key={sub.label}>
+                                <Link href={sub.href} className="text-black/80 hover:text-black transition">
+                                  {sub.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                        <ul className="space-y-2">
-                          {group.items.map((sub) => (
-                            <li key={sub.label}>
-                              <Link
-                                href={sub.href}
-                                className="text-black/80 hover:text-black transition"
-                              >
-                                {sub.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <Link
-                  href={item.href!}
-                  className={`transition font-medium hover:text-black ${
-                    pathname === item.href ? "text-black" : "text-black/70"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
-        <button
-          onClick={onSendFreeTest}
-          className="hidden md:flex ml-6 bg-black rounded-full text-white px-6 py-3 text-sm font-medium items-center gap-2 shadow hover:bg-black/90 transition"
-        >
-          Send Free Test <ArrowRightIcon />
-        </button>
-        <button
-          className="md:hidden bg-white rounded-full w-[44px] h-[44px] flex items-center justify-center shadow"
-          onClick={() => {
-            setIsMobileOpen(!isMobileOpen);
-            setSelectedMobileGroup(null);
-          }}
-          aria-label="Toggle menu"
-        >
-          {isMobileOpen ? "X" : <HamburgerIcon />}
-        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <Link
+                    href={item.href!}
+                    className={`transition text-[16px] font-medium hover:text-black ${pathname === item.href ? "text-black" : ""}`}
+                  >
+                    {item.label}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={onSendFreeTest}
+            className="hidden md:flex ml-6 bg-black rounded-full text-white px-6 py-3 text-sm font-medium items-center gap-2 shadow hover:bg-black/90 transition"
+          >
+            Send Free Test <ArrowRightIcon />
+          </button>
+          <button
+            className="md:hidden bg-white w-[44px] h-[44px] flex items-center justify-center shadow"
+            onClick={() => {
+              setIsMobileOpen(!isMobileOpen);
+              setSelectedMobileGroup(null);
+            }}
+            aria-label="Toggle menu"
+          >
+            {isMobileOpen ? "X" : <HamburgerIcon />}
+          </button>
+        </div>
       </header>
       {/* <div className="h-[90px] md:h-[90px]" /> */}
 
@@ -248,11 +204,7 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void }> = ({
                         {item.label} <ChevronDownIcon size={16} />
                       </button>
                     ) : (
-                      <Link
-                        href={item.href!}
-                        onClick={() => setIsMobileOpen(false)}
-                        className="block py-2 px-3 text-black font-medium"
-                      >
+                      <Link href={item.href!} onClick={() => setIsMobileOpen(false)} className="block py-2 px-3 text-black font-medium">
                         {item.label}
                       </Link>
                     )}
@@ -261,17 +213,12 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void }> = ({
               </>
             ) : (
               <div className="space-y-4">
-                <button
-                  onClick={() => setSelectedMobileGroup(null)}
-                  className="text-sm text-gray-600 flex items-center gap-1"
-                >
+                <button onClick={() => setSelectedMobileGroup(null)} className="text-sm text-gray-600 flex items-center gap-1">
                   ← Back
                 </button>
                 {selectedMobileGroup.map((group) => (
                   <div key={group.title}>
-                    <div className="font-semibold text-[#A78956] mb-2">
-                      {group.title}
-                    </div>
+                    <div className="font-semibold text-[#A78956] mb-2">{group.title}</div>
                     <ul className="space-y-2">
                       {group.items.map((sub) => (
                         <li key={sub.label}>

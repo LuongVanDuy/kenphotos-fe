@@ -1,12 +1,12 @@
 "use client";
 
-import { CompareSlider } from "./CompareSlider";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import SwiperCore from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
 import { useEffect, useRef, useState } from "react";
+import { CompareSlider } from "./CompareSlider";
 
 const ServiceSlider: React.FC = () => {
   const swiperRef = useRef<SwiperCore>();
@@ -157,46 +157,30 @@ const ServiceSlider: React.FC = () => {
                     beforeImage={service.beforeImage}
                     afterImage={service.afterImage}
                     onDragStart={() => {
-                      if (swiperRef.current)
-                        swiperRef.current.allowTouchMove = false;
+                      if (swiperRef.current) swiperRef.current.allowTouchMove = false;
                     }}
                     onDragEnd={() => {
-                      if (swiperRef.current)
-                        swiperRef.current.allowTouchMove = true;
+                      if (swiperRef.current) swiperRef.current.allowTouchMove = true;
                     }}
                   />
                 </div>
 
                 {/* Content */}
                 <div className="p-4 text-start">
-                  <h3 className="text-lg font-bold text-[#1C244B] mb-2">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm  line-clamp-3 mb-5">
-                    {service.description}
-                  </p>
+                  <h3 className="text-lg font-bold text-[#1C244B] mb-2">{service.title}</h3>
+                  <p className="text-gray-600 text-sm  line-clamp-3 mb-5">{service.description}</p>
 
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-1 text-yellow-500">
                       <span className="text-lg">★</span>
-                      <span className="font-semibold text-gray-800">
-                        {service.rating}
-                      </span>
-                      <span className="text-gray-500 text-sm">
-                        ({service.orders})
-                      </span>
+                      <span className="font-semibold text-gray-800">{service.rating}</span>
+                      <span className="text-gray-500 text-sm">({service.orders})</span>
                     </div>
 
                     <div className="text-right flex items-center gap-2">
-                      <div className="text-red-500 text-sm font-bold">
-                        {service.discount}
-                      </div>
-                      <div className="text-sm line-through text-gray-400">
-                        {service.originalPrice}
-                      </div>
-                      <div className="text-green-600 font-bold">
-                        {service.newPrice}
-                      </div>
+                      <div className="text-red-500 text-sm font-bold">{service.discount}</div>
+                      <div className="text-sm line-through text-gray-400">{service.originalPrice}</div>
+                      <div className="text-green-600 font-bold">{service.newPrice}</div>
                     </div>
                   </div>
                 </div>

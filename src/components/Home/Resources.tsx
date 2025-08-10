@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import SectionTitle from "../UI/SectionTitle";
+import MainTitle from "../UI/Title/MainTitle";
 
 const Resources: React.FC = () => {
   const resources = [
@@ -48,9 +49,20 @@ const Resources: React.FC = () => {
   ];
 
   return (
-    <section className="pt-12 pb-24  md:pt-24 md:pb-40 bg-section relative">
+    <section className="py-10 md:pt-[120px] md:pb-[120px] bg-[rgba(220,237,248,0.6)] relative">
       <div className="max-w-content mx-auto px-4 text-center">
-        <span className="notch-top-left" aria-hidden="true"></span>
+        <MainTitle
+          title={
+            <>
+              Access a Wide Range of Free and Useful <br />
+              <span className="inline-block bg-gradient-to-r from-[#2D6DFF] to-[#3BE5FF] bg-clip-text text-transparent -webkit-background-clip-text -webkit-text-fill-transparent">
+                Real Estate
+              </span>{" "}
+              Visual Resources
+            </>
+          }
+          content="True Color offers a curated collection of high-quality photo editing samples, 3D visualization previews, and advanced retouching examples—all shared completely free.  You can download and use these resources to inspire your marketing projects or to see the transformative impact of our editing techniques."
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -82,10 +94,8 @@ const Resources: React.FC = () => {
                 priority
               />
 
-              <div className="absolute bottom-3 left-3">
-                <span className="bg-gray-600/70 text-white text-sm px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">
-                  {resource.name}
-                </span>
+              <div className="absolute bottom-4 left-4">
+                <span className="bg-gray-600/70 text-white px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">{resource.name}</span>
               </div>
             </motion.div>
           ))}
