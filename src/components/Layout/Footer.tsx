@@ -18,51 +18,152 @@ const Footer: React.FC = () => {
         <div className='grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8'>
           <div className='space-y-4'>
             <span className='text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white'>
-              Leistungen
+              Photo Editing
             </span>
             <ul className='space-y-3 text-[#ccc] text-[16px]'>
-              <li className='hover:text-white transition-colors cursor-pointer'>Websites</li>
-              <li className='hover:text-white transition-colors cursor-pointer'>Webshops</li>
               <li className='hover:text-white transition-colors cursor-pointer'>
-                Barrierefreie Websites
+                <Link
+                  href='/services/single-exposure'
+                  className='block hover:text-white transition-colors'
+                >
+                  Single Exposure
+                </Link>
               </li>
               <li className='hover:text-white transition-colors cursor-pointer'>
-                Webapplikationen
+                <Link
+                  href='/services/hdr-bracket'
+                  className='block hover:text-white transition-colors'
+                >
+                  HDR Bracket
+                </Link>
               </li>
-              <li className='hover:text-white transition-colors cursor-pointer'>SEO</li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/flambient'
+                  className='block hover:text-white transition-colors'
+                >
+                  Flambient
+                </Link>
+              </li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/day-to-twilight'
+                  className='block hover:text-white transition-colors'
+                >
+                  Day To Twilight or Dusk
+                </Link>
+              </li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/water-in-pool'
+                  className='block hover:text-white transition-colors'
+                >
+                  Water in Pool
+                </Link>
+              </li>
             </ul>
           </div>
           <div className='space-y-4'>
             <span className='text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white'>
-              Leistungen
+              3D Visualizations
             </span>
             <ul className='space-y-3 text-[#ccc] text-[16px]'>
-              <li className='hover:text-white transition-colors cursor-pointer'>Websites</li>
-              <li className='hover:text-white transition-colors cursor-pointer'>Webshops</li>
               <li className='hover:text-white transition-colors cursor-pointer'>
-                Barrierefreie Websites
+                <Link
+                  href='/services/360-image-enhancement'
+                  className='block hover:text-white transition-colors'
+                >
+                  360° Image Enhancement
+                </Link>
               </li>
               <li className='hover:text-white transition-colors cursor-pointer'>
-                Webapplikationen
+                <Link
+                  href='/services/webshops'
+                  className='block hover:text-white transition-colors'
+                >
+                  Webshops
+                </Link>
               </li>
-              <li className='hover:text-white transition-colors cursor-pointer'>SEO</li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/virtual-staging'
+                  className='block hover:text-white transition-colors'
+                >
+                  Virtual Staging
+                </Link>
+              </li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/virtual-renovations'
+                  className='block hover:text-white transition-colors'
+                >
+                  Virtual Renovations
+                </Link>
+              </li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/360-virtual-staging'
+                  className='block hover:text-white transition-colors'
+                >
+                  360° Virtual Staging
+                </Link>
+              </li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/changing-seasons'
+                  className='block hover:text-white transition-colors'
+                >
+                  Changing Seasons
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div className='space-y-4'>
             <span className='text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white'>
-              Leistungen
+              Advanced Editing
             </span>
             <ul className='space-y-3 text-[#ccc] text-[16px]'>
-              <li className='hover:text-white transition-colors cursor-pointer'>Websites</li>
-              <li className='hover:text-white transition-colors cursor-pointer'>Webshops</li>
               <li className='hover:text-white transition-colors cursor-pointer'>
-                Barrierefreie Websites
+                <Link
+                  href='/services/real-estate-video-editing'
+                  className='block hover:text-white transition-colors'
+                >
+                  Real Estate Video Editing
+                </Link>
               </li>
               <li className='hover:text-white transition-colors cursor-pointer'>
-                Webapplikationen
+                <Link
+                  href='/services/webshops'
+                  className='block hover:text-white transition-colors'
+                >
+                  Webshops
+                </Link>
               </li>
-              <li className='hover:text-white transition-colors cursor-pointer'>SEO</li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/item-removal'
+                  className='block hover:text-white transition-colors'
+                >
+                  Item Removal
+                </Link>
+              </li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/aerial-drone-highlight'
+                  className='block hover:text-white transition-colors'
+                >
+                  Aerial/ Drone Highlight
+                </Link>
+              </li>
+              <li className='hover:text-white transition-colors cursor-pointer'>
+                <Link
+                  href='/services/lawn-replacement'
+                  className='block hover:text-white transition-colors'
+                >
+                  Lawn Replacement
+                </Link>
+              </li>
             </ul>
           </div>
 
