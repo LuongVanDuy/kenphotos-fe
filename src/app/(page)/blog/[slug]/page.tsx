@@ -1,6 +1,6 @@
 import BlogDetail from "@/components/Client/Blog/BlogDetails";
 import FormService from "@/components/Client/Common/FormService";
-import { createMetadata, fetchPostMeta, stripHtml } from "@/utils/metadata";
+import { createMetadata, createMetadataFromContent, fetchPostMeta, stripHtml } from "@/utils/metadata";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
@@ -12,14 +12,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     });
   }
 
-  const plainText = stripHtml(post.content);
-  const shortDescription = plainText.length > 160 ? plainText.slice(0, 157) + "..." : plainText;
-
-  return createMetadata({
+  return createMetadataFromContent({
     title: post.title,
-    description: shortDescription,
+    content: post.content,
+    image: post.thumbnail || "/default-preview.jpg",
+    url: `https://example.com/blog/${params.slug}`,
   });
 }
+
 export default async function PostDetails({ params }: { params: { slug: string[] | string } }) {
   const slugPath = Array.isArray(params.slug) ? params.slug.join("/") : params.slug;
   const post = await fetchPostMeta(slugPath);

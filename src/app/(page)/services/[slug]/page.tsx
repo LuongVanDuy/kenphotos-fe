@@ -9,7 +9,7 @@ import HowWeWork from "@/components/Client/Common/HowWeWork";
 import Info from "@/components/Client/Service/Info";
 import StepGrid from "@/components/Client/Service/StepGrid";
 import Related from "@/components/Client/Service/Related";
-import { createMetadata, fetchServiceMeta, stripHtml } from "@/utils/metadata";
+import { createMetadata, createMetadataFromContent, fetchServiceMeta, stripHtml } from "@/utils/metadata";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const service = await fetchServiceMeta(params.slug);
@@ -20,12 +20,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     });
   }
 
-  const plainText = stripHtml(service.content);
-  const shortDescription = plainText.length > 160 ? plainText.slice(0, 157) + "..." : plainText;
-
-  return createMetadata({
+  return createMetadataFromContent({
     title: service.title,
-    description: shortDescription,
+    content: service.content,
+    image: service.images[0]?.afterUrl || "/default-preview.jpg",
+    url: `https://example.com/services/${params.slug}`,
   });
 }
 

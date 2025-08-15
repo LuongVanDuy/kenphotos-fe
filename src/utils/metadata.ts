@@ -43,16 +43,47 @@ export function stripHtml(html: string) {
     .trim();
 }
 
-export async function createMetadata({ title, description }: { title?: string; description?: string }) {
-  const siteMeta = await fetchSiteMeta();
+export async function createMetadata({ title, description, url, image }: { title?: string; description?: string; url?: string; image?: string }) {
+  const site = await fetchSiteMeta();
 
-  const finalTitle = title ? `${title} - ${siteMeta.siteName}` : siteMeta.siteName;
-  const finalDescription = description || siteMeta.siteDescription;
-  const icon = getImageUrl(siteMeta.siteLogo || "/favicon.ico");
+  const finalTitle = title || site.siteName;
+  const finalDescription = description || site.siteDescription;
+  const finalUrl = url || site.siteUrl;
+  const finalImage = image || site.siteLogo || "/default-preview.jpg";
 
   return {
     title: finalTitle,
     description: finalDescription,
-    icons: { icon },
+    icons: { icon: finalImage },
+    openGraph: {
+      title: finalTitle,
+      description: finalDescription,
+      url: finalUrl,
+      siteName: site.siteName,
+      images: [
+        {
+          url: finalImage,
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: finalTitle,
+      description: finalDescription,
+      images: [finalImage],
+    },
   };
+}
+
+export async function createMetadataFromContent({ content, title, url, image }: { content: string; title?: string; url?: string; image?: string }) {
+  const plainText = stripHtml(content);
+  const shortDescription = plainText.length > 160 ? plainText.slice(0, 157) + "..." : plainText;
+
+  return createMetadata({
+    title,
+    description: shortDescription,
+    url,
+    image,
+  });
 }
