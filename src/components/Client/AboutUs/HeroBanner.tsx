@@ -94,11 +94,17 @@ const HeroBanner: React.FC = () => {
             className="w-[100%] lg:w-[50%] flex-1 h-full"
           >
             <div className="relative w-full h-full rounded-xl overflow-hidden">
-              {/* <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
-                <source src="/video-about.mp4" type="video/webm" />
-                <source src="/video.mp4" type="video/mp4" />
+              <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
+                <source
+                  src="https://firebasestorage.googleapis.com/v0/b/video-cdn-518f9.appspot.com/o/EARTH-web.mp4?alt=media&token=36f3207d-c171-4526-89c9-a950645dfe4c"
+                  type="video/webm"
+                />
+                <source
+                  src="https://firebasestorage.googleapis.com/v0/b/video-cdn-518f9.appspot.com/o/EARTH-web.mp4?alt=media&token=36f3207d-c171-4526-89c9-a950645dfe4c"
+                  type="video/mp4"
+                />
                 Your browser does not support the video tag.
-              </video> */}
+              </video>
             </div>
           </motion.div>
         </div>

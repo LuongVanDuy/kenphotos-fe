@@ -88,9 +88,9 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ form, onFinish, onSaveDraft, 
   ];
 
   const typeOptions = [
-    { value: 0, label: "Photo Editing" },
-    { value: 1, label: "3D Visualizations" },
-    { value: 2, label: "Advanced Editing" },
+    { value: 1, label: "Photo Editing" },
+    { value: 2, label: "3D Visualizations" },
+    { value: 3, label: "Advanced Editing" },
   ];
 
   const handleMediaSelect = (media: any) => {

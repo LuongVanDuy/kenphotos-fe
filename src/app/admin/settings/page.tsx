@@ -19,6 +19,7 @@ import { fetchSetting, upsertSetting } from "@/store/actions/settings";
 import { getImageUrl } from "@/utils";
 import Image from "next/image";
 import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
+import namespace from "quill/core/logger";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -94,12 +95,20 @@ const SettingsPage: React.FC = (props: any) => {
 
   const handleSaveSettings = async (values: any, formType: string) => {
     setLoading(true);
-    const payload = {
-      ...values,
-      type: formType,
-    };
 
-    dispatch(upsertSetting(payload, session?.accessToken || "", onSuccess, onFailure) as any);
+    const settingsArray = Object.entries(values).map(([key, value]) => ({ key, value }));
+
+    dispatch(
+      upsertSetting(
+        {
+          namespace: activeTab,
+          data: { settings: settingsArray },
+        },
+        session?.accessToken || "",
+        onSuccess,
+        onFailure
+      ) as any
+    );
   };
 
   const handleMediaSelect = (media: any) => {

@@ -13,6 +13,13 @@ import {
   FETCH_PUBLIC_SERVICE_FAILURE,
 } from "../actionTypes";
 
+interface PublicDataItem {
+  list: any[];
+  total: number;
+  loading: boolean;
+  error: string | null;
+}
+
 interface ServiceState {
   list: any[];
   total: number;
@@ -20,9 +27,8 @@ interface ServiceState {
   loading: boolean;
   error: boolean;
   message: string;
-  // Public state
-  listPublic: any[];
-  totalPublic: number;
+  // Public state key-based
+  publicData: Record<string, PublicDataItem>;
   detailPublic: any;
 }
 
@@ -33,8 +39,7 @@ const initialState: ServiceState = {
   loading: true,
   error: false,
   message: "",
-  listPublic: [],
-  totalPublic: 0,
+  publicData: {}, // thêm đây
   detailPublic: null,
 };
 
@@ -83,27 +88,46 @@ const servicesReducer = (state = initialState, action: any) => {
       };
 
     // Public actions
-    case FETCH_PUBLIC_SERVICES:
+    case FETCH_PUBLIC_SERVICES: {
+      const key = action.meta.key;
       return {
         ...state,
-        loading: true,
-        error: false,
+        publicData: {
+          ...state.publicData,
+          [key]: { list: [], total: 0, loading: true, error: null },
+        },
       };
-    case FETCH_PUBLIC_SERVICES_SUCCESS:
+    }
+    case FETCH_PUBLIC_SERVICES_SUCCESS: {
+      const key = action.meta.key;
       return {
         ...state,
-        loading: false,
-        listPublic: action.payload.data.data || [],
-        totalPublic: action.payload.data.total || 0,
+        publicData: {
+          ...state.publicData,
+          [key]: {
+            list: action.payload.data.data || [],
+            total: action.payload.data.total || 0,
+            loading: false,
+            error: null,
+          },
+        },
       };
-    case FETCH_PUBLIC_SERVICES_FAILURE:
+    }
+    case FETCH_PUBLIC_SERVICES_FAILURE: {
+      const key = action.meta.key;
       return {
         ...state,
-        loading: false,
-        error: true,
-        message: action.payload.error,
+        publicData: {
+          ...state.publicData,
+          [key]: {
+            list: [],
+            total: 0,
+            loading: false,
+            error: action.payload.error,
+          },
+        },
       };
-
+    }
     case FETCH_PUBLIC_SERVICE:
       return {
         ...state,

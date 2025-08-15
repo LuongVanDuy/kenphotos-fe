@@ -8,14 +8,8 @@ interface BlogFilterBarProps {
 
 const BlogFilterBar: React.FC<BlogFilterBarProps> = ({ keyword, onKeywordChange, onSearch }) => {
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between mb-12">
-      <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-500">
-        {["Recents", "Design", "Development", "Management", "Marketing"].map((cat) => (
-          <button key={cat} className="hover:text-black transition">
-            {cat}
-          </button>
-        ))}
-      </div>
+    <div className="flex flex-col md:flex-row items-center justify-between md:mt-[-80px]">
+      <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-500"></div>
 
       <div className="w-full md:w-auto mt-6 md:mt-0">
         <div className="relative w-full md:w-[300px] mx-auto md:mx-0">

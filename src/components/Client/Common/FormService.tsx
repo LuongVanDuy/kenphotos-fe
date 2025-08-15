@@ -1,16 +1,80 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import MainTitle from "./Title/MainTitle";
 import { MailOutlined, PhoneOutlined } from "@ant-design/icons";
+import { connect } from "react-redux";
+import { fetchPublicServices } from "@/store/actions/services";
+import { useParams } from "next/navigation";
+import { postNoToken } from "@/app/api";
 
-const FormService: React.FC = () => {
-  const services = [
-    { label: "Service-1", value: "service1" },
-    { label: "Service-2", value: "service2" },
-    { label: "Service-3", value: "service3" },
-  ];
+interface CaptchaResponse {
+  verified: boolean;
+}
+
+const FormService = ({ fetchPublicServices, serviceList, serviceLoading }: any) => {
+  const params = useParams();
+  const slug = params?.slug;
+
+  const [verified, setVerified] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+
+  function handleQuery(page = 1, itemsPerPage = 20) {
+    fetchPublicServices(
+      {
+        page,
+        itemsPerPage,
+        sortBy: "createdTime",
+        sortDesc: true,
+      },
+      "formService"
+    );
+
+    setPageNumber(page);
+    setPageSize(itemsPerPage);
+  }
+
+  useEffect(() => {
+    handleQuery(pageNumber, pageSize);
+  }, [pageNumber, pageSize]);
+
+  const isDetailPage = !!slug;
+
+  const slugString = Array.isArray(slug) ? slug[0] : slug;
+
+  const displayedServices =
+    isDetailPage && !serviceLoading
+      ? serviceList.filter((service: any) => service.slug.trim().toLowerCase() === slugString?.trim().toLowerCase())
+      : serviceList;
+
+  const handleCheckboxChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.checked) return;
+
+    setLoading(true);
+    try {
+      const token = await window.grecaptcha.execute("6LfvyqYrAAAAACOms6yP9H3TowHoG082voRRc9sx", { action: "submit" });
+
+      const res = await postNoToken("captcha/verify", { token });
+      if (res.verified) {
+        setVerified(true);
+        alert("Captcha verified successfully");
+      } else {
+        setVerified(false);
+        alert("Captcha verification failed");
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(`Captcha verification failed: ${err.message}`);
+      setVerified(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)]" data-form-service>
       <div className="max-w-content mx-auto px-4">
@@ -72,7 +136,6 @@ const FormService: React.FC = () => {
             className="md:pl-16"
           >
             <form className="space-y-10 text-black" aria-label="Projektanfrage Formular">
-              {/* Ihre Kontaktdaten */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -208,31 +271,22 @@ const FormService: React.FC = () => {
                     viewport={{ once: true, amount: 0.3 }}
                     transition={{ duration: 0.6, ease: "easeOut", delay: 1.0 }}
                   >
-                    <span className="block mb-2 text-sm ">Services</span>
-                    <div className="space-y-3">
-                      {services.map((service, index) => (
-                        <motion.label
-                          key={service.value}
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true, amount: 0.3 }}
-                          transition={{
-                            duration: 0.6,
-                            ease: "easeOut",
-                            delay: 1.1 + index * 0.1,
-                          }}
-                          whileHover={{ scale: 1.02 }}
+                    <span className="block mb-2">Services</span>
+                    <div className={`${!isDetailPage ? "max-h-[200px] overflow-y-auto" : ""} space-y-3`}>
+                      {displayedServices.map((service: any, index: any) => (
+                        <label
+                          key={service.id || index}
                           className="flex items-center gap-3 border bg-white border-[#B1B1B1] p-4 rounded-md cursor-pointer hover:border-gray-500"
                         >
                           <input
                             type="radio"
                             name="service"
-                            value={service.value}
-                            aria-label={`Select ${service.label} service`}
+                            value={service.id}
+                            aria-label={`Select ${service.title} service`}
                             className="accent-black"
                           />
-                          <span>{service.label}</span>
-                        </motion.label>
+                          <span>{service.title}</span>
+                        </label>
                       ))}
                     </div>
                   </motion.div>
@@ -254,17 +308,17 @@ const FormService: React.FC = () => {
                     viewport={{ once: true, amount: 0.3 }}
                     transition={{ duration: 0.6, ease: "easeOut", delay: 1.5 }}
                   >
-                    <label className="block text-sm  mb-2">
-                      Captcha <span className="font-bold">(Pflichtfeld)</span>
+                    <label className="block text-sm mb-2">
+                      Captcha <span className="font-bold">(Required)</span>
                     </label>
                     <label className="flex items-center gap-3 border border-[#B1B1B1] rounded-md p-4 bg-white cursor-pointer w-fit">
                       <input
                         type="checkbox"
                         name="captcha"
-                        required
+                        onChange={handleCheckboxChange}
                         className="form-checkbox w-5 h-5 text-[#F7B500] border-[#B1B1B1] focus:ring-0 accent-[#F7B500]"
                       />
-                      <span className="text-gray-900 font-medium">Verifiziert</span>
+                      <span className="text-gray-900 font-medium">{loading ? "Verifying..." : verified ? "Verified" : "Not verified"}</span>
                     </label>
                   </motion.div>
 
@@ -289,4 +343,25 @@ const FormService: React.FC = () => {
   );
 };
 
-export default FormService;
+const mapStateToProps = (state: any, ownProps: any) => {
+  const key = ownProps.dataKey;
+  const publicData = state.services.publicData[key] || {
+    list: [],
+    total: 0,
+    loading: true,
+    error: null,
+  };
+
+  return {
+    serviceList: publicData.list,
+    serviceTotal: publicData.total,
+    serviceLoading: publicData.loading,
+    serviceError: publicData.error,
+  };
+};
+
+const mapDispatchToProps = {
+  fetchPublicServices,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FormService);

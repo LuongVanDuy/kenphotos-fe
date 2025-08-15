@@ -10,115 +10,12 @@ import { CompareSlider } from "../Common/CompareSlider";
 import ServiceCard from "./ServiceCard";
 import MainTitle from "../Common/Title/MainTitle";
 
-const Related: React.FC = () => {
-  const swiperRef = useRef<SwiperCore>();
+interface InfoProps {
+  relatedServices: any;
+}
 
-  const services = [
-    {
-      id: 1,
-      title: "Single Exposure",
-      beforeImage: "/images/view-4.jpg",
-      afterImage: "/images/view-5.jpg",
-      discount: "-20%",
-      originalPrice: "US$1",
-      newPrice: "US$0.8",
-      description:
-        "Taken with a phone or camera with one exposure per shot. This method of shooting is for Agents or homeowners take quick photos themselves, without looking out the window.",
-      rating: 4.9,
-      orders: "17.4k",
-    },
-    {
-      id: 2,
-      title: "HDR Bracket",
-      beforeImage: "/images/view-3.jpg",
-      afterImage: "/images/view-2.jpg",
-      discount: "-17%",
-      originalPrice: "US$1.2",
-      newPrice: "US$1",
-      description:
-        "This technique helps to showcase the best aspects of a property by ensuring that both the interior and exterior are well-lit and detailed, even in challenging lighting conditions. 5 exposures is the best.",
-      rating: 5,
-      orders: "16k+",
-    },
-    {
-      id: 3,
-      title: "Flambient",
-      beforeImage: "/images/view-4.jpg",
-      afterImage: "/images/view-5.jpg",
-      discount: "-20%",
-      originalPrice: "US$1.5",
-      newPrice: "US$1.2",
-      description:
-        'The "flambient" method for shooting real estate photography involves combining both flash and ambient light in your shots. Use multiple flash shots.',
-      rating: 4.9,
-      orders: "15.7k+",
-    },
-    {
-      id: 4,
-      title: "Virtual Staging",
-      beforeImage: "/images/view-3.jpg",
-      afterImage: "/images/view-2.jpg",
-      discount: "-33%",
-      originalPrice: "US$29.99",
-      newPrice: "US$19.99",
-      description:
-        "Turn an empty room into a fully furnished room. Home staging is completed quickly on the computer rather than in person, requiring a lot less cost and labor",
-      rating: 5,
-      orders: "8.7k",
-    },
-    {
-      id: 5,
-      title: "Day To Twilight or Dusk",
-      beforeImage: "/images/view-3.jpg",
-      afterImage: "/images/view-2.jpg",
-      discount: "-17%",
-      originalPrice: "US$5.99",
-      newPrice: "US$4.99",
-      description:
-        "Creating an artistically advanced sunset photo only from a daytime outdoor photo without requiring you to capture an additional picture.",
-      rating: 4.9,
-      orders: "6.3k",
-    },
-    {
-      id: 6,
-      title: "Water in Pool",
-      beforeImage: "/images/view-4.jpg",
-      afterImage: "/images/view-5.jpg",
-      discount: "-17%",
-      originalPrice: "US$5.99",
-      newPrice: "US$4.99",
-      description:
-        "Houses with swimming pools are often valuable, sometimes the pool is dry or surrounded by dirt, we will remove the dirt or replace the water in the pool to help increase the value of your property",
-      rating: 4.9,
-      orders: "3.5k",
-    },
-    {
-      id: 7,
-      title: "Water in Pool",
-      beforeImage: "/images/view-3.jpg",
-      afterImage: "/images/view-2.jpg",
-      discount: "-17%",
-      originalPrice: "US$5.99",
-      newPrice: "US$4.99",
-      description:
-        "Houses with swimming pools are often valuable, sometimes the pool is dry or surrounded by dirt, we will remove the dirt or replace the water in the pool to help increase the value of your property",
-      rating: 4.9,
-      orders: "3.5k",
-    },
-    {
-      id: 8,
-      title: "Water in Pool",
-      beforeImage: "/images/view-4.jpg",
-      afterImage: "/images/view-5.jpg",
-      discount: "-17%",
-      originalPrice: "US$5.99",
-      newPrice: "US$4.99",
-      description:
-        "Houses with swimming pools are often valuable, sometimes the pool is dry or surrounded by dirt, we will remove the dirt or replace the water in the pool to help increase the value of your property",
-      rating: 4.9,
-      orders: "3.5k",
-    },
-  ];
+const Related: React.FC<InfoProps> = ({ relatedServices }) => {
+  const swiperRef = useRef<SwiperCore>();
 
   return (
     <section className="py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)]">
@@ -152,26 +49,23 @@ const Related: React.FC = () => {
               swiperRef.current = swiper;
             }}
           >
-            {services.map((service, index) => {
-              return (
-                <SwiperSlide key={service.id}>
-                  <ServiceCard
-                    key={service.id}
-                    index={index}
-                    id={service.id}
-                    beforeImage={service.beforeImage}
-                    afterImage={service.afterImage}
-                    title={service.title}
-                    description={service.description}
-                    rating={service.rating}
-                    orders={service.orders}
-                    discount={service.discount}
-                    originalPrice={service.originalPrice}
-                    newPrice={service.newPrice}
-                  />
-                </SwiperSlide>
-              );
-            })}
+            {relatedServices.map((service: any, index: any) => (
+              <SwiperSlide key={service.id}>
+                <ServiceCard
+                  key={service.id || index}
+                  id={service.id}
+                  index={index}
+                  title={service.title}
+                  content={service.content}
+                  rating={service.rating}
+                  orderCount={service.orderCount}
+                  originalPrice={service.originalPrice}
+                  discountedPrice={service.discountedPrice}
+                  images={service.images}
+                  slug={service.slug}
+                />
+              </SwiperSlide>
+            ))}
           </Swiper>
           <button
             onClick={() => swiperRef.current?.slideNext()}

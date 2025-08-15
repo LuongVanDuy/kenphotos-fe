@@ -31,47 +31,25 @@ const CreateServicePage: React.FC = () => {
     setLoading(true);
     const serviceData = {
       ...values,
-      status: 1, // Published
-      authorId: 1, // Default author ID
+      status: 1,
+      authorId: 1,
     };
 
-    dispatch(
-      createService(
-        serviceData,
-        session?.accessToken || "",
-        onSuccess,
-        onFailure
-      ) as any
-    );
+    dispatch(createService(serviceData, session?.accessToken || "", onSuccess, onFailure) as any);
   };
 
   const handleDraft = async (values: any) => {
     setLoading(true);
     const draftValues = {
       ...values,
-      status: 0, // Draft
-      authorId: 1, // Default author ID
+      status: 0,
+      authorId: 1,
     };
 
-    dispatch(
-      createService(
-        draftValues,
-        session?.accessToken || "",
-        onSuccess,
-        onFailure
-      ) as any
-    );
+    dispatch(createService(draftValues, session?.accessToken || "", onSuccess, onFailure) as any);
   };
 
-  return (
-    <ServiceForm
-      form={form}
-      onFinish={handleFinish}
-      onSaveDraft={handleDraft}
-      mode="create"
-      loading={loading}
-    />
-  );
+  return <ServiceForm form={form} onFinish={handleFinish} onSaveDraft={handleDraft} mode="create" loading={loading} />;
 };
 
 export default CreateServicePage;

@@ -1,10 +1,6 @@
 import { ApiResponse } from "@/types";
 
-export async function fetchApi(
-  endpoint: string,
-  method: string,
-  body: any = null
-) {
+export async function fetchApi(endpoint: string, method: string, body: any = null) {
   const url = `${process.env.apiUrl}/${endpoint}`;
 
   const headers: { [key: string]: string } = {
@@ -21,9 +17,7 @@ export async function fetchApi(
     const response = await fetch(url, options);
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(
-        errorData?.message || `HTTP error! status: ${response.status}`
-      );
+      throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
     return data;
@@ -33,11 +27,7 @@ export async function fetchApi(
   }
 }
 
-export const fetchWithToken = async (
-  url: string,
-  token: string,
-  callback: ((data: ApiResponse) => void) | null = null
-): Promise<ApiResponse> => {
+export const fetchWithToken = async (url: string, token: string, callback: ((data: ApiResponse) => void) | null = null): Promise<ApiResponse> => {
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "GET",
     headers: {
@@ -59,10 +49,7 @@ export const fetchWithToken = async (
   return data;
 };
 
-export const fetchNoToken = async (
-  url: string,
-  callback: ((data: ApiResponse) => void) | null = null
-): Promise<ApiResponse> => {
+export const fetchNoToken = async (url: string, callback: ((data: ApiResponse) => void) | null = null): Promise<ApiResponse> => {
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "GET",
     headers: {
@@ -112,11 +99,7 @@ export const postWithToken = async (
   return data;
 };
 
-export const postNoToken = async (
-  url: string,
-  body: any,
-  callback: ((data: ApiResponse) => void) | null = null
-): Promise<ApiResponse> => {
+export const postNoToken = async <T = any>(url: string, body: any, callback: ((data: T) => void) | null = null): Promise<T> => {
   const response = await fetch(`${process.env.apiUrl}/${url}`, {
     method: "POST",
     headers: {
@@ -127,14 +110,12 @@ export const postNoToken = async (
 
   if (!response.ok) {
     const errorData = await response.json();
-    const errorMessage = errorData?.message || "Unknown error";
+    const errorMessage = (errorData as any)?.message || "Unknown error";
     throw new Error(errorMessage);
   }
 
-  const data = await response.json();
-  if (callback && typeof callback === "function") {
-    callback(data);
-  }
+  const data: T = await response.json();
+  if (callback) callback(data);
   return data;
 };
 

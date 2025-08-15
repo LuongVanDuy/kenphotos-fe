@@ -1,26 +1,49 @@
-"use client";
+import { notFound } from "next/navigation";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "../../../../../public/css/ServiceSlide.css";
+
 import FormService from "@/components/Client/Common/FormService";
 import HowWeWork from "@/components/Client/Common/HowWeWork";
 import Info from "@/components/Client/Service/Info";
 import StepGrid from "@/components/Client/Service/StepGrid";
 import Related from "@/components/Client/Service/Related";
+import { createMetadata, fetchServiceMeta, stripHtml } from "@/utils/metadata";
 
-const ServiceDetail = ({ params }: { params: { slug: string[] } }) => {
-  const { slug } = params;
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const service = await fetchServiceMeta(params.slug);
+  if (!service) {
+    return createMetadata({
+      title: "Page Not Found",
+      description: "Service information not found.",
+    });
+  }
+
+  const plainText = stripHtml(service.content);
+  const shortDescription = plainText.length > 160 ? plainText.slice(0, 157) + "..." : plainText;
+
+  return createMetadata({
+    title: service.title,
+    description: shortDescription,
+  });
+}
+
+export default async function ServiceDetails({ params }: { params: { slug: string[] | string } }) {
+  const slugPath = Array.isArray(params.slug) ? params.slug.join("/") : params.slug;
+  const service = await fetchServiceMeta(slugPath);
+
+  if (!service) {
+    notFound();
+  }
 
   return (
     <>
-      <Info />
+      <Info serviceDetail={service} />
       <StepGrid />
-      <Related />
+      <Related relatedServices={service.relatedServices} />
       <HowWeWork />
-      <FormService />
+      <FormService dataKey="formService" />
     </>
   );
-};
-
-export default ServiceDetail;
+}

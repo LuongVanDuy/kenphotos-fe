@@ -1,9 +1,4 @@
-import {
-  fetchWithToken,
-  postWithToken,
-  putWithToken,
-  deleteWithToken,
-} from "@/app/api";
+import { fetchWithToken, postWithToken, putWithToken, deleteWithToken } from "@/app/api";
 import {
   FETCH_USER,
   FETCH_USER_FAILURE,
@@ -57,51 +52,17 @@ export const fetchUser = (payload: number, accessToken: any) => {
   };
 };
 
-export const createUser =
-  (
-    payload: any,
-    accessToken: string,
-    onSuccess: () => void,
-    onFailure: (error: string) => void
-  ) =>
-  async () => {
-    await asyncActionWrapper(
-      () => postWithToken(users.createUser(), accessToken, payload),
-      onSuccess,
-      onFailure
-    );
-  };
+export const createUser = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
+  await asyncActionWrapper(() => postWithToken(users.createUser(), accessToken, payload), onSuccess, onFailure);
+};
 
-export const updateUser =
-  (
-    payload: any,
-    accessToken: string,
-    onSuccess: () => void,
-    onFailure: (error: string) => void
-  ) =>
-  async () => {
-    await asyncActionWrapper(
-      () =>
-        putWithToken(users.updateUser(payload.id), accessToken, payload.data),
-      onSuccess,
-      onFailure
-    );
-  };
+export const updateUser = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
+  await asyncActionWrapper(() => putWithToken(users.updateUser(payload.id), accessToken, payload.data), onSuccess, onFailure);
+};
 
-export const deleteUser =
-  (
-    id: number,
-    accessToken: string,
-    onSuccess: () => void,
-    onFailure: (error: string) => void
-  ) =>
-  async () => {
-    await asyncActionWrapper(
-      () => deleteWithToken(users.deleteUser(id), accessToken, null),
-      onSuccess,
-      onFailure
-    );
-  };
+export const deleteUser = (id: number, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
+  await asyncActionWrapper(() => deleteWithToken(users.deleteUser(id), accessToken, null), onSuccess, onFailure);
+};
 
 export const changePassword =
   (
@@ -114,11 +75,7 @@ export const changePassword =
   async (dispatch: AppDispatch) => {
     dispatch({ type: CHANGE_PASSWORD });
     try {
-      const response = await putWithToken(
-        users.changePassword(id),
-        accessToken,
-        payload
-      );
+      const response = await putWithToken(users.changePassword(id), accessToken, payload);
       dispatch({
         type: CHANGE_PASSWORD_SUCCESS,
         payload: { data: response },
