@@ -1,5 +1,6 @@
 import BlogDetail from "@/components/Client/Blog/BlogDetails";
 import FormService from "@/components/Client/Common/FormService";
+import { getImageUrl } from "@/utils";
 import { createMetadata, createMetadataFromContent, fetchPostMeta, stripHtml } from "@/utils/metadata";
 import { notFound } from "next/navigation";
 
@@ -15,8 +16,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return createMetadataFromContent({
     title: post.title,
     content: post.content,
-    image: post.thumbnail || "/default-preview.jpg",
-    url: `https://example.com/blog/${params.slug}`,
+    image: getImageUrl(post.thumbnail) || "/default-preview.jpg",
+    url: `https://kenphotos.com/blog/${params.slug}`,
   });
 }
 

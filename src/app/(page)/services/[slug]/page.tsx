@@ -10,6 +10,7 @@ import Info from "@/components/Client/Service/Info";
 import StepGrid from "@/components/Client/Service/StepGrid";
 import Related from "@/components/Client/Service/Related";
 import { createMetadata, createMetadataFromContent, fetchServiceMeta, stripHtml } from "@/utils/metadata";
+import { getImageUrl } from "@/utils";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const service = await fetchServiceMeta(params.slug);
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return createMetadataFromContent({
     title: service.title,
     content: service.content,
-    image: service.images[0]?.afterUrl || "/default-preview.jpg",
+    image: getImageUrl(service.images[0]?.afterUrl) || "/default-preview.jpg",
     url: `https://example.com/services/${params.slug}`,
   });
 }

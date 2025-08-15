@@ -7,7 +7,7 @@ export async function fetchSiteMeta() {
     return {
       siteName: data.siteName || "KenPhotos",
       siteDescription: data.siteDescription || "Welcome to KenPhotos",
-      siteLogo: data.siteLogo || "/favicon.ico",
+      siteLogo: getImageUrl(data.siteLogo) || "/favicon.ico",
       siteUrl: data.siteUrl || "",
     };
   } catch {
@@ -49,7 +49,7 @@ export async function createMetadata({ title, description, url, image }: { title
   const finalTitle = title || site.siteName;
   const finalDescription = description || site.siteDescription;
   const finalUrl = url || site.siteUrl;
-  const finalImage = image || site.siteLogo || "/default-preview.jpg";
+  const finalImage = image || getImageUrl(site.siteLogo) || "/default-preview.jpg";
 
   return {
     title: finalTitle,
