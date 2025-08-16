@@ -7,10 +7,15 @@ import {
   FETCH_CATEGORY_SUCCESS,
   FETCH_CATEGORY_FAILURE,
 } from "../actionTypes";
-import { fetchWithToken, putWithToken, deleteWithToken, patchWithToken } from "@/app/api/index";
+import {
+  fetchWithToken,
+  putWithToken,
+  deleteWithToken,
+  patchWithToken,
+} from "@/app/api/index";
 import categoriesEndpoint from "../endpoint/categories";
 import { postWithToken } from "@/app/api/index";
-import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
+import { asyncActionWrapper } from "@/utils/asyncAction";
 
 export const fetchCategories = (payload: any, accessToken: string) => {
   return (dispatch: AppDispatch) => {

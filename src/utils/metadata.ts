@@ -1,5 +1,7 @@
 import { fetchApi } from "@/app/api";
-import { getImageUrl } from ".";
+import { getImageUrl } from "./imageUrl";
+
+const defaultImage = "/default-preview.jpg";
 
 export async function fetchSiteMeta() {
   try {
@@ -7,7 +9,7 @@ export async function fetchSiteMeta() {
     return {
       siteName: data.siteName || "KenPhotos",
       siteDescription: data.siteDescription || "Welcome to KenPhotos",
-      siteLogo: getImageUrl(data.siteLogo) || "/favicon.ico",
+      siteLogo: data.siteLogo || "/favicon.ico",
       siteUrl: data.siteUrl || "",
     };
   } catch {
@@ -43,47 +45,49 @@ export function stripHtml(html: string) {
     .trim();
 }
 
-export async function createMetadata({ title, description, url, image }: { title?: string; description?: string; url?: string; image?: string }) {
-  const site = await fetchSiteMeta();
+export async function createMetadata({
+  title,
+  description,
+  url,
+  image,
+  type = "website",
+}: {
+  title?: string;
+  description?: string;
+  url?: string;
+  image?: string;
+  type?: string;
+}) {
+  const siteMeta = await fetchSiteMeta();
 
-  const finalTitle = title || site.siteName;
-  const finalDescription = description || site.siteDescription;
-  const finalUrl = url || site.siteUrl;
-  const finalImage = image || getImageUrl(site.siteLogo) || "/default-preview.jpg";
+  const finalTitle = title
+    ? `${title} - ${siteMeta.siteName}`
+    : siteMeta.siteName;
+
+  const plainText = stripHtml(description || siteMeta.siteDescription);
+  const finalDescription =
+    plainText.length > 160 ? plainText.slice(0, 157) + "..." : plainText;
+
+  const icon = getImageUrl(siteMeta.siteLogo || "/favicon.ico");
+  const shareImage =
+    getImageUrl(image) || getImageUrl(siteMeta.siteLogo) || defaultImage;
 
   return {
     title: finalTitle,
     description: finalDescription,
-    icons: { icon: finalImage },
+    icons: { icon },
     openGraph: {
       title: finalTitle,
       description: finalDescription,
-      url: finalUrl,
-      siteName: site.siteName,
-      images: [
-        {
-          url: finalImage,
-        },
-      ],
-      type: "website",
+      image: shareImage,
+      type,
+      url,
     },
     twitter: {
       card: "summary_large_image",
       title: finalTitle,
       description: finalDescription,
-      images: [finalImage],
+      image: shareImage,
     },
   };
-}
-
-export async function createMetadataFromContent({ content, title, url, image }: { content: string; title?: string; url?: string; image?: string }) {
-  const plainText = stripHtml(content);
-  const shortDescription = plainText.length > 160 ? plainText.slice(0, 157) + "..." : plainText;
-
-  return createMetadata({
-    title,
-    description: shortDescription,
-    url,
-    image,
-  });
 }

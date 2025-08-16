@@ -1,15 +1,31 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Image, Button, Tag, Input, Select, Modal, Typography, Table, message, Space } from "antd";
-import { AppstoreOutlined, UnorderedListOutlined, UploadOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  Image,
+  Button,
+  Tag,
+  Input,
+  Select,
+  Modal,
+  Typography,
+  Table,
+  message,
+  Space,
+} from "antd";
+import {
+  AppstoreOutlined,
+  UnorderedListOutlined,
+  UploadOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { Media } from "@/types";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMedia, deleteMedia } from "@/store/actions/media";
 import { useSession } from "next-auth/react";
 import MediaItem from "@/components/Admin/Media/MediaItem";
-import { getImageUrl } from "@/utils";
+import { getImageUrl } from "@/utils/imageUrl";
 import { AppDispatch, RootState } from "@/store/store";
 
 const { Search } = Input;
@@ -37,7 +53,9 @@ const MediaListPage: React.FC = () => {
   // State management
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState<number | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<number | undefined>(
+    undefined
+  );
   const [sortBy, setSortBy] = useState("createdTime");
   const [sortDesc, setSortDesc] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
@@ -131,8 +149,12 @@ const MediaListPage: React.FC = () => {
                   setSelectedRowKeys([...selectedRowKeys, item.id]);
                   setSelectedMedia([...selectedMedia, item]);
                 } else {
-                  setSelectedRowKeys(selectedRowKeys.filter((key) => key !== item.id));
-                  setSelectedMedia(selectedMedia.filter((media) => media.id !== item.id));
+                  setSelectedRowKeys(
+                    selectedRowKeys.filter((key) => key !== item.id)
+                  );
+                  setSelectedMedia(
+                    selectedMedia.filter((media) => media.id !== item.id)
+                  );
                 }
               }}
             />
@@ -151,9 +173,15 @@ const MediaListPage: React.FC = () => {
       render: (_: any, record: Media) => (
         <div className="relative w-[60px] h-[60px]">
           {/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(record.name) ? (
-            <Image alt="preview" src={getImageUrl(record.slug)} className="object-cover rounded" />
+            <Image
+              alt="preview"
+              src={getImageUrl(record.slug)}
+              className="object-cover rounded"
+            />
           ) : (
-            <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded">📄</div>
+            <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded">
+              📄
+            </div>
           )}
         </div>
       ),
@@ -164,9 +192,12 @@ const MediaListPage: React.FC = () => {
       key: "name",
       render: (text: string, record: Media) => (
         <div>
-          <div className="font-medium text-sm lg:text-base truncate">{text}</div>
+          <div className="font-medium text-sm lg:text-base truncate">
+            {text}
+          </div>
           <div className="text-xs lg:text-sm text-gray-500">
-            Uploaded by {record.uploadedBy.firstName} {record.uploadedBy.lastName}
+            Uploaded by {record.uploadedBy.firstName}{" "}
+            {record.uploadedBy.lastName}
           </div>
         </div>
       ),
@@ -183,7 +214,9 @@ const MediaListPage: React.FC = () => {
       title: "Date",
       dataIndex: "createdTime",
       key: "createdTime",
-      render: (date: string) => <div className="text-sm">{new Date(date).toLocaleDateString()}</div>,
+      render: (date: string) => (
+        <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
+      ),
     },
   ];
 
@@ -196,20 +229,42 @@ const MediaListPage: React.FC = () => {
             <Title level={2} className="mb-1 text-xl lg:text-2xl">
               Media Library
             </Title>
-            <Text className="text-gray-600 text-sm lg:text-base">Manage your media files and assets</Text>
+            <Text className="text-gray-600 text-sm lg:text-base">
+              Manage your media files and assets
+            </Text>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 lg:gap-0 lg:items-center">
             {selectedMedia.length > 0 && (
-              <Button type="default" danger icon={<DeleteOutlined />} onClick={handleBulkDelete} size="middle" block={isMobile}>
+              <Button
+                type="default"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={handleBulkDelete}
+                size="middle"
+                block={isMobile}
+              >
                 Delete Selected ({selectedMedia.length})
               </Button>
             )}
             <div className="flex gap-1">
               <Button.Group size="middle">
-                <Button type={viewMode === "grid" ? "primary" : "default"} icon={<AppstoreOutlined />} onClick={() => setViewMode("grid")} />
-                <Button type={viewMode === "list" ? "primary" : "default"} icon={<UnorderedListOutlined />} onClick={() => setViewMode("list")} />
+                <Button
+                  type={viewMode === "grid" ? "primary" : "default"}
+                  icon={<AppstoreOutlined />}
+                  onClick={() => setViewMode("grid")}
+                />
+                <Button
+                  type={viewMode === "list" ? "primary" : "default"}
+                  icon={<UnorderedListOutlined />}
+                  onClick={() => setViewMode("list")}
+                />
               </Button.Group>
-              <Button type="primary" icon={<UploadOutlined />} onClick={() => router.push("/admin/media/create")} size="middle">
+              <Button
+                type="primary"
+                icon={<UploadOutlined />}
+                onClick={() => router.push("/admin/media/create")}
+                size="middle"
+              >
                 <span className="hidden sm:inline">Add New</span>
                 <span className="sm:hidden">Add</span>
               </Button>

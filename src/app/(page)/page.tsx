@@ -10,14 +10,15 @@ import { createMetadata } from "@/utils/metadata";
 export async function generateMetadata() {
   return createMetadata({
     title: "Home",
-    description: "Welcome to KenPhotos, your go-to destination for stunning photography and videography services.",
+    description:
+      "Welcome to KenPhotos, your go-to destination for stunning photography and videography services.",
   });
 }
 
 export default function Home() {
   return (
     <>
-      <HeroBanner />
+      <HeroBanner dataKey="featuredServices" />
       <Services dataKey="featuredServices" />
       <Resources />
       <WindowViewStyles />

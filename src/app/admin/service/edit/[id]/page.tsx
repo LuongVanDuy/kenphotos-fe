@@ -83,7 +83,6 @@ const EditServicePage: React.FC = () => {
       id: serviceId,
       data: {
         ...values,
-        authorId: 1, // Default author ID
       },
     };
 
@@ -101,8 +100,7 @@ const EditServicePage: React.FC = () => {
     setLoading(true);
     const draftValues = {
       ...values,
-      status: 0, // Draft
-      authorId: 1, // Default author ID
+      status: 0,
     };
 
     dispatch(

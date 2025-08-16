@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchMedia, uploadMedia } from "@/store/actions/media";
 import { useSession } from "next-auth/react";
 import { Media } from "@/types";
-import { getImageUrl } from "@/utils";
+import { getImageUrl } from "@/utils/imageUrl";
 import { AppDispatch, RootState } from "@/store/store";
 import MediaItem from "@/components/Admin/Media/MediaItem";
 import Image from "next/image";

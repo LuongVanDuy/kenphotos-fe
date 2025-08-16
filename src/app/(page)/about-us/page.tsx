@@ -8,7 +8,8 @@ import { createMetadata } from "@/utils/metadata";
 export async function generateMetadata() {
   return createMetadata({
     title: "About Us",
-    description: "Learn more about KenPhotos and our mission to capture stunning moments.",
+    description:
+      "Learn more about KenPhotos and our mission to capture stunning moments.",
   });
 }
 

@@ -1,7 +1,6 @@
 import BlogDetail from "@/components/Client/Blog/BlogDetails";
 import FormService from "@/components/Client/Common/FormService";
-import { getImageUrl } from "@/utils";
-import { createMetadata, createMetadataFromContent, fetchPostMeta, stripHtml } from "@/utils/metadata";
+import { createMetadata, fetchPostMeta } from "@/utils/metadata";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
@@ -13,10 +12,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     });
   }
 
-  return createMetadataFromContent({
+  return createMetadata({
     title: post.title,
-    content: post.content,
-    image: getImageUrl(post.thumbnail) || "/default-preview.jpg",
+    description: post.content,
+    image: post.thumbnail,
     url: `https://kenphotos.com/blog/${params.slug}`,
   });
 }

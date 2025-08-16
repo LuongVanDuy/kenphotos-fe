@@ -24,7 +24,7 @@ import {
 } from "@ant-design/icons";
 import type { UploadProps, UploadFile } from "antd";
 import { uploadMedia } from "@/store/actions/media";
-import { getImageUrl } from "@/utils";
+import { getImageUrl } from "@/utils/imageUrl";
 import { AppDispatch } from "@/store/store";
 import Image from "next/image";
 

@@ -1,3 +1,49 @@
+import { DefaultUser } from "next-auth";
+
+export {};
+
+// global types
+declare global {
+  interface Window {
+    grecaptcha: {
+      execute: (
+        siteKey: string,
+        options: { action: string }
+      ) => Promise<string>;
+      ready: (callback: () => void) => void;
+    };
+  }
+}
+
+// NextAuth types
+declare module "next-auth" {
+  interface Session {
+    accessToken?: string;
+    refreshToken?: string;
+    user: any;
+  }
+
+  interface User extends DefaultUser {
+    id: number;
+    accessToken: string;
+    refreshToken: string;
+    role?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    avatarUrl?: string | null;
+  }
+}
+
+// NextAuth JWT types
+declare module "next-auth/jwt" {
+  interface JWT {
+    accessToken?: string;
+    refreshToken?: string;
+    user?: any;
+  }
+}
+
+// API response types
 export type ApiResponse = {
   status: number;
   data: any;

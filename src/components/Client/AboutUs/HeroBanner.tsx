@@ -1,5 +1,5 @@
 "use client";
-import { useScrollToForm } from "@/utils/useScrollToForm";
+import { useScrollToForm } from "@/utils/scrollToForm";
 import { motion } from "framer-motion";
 
 const HeroBanner: React.FC = () => {
@@ -17,7 +17,9 @@ const HeroBanner: React.FC = () => {
             className="w-[100%] lg:w-[50%] flex-1 h-full"
           >
             <div className="text-center md:text-left">
-              <p className="text-[22px] leading-[30px] text-center md:text-[24px] md:text-left">About Us</p>
+              <p className="text-[22px] leading-[30px] text-center md:text-[24px] md:text-left">
+                About Us
+              </p>
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -45,9 +47,11 @@ const HeroBanner: React.FC = () => {
                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
                 className="text-[18px] md:max-w-[90%]"
               >
-                From precise color correction and realistic virtual staging to immersive 3D visualizations, True Color elevates ordinary property
-                photos into powerful marketing assets. Our fast turnaround and meticulous attention to detail help you attract more buyers and close
-                deals faster.
+                From precise color correction and realistic virtual staging to
+                immersive 3D visualizations, True Color elevates ordinary
+                property photos into powerful marketing assets. Our fast
+                turnaround and meticulous attention to detail help you attract
+                more buyers and close deals faster.
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -73,7 +77,13 @@ const HeroBanner: React.FC = () => {
               >
                 <div className="flex items-center  gap-1">
                   {[...Array(5)].map((_, index) => (
-                    <svg key={index} className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <svg
+                      key={index}
+                      className="w-6 h-6 text-yellow-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
@@ -94,7 +104,13 @@ const HeroBanner: React.FC = () => {
             className="w-[100%] lg:w-[50%] flex-1 h-full"
           >
             <div className="relative w-full h-full rounded-xl overflow-hidden">
-              <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
+              <video
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              >
                 <source
                   src="https://firebasestorage.googleapis.com/v0/b/video-cdn-518f9.appspot.com/o/EARTH-web.mp4?alt=media&token=36f3207d-c171-4526-89c9-a950645dfe4c"
                   type="video/webm"

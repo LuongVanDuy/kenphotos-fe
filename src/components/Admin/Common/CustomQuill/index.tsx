@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
-import { customMessage } from "@/utils/messageHelper";
-import { slugifyFileName } from "@/utils/renameUploadedImage";
-import { getImageUrl } from "@/utils";
+import { customMessage } from "@/utils/message";
+import { slugifyFileName } from "@/utils/renameImage";
+import { getImageUrl } from "@/utils/imageUrl";
 import MediaLibraryModal from "../MediaLibraryModal";
 
 // Interface cho props của CustomQuill

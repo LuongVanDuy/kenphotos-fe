@@ -13,10 +13,16 @@ import {
   FETCH_PUBLIC_SERVICE_SUCCESS,
   FETCH_PUBLIC_SERVICE_FAILURE,
 } from "../actionTypes";
-import { fetchWithToken, putWithToken, deleteWithToken, fetchNoToken, patchWithToken } from "@/app/api/index";
+import {
+  fetchWithToken,
+  putWithToken,
+  deleteWithToken,
+  fetchNoToken,
+  patchWithToken,
+} from "@/app/api/index";
 import servicesEndpoint from "../endpoint/services";
 import { postWithToken } from "@/app/api/index";
-import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
+import { asyncActionWrapper } from "@/utils/asyncAction";
 
 // Admin actions
 export const fetchServices = (payload: any, accessToken: string) => {
@@ -59,25 +65,94 @@ export const fetchService = (payload: number, accessToken: string) => {
   };
 };
 
-export const createService = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => postWithToken(servicesEndpoint.createService(), accessToken, payload), onSuccess, onFailure);
-};
+export const createService =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        postWithToken(servicesEndpoint.createService(), accessToken, payload),
+      onSuccess,
+      onFailure
+    );
+  };
 
-export const updateService = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => putWithToken(servicesEndpoint.updateService(payload.id), accessToken, payload.data), onSuccess, onFailure);
-};
+export const updateService =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        putWithToken(
+          servicesEndpoint.updateService(payload.id),
+          accessToken,
+          payload.data
+        ),
+      onSuccess,
+      onFailure
+    );
+  };
 
-export const deleteService = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => patchWithToken(servicesEndpoint.deleteService(), accessToken, payload), onSuccess, onFailure);
-};
+export const deleteService =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        patchWithToken(servicesEndpoint.deleteService(), accessToken, payload),
+      onSuccess,
+      onFailure
+    );
+  };
 
-export const restoreService = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => patchWithToken(servicesEndpoint.restoreService(), accessToken, payload), onSuccess, onFailure);
-};
+export const restoreService =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        patchWithToken(servicesEndpoint.restoreService(), accessToken, payload),
+      onSuccess,
+      onFailure
+    );
+  };
 
-export const permanentDeleteService = (payload: any, accessToken: string, onSuccess: () => void, onFailure: (error: string) => void) => async () => {
-  await asyncActionWrapper(() => deleteWithToken(servicesEndpoint.permanentDeleteService(), accessToken, payload, null), onSuccess, onFailure);
-};
+export const permanentDeleteService =
+  (
+    payload: any,
+    accessToken: string,
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) =>
+  async () => {
+    await asyncActionWrapper(
+      () =>
+        deleteWithToken(
+          servicesEndpoint.permanentDeleteService(),
+          accessToken,
+          payload,
+          null
+        ),
+      onSuccess,
+      onFailure
+    );
+  };
 
 // Public actions
 export const fetchPublicServices = (option: any, key: string) => {

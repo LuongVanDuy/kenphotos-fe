@@ -40,11 +40,9 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
 }) => {
   const { data: session } = useSession();
 
-
   const breadcrumbs = AdminMenuHelper.getBreadcrumbs(pathname);
   const userMenuItems = AdminMenuHelper.convertUserMenuToAntd(onNavigation);
 
-  // Use session data or fallback to default values
   const user = {
     name: `${session?.user?.firstName} ${session?.user?.lastName}`,
     email: session?.user?.email || "guest@example.com",
@@ -157,7 +155,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                   lineHeight: "1.2",
                 }}
               >
-                {user.name}
+                {user.email}
               </Text>
               <Text
                 style={{

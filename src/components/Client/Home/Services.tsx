@@ -3,39 +3,16 @@
 import { motion } from "framer-motion";
 import ServiceCard from "../Service/ServiceCard";
 import { ArrowRightIcon } from "@/components/Icons";
-import { fetchPublicServices } from "@/store/actions/services";
 import { connect } from "react-redux";
-import { useEffect, useState } from "react";
 import MainTitle from "../Common/Title/MainTitle";
 import ServiceCardLoading from "../Services/ServiceCardLoading";
 import { useRouter } from "next/navigation";
 
-const Services = ({ fetchPublicServices, serviceList, serviceTotal, serviceLoading }: any) => {
+const Services = ({ serviceList, serviceTotal, serviceLoading }: any) => {
   const router = useRouter();
 
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(6);
-
-  function handleQuery(page = 1, itemsPerPage = 6) {
-    fetchPublicServices(
-      {
-        page,
-        itemsPerPage,
-        sortBy: "createdTime",
-        sortDesc: true,
-      },
-      "featuredServices"
-    );
-
-    setPageNumber(page);
-    setPageSize(itemsPerPage);
-  }
-
-  useEffect(() => {
-    handleQuery(pageNumber, pageSize);
-  }, [pageNumber, pageSize]);
-
-  const displayedServiceList = serviceList.length > 0 ? serviceList : Array(6).fill({});
+  const displayedServiceList =
+    serviceList.length > 0 ? serviceList : Array(6).fill({});
 
   return (
     <section className="bg-white relative py-10 md:pt-[70px] md:pb-[120px]">
@@ -55,7 +32,9 @@ const Services = ({ fetchPublicServices, serviceList, serviceTotal, serviceLoadi
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mt-12">
           {serviceLoading
-            ? Array.from({ length: 6 }).map((_, index) => <ServiceCardLoading key={index} />)
+            ? Array.from({ length: 6 }).map((_, index) => (
+                <ServiceCardLoading key={index} />
+              ))
             : serviceList && serviceTotal
             ? displayedServiceList.map((service: any, index: any) => (
                 <ServiceCard
@@ -97,19 +76,15 @@ const mapStateToProps = (state: any, ownProps: any) => {
     list: [],
     total: 0,
     loading: true,
-    error: null,
   };
 
   return {
     serviceList: publicData.list,
     serviceTotal: publicData.total,
     serviceLoading: publicData.loading,
-    serviceError: publicData.error,
   };
 };
 
-const mapDispatchToProps = {
-  fetchPublicServices,
-};
+const mapDispatchToProps = {};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Services);

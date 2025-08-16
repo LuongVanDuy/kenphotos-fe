@@ -10,8 +10,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "../../../../public/css/ServiceSlide.css";
 import { CompareSlider } from "@/components/Client/Common/CompareSlider";
-import { useScrollToForm } from "@/utils/useScrollToForm";
-import { getImageUrl } from "@/utils";
+import { useScrollToForm } from "@/utils/scrollToForm";
+import { getImageUrl } from "@/utils/imageUrl";
 
 const accordionData = [
   {
@@ -67,7 +67,9 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
           {/* LEFT CONTENT */}
           <div className="md:col-span-4 text-left space-y-6">
             <div className="text-center md:text-left">
-              <p className="text-[22px] leading-[30px] text-center md:text-[24px] md:text-left">Photo Editing</p>
+              <p className="text-[22px] leading-[30px] text-center md:text-[24px] md:text-left">
+                Photo Editing
+              </p>
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -86,16 +88,30 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                 className="flex gap-8 items-center justify-center md:justify-start mb-6"
               >
                 <div className="flex items-center  gap-2 text-center">
-                  {serviceDetail?.originalPrice && serviceDetail?.discountedPrice ? (
+                  {serviceDetail?.originalPrice &&
+                  serviceDetail?.discountedPrice ? (
                     <>
                       <span className="text-red-500 font-bold">
-                        -{Math.round(((serviceDetail.originalPrice - serviceDetail.discountedPrice) / serviceDetail.originalPrice) * 100)}%
+                        -
+                        {Math.round(
+                          ((serviceDetail.originalPrice -
+                            serviceDetail.discountedPrice) /
+                            serviceDetail.originalPrice) *
+                            100
+                        )}
+                        %
                       </span>
-                      <span className="text-gray-400 line-through">${serviceDetail.originalPrice.toFixed(2)}</span>
-                      <span className="text-green-600 font-bold text-lg">${serviceDetail.discountedPrice.toFixed(2)}</span>
+                      <span className="text-gray-400 line-through">
+                        ${serviceDetail.originalPrice.toFixed(2)}
+                      </span>
+                      <span className="text-green-600 font-bold text-lg">
+                        ${serviceDetail.discountedPrice.toFixed(2)}
+                      </span>
                     </>
                   ) : serviceDetail?.originalPrice ? (
-                    <span className="text-green-600 font-bold text-lg">${serviceDetail.originalPrice.toFixed(2)}</span>
+                    <span className="text-green-600 font-bold text-lg">
+                      ${serviceDetail.originalPrice.toFixed(2)}
+                    </span>
                   ) : (
                     <span className="text-gray-400 font-bold">$0.00</span>
                   )}
@@ -105,10 +121,16 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                   {serviceDetail?.rating !== undefined && (
                     <div className="flex items-center">
                       <span className="text-yellow-400 text-lg">★</span>
-                      <span className="font-semibold ml-1">{serviceDetail.rating}</span>
+                      <span className="font-semibold ml-1">
+                        {serviceDetail.rating}
+                      </span>
                     </div>
                   )}
-                  {serviceDetail?.orderCount !== undefined && <span className="text-gray-500">({serviceDetail.orderCount})</span>}
+                  {serviceDetail?.orderCount !== undefined && (
+                    <span className="text-gray-500">
+                      ({serviceDetail.orderCount})
+                    </span>
+                  )}
                 </div>
               </motion.div>
 
@@ -147,9 +169,17 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                     key={index}
                     onClick={() => setActiveTab(index)}
                     className={`text-center md:text-left md:px-4 py-3 transition-all font-semibold relative flex-1 md:flex-none ${
-                      activeTab === index ? " text-blue-600  font-semibold" : "text-gray-600 border-transparent "
-                    } ${index === 0 ? "rounded-tl-lg md:rounded-tl-lg md:rounded-bl-none" : ""} ${
-                      index === accordionData.length - 1 ? "rounded-tr-lg md:rounded-tr-none md:rounded-bl-lg" : ""
+                      activeTab === index
+                        ? " text-blue-600  font-semibold"
+                        : "text-gray-600 border-transparent "
+                    } ${
+                      index === 0
+                        ? "rounded-tl-lg md:rounded-tl-lg md:rounded-bl-none"
+                        : ""
+                    } ${
+                      index === accordionData.length - 1
+                        ? "rounded-tr-lg md:rounded-tr-none md:rounded-bl-lg"
+                        : ""
                     }`}
                   >
                     {item.title}
@@ -158,12 +188,16 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                       <>
                         <div
                           className={`absolute right-0 top-1/2 w-px h-full transform -translate-y-1/2 md:hidden ${
-                            activeTab === index || activeTab === index + 1 ? "bg-gray-300" : "bg-gray-200"
+                            activeTab === index || activeTab === index + 1
+                              ? "bg-gray-300"
+                              : "bg-gray-200"
                           }`}
                         />
                         <div
                           className={`absolute left-0 bottom-0 w-full h-px hidden md:block ${
-                            activeTab === index || activeTab === index + 1 ? "bg-gray-300" : "bg-gray-200"
+                            activeTab === index || activeTab === index + 1
+                              ? "bg-gray-300"
+                              : "bg-gray-200"
                           }`}
                         />
                       </>
@@ -173,7 +207,9 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
               </div>
 
               <div className="flex-1 border-t md:border-t-0 md:border-l border-gray-200 p-6">
-                <div className="text-gray-700">{accordionData[activeTab].content}</div>
+                <div className="text-gray-700">
+                  {accordionData[activeTab].content}
+                </div>
               </div>
             </div>
           </div>
@@ -198,10 +234,12 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                       beforeImage={getImageUrl(image.beforeUrl)}
                       afterImage={getImageUrl(image.afterUrl)}
                       onDragStart={() => {
-                        if (swiperRef.current) swiperRef.current.allowTouchMove = false;
+                        if (swiperRef.current)
+                          swiperRef.current.allowTouchMove = false;
                       }}
                       onDragEnd={() => {
-                        if (swiperRef.current) swiperRef.current.allowTouchMove = true;
+                        if (swiperRef.current)
+                          swiperRef.current.allowTouchMove = true;
                       }}
                     />
                   </div>

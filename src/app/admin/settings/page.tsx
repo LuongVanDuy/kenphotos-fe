@@ -1,7 +1,23 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, Tabs, Form, message, Divider, Typography, Button, Input, Select, Upload, Space, Tooltip, Modal, Row, Col } from "antd";
+import {
+  Card,
+  Tabs,
+  Form,
+  message,
+  Divider,
+  Typography,
+  Button,
+  Input,
+  Select,
+  Upload,
+  Space,
+  Tooltip,
+  Modal,
+  Row,
+  Col,
+} from "antd";
 import {
   SaveOutlined,
   GlobalOutlined,
@@ -16,10 +32,9 @@ import { useSession } from "next-auth/react";
 import { AppDispatch, RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSetting, upsertSetting } from "@/store/actions/settings";
-import { getImageUrl } from "@/utils";
+import { getImageUrl } from "@/utils/imageUrl";
 import Image from "next/image";
 import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
-import namespace from "quill/core/logger";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -37,10 +52,13 @@ const SettingsPage: React.FC = (props: any) => {
   }, []);
 
   const settingData = useSelector((state: RootState) => state.settings.detail);
-  const settingLoading = useSelector((state: RootState) => state.settings.loading);
+  const settingLoading = useSelector(
+    (state: RootState) => state.settings.loading
+  );
 
   const [generalForm] = Form.useForm();
   const [emailForm] = Form.useForm();
+  const [contactForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
   const [formField, setFormField] = useState<any | undefined>();
@@ -93,10 +111,13 @@ const SettingsPage: React.FC = (props: any) => {
     setLoading(false);
   };
 
-  const handleSaveSettings = async (values: any, formType: string) => {
+  const handleSaveSettings = async (values: any) => {
     setLoading(true);
 
-    const settingsArray = Object.entries(values).map(([key, value]) => ({ key, value }));
+    const settingsArray = Object.entries(values).map(([key, value]) => ({
+      key,
+      value,
+    }));
 
     dispatch(
       upsertSetting(
@@ -156,7 +177,11 @@ const SettingsPage: React.FC = (props: any) => {
 
   const generalSettings = (
     <Card loading={settingLoading}>
-      <Form form={generalForm} layout="vertical" onFinish={(values) => handleSaveSettings(values, "general")}>
+      <Form
+        form={generalForm}
+        layout="vertical"
+        onFinish={(values) => handleSaveSettings(values)}
+      >
         <Form.Item
           name="siteLogo"
           label={
@@ -185,7 +210,9 @@ const SettingsPage: React.FC = (props: any) => {
                           height={120}
                           className="rounded-lg border-2 border-gray-200 object-contain bg-white"
                         />
-                        <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">Active</div>
+                        <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                          Active
+                        </div>
                       </div>
                     ) : (
                       <div className="w-[120px] h-[120px] bg-gray-200 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
@@ -196,7 +223,9 @@ const SettingsPage: React.FC = (props: any) => {
                       </div>
                     )}
                   </div>
-                  <Text className="text-xs text-gray-500 text-center">Logo Preview</Text>
+                  <Text className="text-xs text-gray-500 text-center">
+                    Logo Preview
+                  </Text>
                 </div>
 
                 {/* Browser Preview */}
@@ -229,31 +258,52 @@ const SettingsPage: React.FC = (props: any) => {
                           <div className="w-8 h-8 bg-gray-300 rounded flex-shrink-0"></div>
                         )}
                         <div className="min-w-0 flex-1">
-                          <div className="font-semibold text-gray-800 text-sm lg:text-base truncate">{formField?.siteName || "Site Name"}</div>
-                          <div className="text-xs text-gray-500 truncate">{formField?.siteDescription || "Site description"}</div>
+                          <div className="font-semibold text-gray-800 text-sm lg:text-base truncate">
+                            {formField?.siteName || "Site Name"}
+                          </div>
+                          <div className="text-xs text-gray-500 truncate">
+                            {formField?.siteDescription || "Site description"}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <Text className="text-xs text-gray-500 mt-2 block">Browser Tab Preview</Text>
+                  <Text className="text-xs text-gray-500 mt-2 block">
+                    Browser Tab Preview
+                  </Text>
                 </div>
               </div>
             </div>
 
             {/* Logo Actions */}
             <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-              <Button type="primary" icon={<PictureOutlined />} onClick={() => setIsModalMediaOpen(true)} className="flex-1" size="middle">
+              <Button
+                type="primary"
+                icon={<PictureOutlined />}
+                onClick={() => setIsModalMediaOpen(true)}
+                className="flex-1"
+                size="middle"
+              >
                 {getCurrentLogo() ? "Change Logo" : "Select Logo"}
               </Button>
 
               {getCurrentLogo() && (
                 <div className="flex gap-2">
                   <Tooltip title="Preview logo">
-                    <Button icon={<EyeOutlined />} onClick={handlePreviewLogo} size="middle" />
+                    <Button
+                      icon={<EyeOutlined />}
+                      onClick={handlePreviewLogo}
+                      size="middle"
+                    />
                   </Tooltip>
 
                   <Tooltip title="Remove logo">
-                    <Button danger icon={<DeleteOutlined />} onClick={handleRemoveLogo} size="middle" />
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={handleRemoveLogo}
+                      size="middle"
+                    />
                   </Tooltip>
                 </div>
               )}
@@ -263,23 +313,42 @@ const SettingsPage: React.FC = (props: any) => {
 
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={12}>
-            <Form.Item name="siteName" label="Site Name" rules={[{ required: true, message: "Please enter site name" }]}>
+            <Form.Item
+              name="siteName"
+              label="Site Name"
+              rules={[{ required: true, message: "Please enter site name" }]}
+            >
               <Input placeholder="Enter site name" size="middle" />
             </Form.Item>
           </Col>
           <Col xs={24} lg={12}>
-            <Form.Item name="siteUrl" label="Site URL" rules={[{ required: true, message: "Please enter site URL" }]}>
+            <Form.Item
+              name="siteUrl"
+              label="Site URL"
+              rules={[{ required: true, message: "Please enter site URL" }]}
+            >
               <Input placeholder="https://example.com" size="middle" />
             </Form.Item>
           </Col>
         </Row>
 
-        <Form.Item name="siteDescription" label="Site Description" rules={[{ required: true, message: "Please enter site description" }]}>
+        <Form.Item
+          name="siteDescription"
+          label="Site Description"
+          rules={[{ required: true, message: "Please enter site description" }]}
+        >
           <TextArea placeholder="Enter site description" rows={3} />
         </Form.Item>
 
         <div style={{ marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" loading={loading} icon={<SaveOutlined />} size="middle" block={isMobile}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+            size="middle"
+            block={isMobile}
+          >
             Save General Settings
           </Button>
         </div>
@@ -292,7 +361,7 @@ const SettingsPage: React.FC = (props: any) => {
       <Form
         form={emailForm}
         layout="vertical"
-        onFinish={(values) => handleSaveSettings(values, "email")}
+        onFinish={(values) => handleSaveSettings(values)}
         initialValues={{
           smtpHost: "",
           smtpPort: 587,
@@ -303,12 +372,20 @@ const SettingsPage: React.FC = (props: any) => {
       >
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={12}>
-            <Form.Item name="SMTP_HOST" label="SMTP Host" rules={[{ required: true, message: "Please enter SMTP host" }]}>
+            <Form.Item
+              name="SMTP_HOST"
+              label="SMTP Host"
+              rules={[{ required: true, message: "Please enter SMTP host" }]}
+            >
               <Input placeholder="smtp.gmail.com" size="middle" />
             </Form.Item>
           </Col>
           <Col xs={24} lg={12}>
-            <Form.Item name="SMTP_PORT" label="SMTP Port" rules={[{ required: true, message: "Please enter SMTP port" }]}>
+            <Form.Item
+              name="SMTP_PORT"
+              label="SMTP Port"
+              rules={[{ required: true, message: "Please enter SMTP port" }]}
+            >
               <Input placeholder="587" size="middle" />
             </Form.Item>
           </Col>
@@ -316,7 +393,13 @@ const SettingsPage: React.FC = (props: any) => {
 
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={12}>
-            <Form.Item name="SMTP_SECURITY" label="Security" rules={[{ required: true, message: "Please select security type" }]}>
+            <Form.Item
+              name="SMTP_SECURITY"
+              label="Security"
+              rules={[
+                { required: true, message: "Please select security type" },
+              ]}
+            >
               <Select
                 options={[
                   { value: "none", label: "None" },
@@ -329,13 +412,23 @@ const SettingsPage: React.FC = (props: any) => {
             </Form.Item>
           </Col>
           <Col xs={24} lg={12}>
-            <Form.Item name="SMTP_USERNAME" label="SMTP Username" rules={[{ required: true, message: "Please enter SMTP username" }]}>
+            <Form.Item
+              name="SMTP_USERNAME"
+              label="SMTP Username"
+              rules={[
+                { required: true, message: "Please enter SMTP username" },
+              ]}
+            >
               <Input placeholder="your-email@gmail.com" size="middle" />
             </Form.Item>
           </Col>
         </Row>
 
-        <Form.Item name="SMTP_PASSWORD" label="SMTP Password" rules={[{ required: true, message: "Please enter SMTP password" }]}>
+        <Form.Item
+          name="SMTP_PASSWORD"
+          label="SMTP Password"
+          rules={[{ required: true, message: "Please enter SMTP password" }]}
+        >
           <Input.Password placeholder="Enter password" size="middle" />
         </Form.Item>
 
@@ -347,20 +440,143 @@ const SettingsPage: React.FC = (props: any) => {
 
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={12}>
-            <Form.Item name="FROM_EMAIL" label="From Email" rules={[{ required: true, message: "Please enter from email" }]}>
+            <Form.Item
+              name="FROM_EMAIL"
+              label="From Email"
+              rules={[{ required: true, message: "Please enter from email" }]}
+            >
               <Input placeholder="noreply@example.com" size="middle" />
             </Form.Item>
           </Col>
           <Col xs={24} lg={12}>
-            <Form.Item name="FROM_NAME" label="From Name" rules={[{ required: true, message: "Please enter from name" }]}>
+            <Form.Item
+              name="FROM_NAME"
+              label="From Name"
+              rules={[{ required: true, message: "Please enter from name" }]}
+            >
               <Input placeholder="Your Site Name" size="middle" />
             </Form.Item>
           </Col>
         </Row>
 
         <div style={{ marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" loading={loading} icon={<SaveOutlined />} size="middle" block={isMobile}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+            size="middle"
+            block={isMobile}
+          >
             Save Email Settings
+          </Button>
+        </div>
+      </Form>
+    </Card>
+  );
+
+  const contactSettings = (
+    <Card>
+      <Form
+        form={contactForm}
+        layout="vertical"
+        onFinish={(values) => handleSaveSettings(values)}
+        initialValues={{
+          email: "truecolorcso@gmail.com",
+          whatsapp: "(+84) 339 871 448",
+          skype: "join.skype.com/invite/y68aYbgqRRAx",
+          telegram: "(+84) 339 871 448",
+          facebook: "facebook.com/Truecoloredit",
+          address:
+            "32-33 TT02, Tay Nam Linh Dam Urban Area, Hoang Liet Ward, Hoang Mai District, Hanoi City, Viet Nam",
+        }}
+      >
+        <Title level={4} className="text-lg lg:text-xl">
+          Contact Settings
+        </Title>
+
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[{ required: true, message: "Please enter email" }]}
+            >
+              <Input placeholder="truecolorcso@gmail.com" size="middle" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="whatsapp"
+              label="WhatsApp"
+              rules={[
+                { required: true, message: "Please enter WhatsApp number" },
+              ]}
+            >
+              <Input placeholder="(+84) 339 871 448" size="middle" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="skype"
+              label="Skype"
+              rules={[{ required: true, message: "Please enter Skype link" }]}
+            >
+              <Input
+                placeholder="join.skype.com/invite/y68aYbgqRRAx"
+                size="middle"
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="telegram"
+              label="Telegram"
+              rules={[
+                { required: true, message: "Please enter Telegram number" },
+              ]}
+            >
+              <Input placeholder="(+84) 339 871 448" size="middle" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item
+          name="facebook"
+          label="Facebook Fanpage"
+          rules={[
+            { required: true, message: "Please enter Facebook Fanpage link" },
+          ]}
+        >
+          <Input placeholder="facebook.com/Truecoloredit" size="middle" />
+        </Form.Item>
+
+        <Form.Item
+          name="address"
+          label="Address"
+          rules={[{ required: true, message: "Please enter address" }]}
+        >
+          <Input.TextArea
+            placeholder="32-33 TT02, Tay Nam Linh Dam Urban Area..."
+            rows={3}
+          />
+        </Form.Item>
+
+        <Divider />
+
+        <div style={{ marginTop: 24 }}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            icon={<SaveOutlined />}
+            size="middle"
+            block={isMobile}
+          >
+            Save Contact Settings
           </Button>
         </div>
       </Form>
@@ -380,15 +596,33 @@ const SettingsPage: React.FC = (props: any) => {
       icon: <MailOutlined />,
       children: emailSettings,
     },
+    {
+      key: "contact",
+      label: "Contact",
+      icon: <PictureOutlined />,
+      children: contactSettings,
+    },
   ];
 
   return (
     <div>
       <h1 className="text-2xl md:text-4xl font-bold mb-4 lg:mb-6">Settings</h1>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} size="large" tabPosition="top" className="settings-tabs" />
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems}
+        size="large"
+        tabPosition="top"
+        className="settings-tabs"
+      />
 
-      <MediaLibraryModal isOpen={isModalMediaOpen} onCancel={() => setIsModalMediaOpen(false)} onSelect={handleMediaSelect} accept="image/*" />
+      <MediaLibraryModal
+        isOpen={isModalMediaOpen}
+        onCancel={() => setIsModalMediaOpen(false)}
+        onSelect={handleMediaSelect}
+        accept="image/*"
+      />
 
       {/* Logo Preview Modal */}
       {previewVisible && getCurrentLogo() && (
@@ -407,11 +641,19 @@ const SettingsPage: React.FC = (props: any) => {
         >
           <div className="text-center space-y-4">
             <div className="bg-gray-50 p-4 lg:p-6 rounded-lg">
-              <Image src={getImageUrl(getCurrentLogo())} alt="Site Logo Preview" width={300} height={300} className="mx-auto object-contain" />
+              <Image
+                src={getImageUrl(getCurrentLogo())}
+                alt="Site Logo Preview"
+                width={300}
+                height={300}
+                className="mx-auto object-contain"
+              />
             </div>
             <div className="text-sm text-gray-600">
               <p>This is how your logo will appear on your website.</p>
-              <p>For best results, ensure your logo has a transparent background.</p>
+              <p>
+                For best results, ensure your logo has a transparent background.
+              </p>
             </div>
           </div>
         </Modal>

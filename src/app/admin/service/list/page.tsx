@@ -77,14 +77,12 @@ const ServiceListPage: React.FC = () => {
     }
   }, []);
 
-  // Redux state
   const {
     list: serviceList = [],
     total: serviceTotal = 0,
     loading: serviceLoading = false,
   } = useSelector((state: RootState) => state.services || {});
 
-  // Local state
   const [filters, setFilters] = useState({
     status: "all",
     deleteFlg: 0,
@@ -101,7 +99,6 @@ const ServiceListPage: React.FC = () => {
     selectedServices: [] as Service[],
   });
 
-  // Memoized query function
   const handleQuery = useCallback(
     (keyword: string, page = 1, itemsPerPage = DEFAULT_PAGE_SIZE) => {
       const queryParams: QueryParams = {
@@ -120,14 +117,12 @@ const ServiceListPage: React.FC = () => {
     [dispatch, session?.accessToken, filters]
   );
 
-  // Effects
   useEffect(() => {
     if (session?.accessToken) {
       handleQuery(filters.keyword);
     }
   }, [session?.accessToken, filters, handleQuery]);
 
-  // Callback functions
   const onSuccess = useCallback(() => {
     message.success("Operation completed successfully");
     setSelection({ selectedRowKeys: [], selectedServices: [] });

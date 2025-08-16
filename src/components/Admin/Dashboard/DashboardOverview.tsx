@@ -1,32 +1,13 @@
 "use client";
 
 import React, { useEffect } from "react";
-import {
-  Card,
-  Row,
-  Col,
-  Statistic,
-  Table,
-  Tag,
-  Avatar,
-  List,
-  Button,
-  Space,
-  Progress,
-  Typography,
-  Divider,
-  Badge,
-} from "antd";
+import { Card, Row, Col, Table, Tag, Button, Space, Typography } from "antd";
 import {
   UserOutlined,
   FileTextOutlined,
   PictureOutlined,
   EyeOutlined,
-  ArrowUpOutlined,
-  ArrowDownOutlined,
   PlusOutlined,
-  CalendarOutlined,
-  ClockCircleOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,19 +30,15 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  // Get totals from Redux store
   const userTotal = useSelector((state: RootState) => state.users.total) || 0;
   const postTotal = useSelector((state: RootState) => state.posts.total) || 0;
   const mediaTotal = useSelector((state: RootState) => state.media.total) || 0;
   const orderTotal = useSelector((state: RootState) => state.orders.total) || 0;
 
-  // Get recent posts from Redux store
   const recentPosts = useSelector((state: RootState) => state.posts.list) || [];
 
-  // Fetch data on component mount
   useEffect(() => {
     if (session?.accessToken) {
-      // Fetch minimal data to get totals
       dispatch(
         fetchUsers({ page: 1, itemsPerPage: 1 }, session.accessToken) as any
       );
@@ -77,7 +54,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
     }
   }, [session?.accessToken, dispatch]);
 
-  // Mock data for recent items (keeping this for now)
   const mockStats: any = {
     totalUsers: userTotal,
     totalPosts: postTotal,
@@ -167,7 +143,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
 
   return (
     <div className="dashboard-overview">
-      {/* Modern Header Section - Responsive */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-4 sm:space-y-0">
           <div>
@@ -247,9 +222,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
         ))}
       </Row>
 
-      {/* Main Content Grid - Responsive */}
       <Row gutter={[16, 16]} className="admin-responsive-grid">
-        {/* Recent Posts */}
         <Col xs={24} lg={16}>
           <Card
             title={
@@ -264,28 +237,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
                   >
                     Recent Posts
                   </Text>
-                  <Text
-                    style={{
-                      fontSize: "14px",
-                      color: "#595959",
-                      display: "block",
-                      marginTop: "4px",
-                    }}
-                  >
-                    Latest published content
-                  </Text>
                 </div>
-                <Button
-                  icon={<PlusOutlined />}
-                  style={{
-                    borderRadius: 12,
-                    height: "40px",
-                    border: `1px solid #d9d9d9`,
-                  }}
-                  className="admin-touch-target"
-                >
-                  Add New
-                </Button>
               </div>
             }
             style={{ height: "fit-content" }}
@@ -303,10 +255,8 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ stats }) => {
           </Card>
         </Col>
 
-        {/* Quick Actions & Recent Activity */}
         <Col xs={24} lg={8}>
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
-            {/* Quick Actions */}
             <Card
               title={
                 <Text

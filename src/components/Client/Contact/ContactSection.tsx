@@ -2,11 +2,86 @@
 
 import { motion } from "framer-motion";
 import MainTitle from "../Common/Title/MainTitle";
-import { FacebookOutlined, HomeOutlined, MailOutlined, PhoneOutlined, SendOutlined, SkypeOutlined, WhatsAppOutlined } from "@ant-design/icons";
+import {
+  FacebookOutlined,
+  HomeOutlined,
+  MailOutlined,
+  SendOutlined,
+  SkypeOutlined,
+  WhatsAppOutlined,
+} from "@ant-design/icons";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { postNoToken } from "@/app/api";
+import { useState } from "react";
+
+const iconsMap: Record<string, JSX.Element> = {
+  email: <MailOutlined style={{ fontSize: 18, color: "#2D6DFF" }} />,
+  whatsapp: <WhatsAppOutlined style={{ fontSize: 18, color: "#25D366" }} />,
+  skype: <SkypeOutlined style={{ fontSize: 18, color: "#00AFF0" }} />,
+  telegram: <SendOutlined style={{ fontSize: 18, color: "#0088cc" }} />,
+  facebook: <FacebookOutlined style={{ fontSize: 18, color: "#1877F2" }} />,
+  address: <HomeOutlined style={{ fontSize: 18, color: "#2D6DFF" }} />,
+};
+
+const linkPrefix: Record<string, string> = {
+  email: "mailto:",
+  whatsapp: "https://wa.me/",
+  skype: "",
+  telegram: "https://t.me/+",
+  facebook: "https://",
+  address: "",
+};
+
+const contactOrder = [
+  "email",
+  "whatsapp",
+  "skype",
+  "telegram",
+  "facebook",
+  "address",
+];
 
 const ContactSection: React.FC = () => {
+  const settingData = useSelector((state: RootState) => state.settings.detail);
+
+  const [verified, setVerified] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleCheckboxChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!e.target.checked) return;
+
+    setLoading(true);
+    try {
+      const token = await window.grecaptcha.execute(
+        "6LfvyqYrAAAAACOms6yP9H3TowHoG082voRRc9sx",
+        { action: "submit" }
+      );
+
+      const res = await postNoToken("captcha/verify", { token });
+      if (res.verified) {
+        setVerified(true);
+        alert("Captcha verified successfully");
+      } else {
+        setVerified(false);
+        alert("Captcha verification failed");
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(`Captcha verification failed: ${err.message}`);
+      setVerified(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <section className="py-10 md:py-[120px] md:pt-[180px] bg-[rgba(220,237,248,0.6)]" aria-labelledby="free-test-heading">
+    <section
+      className="py-10 md:py-[120px] md:pt-[180px] bg-[rgba(220,237,248,0.6)]"
+      aria-labelledby="free-test-heading"
+    >
       <div className="max-w-content mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div
@@ -28,7 +103,10 @@ const ContactSection: React.FC = () => {
               }
               align="left"
             />
-            <form className="space-y-10 text-black mt-8" aria-label="Projektanfrage Formular">
+            <form
+              className="space-y-10 text-black mt-8"
+              aria-label="Projektanfrage Formular"
+            >
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -141,19 +219,24 @@ const ContactSection: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ duration: 0.6, ease: "easeOut", delay: 1.5 }}
-                  className="mb-8"
                 >
-                  <label className="block text-sm  mb-2">
-                    Captcha <span className="font-bold">(Pflichtfeld)</span>
+                  <label className="block text-sm mb-2">
+                    Captcha <span className="font-bold">(Required)</span>
                   </label>
                   <label className="flex items-center gap-3 border border-[#B1B1B1] rounded-md p-4 bg-white cursor-pointer w-fit">
                     <input
                       type="checkbox"
                       name="captcha"
-                      required
+                      onChange={handleCheckboxChange}
                       className="form-checkbox w-5 h-5 text-[#F7B500] border-[#B1B1B1] focus:ring-0 accent-[#F7B500]"
                     />
-                    <span className="text-gray-900 font-medium">Verifiziert</span>
+                    <span className="text-gray-900 font-medium">
+                      {loading
+                        ? "Verifying..."
+                        : verified
+                        ? "Verified"
+                        : "Not verified"}
+                    </span>
                   </label>
                 </motion.div>
 
@@ -181,7 +264,9 @@ const ContactSection: React.FC = () => {
           >
             <div className=" bg-white/60 dark:bg-slate-900/60 p-6 rounded-2xl shadow-sm">
               <p className="text-slate-800 dark:text-slate-100 text-[16px] leading-relaxed">
-                <span className="block mb-2">We’re here to assist you throughout the week.</span>
+                <span className="block mb-2">
+                  We’re here to assist you throughout the week.
+                </span>
                 <span className="block font-medium">
                   Monday – Saturday: <time>8:00 AM – 6:00 PM</time>
                 </span>
@@ -189,64 +274,48 @@ const ContactSection: React.FC = () => {
                   Sunday: <time>Closed</time>
                 </span>
                 <span className="block mt-3">
-                  Call us, email us, or send a message via the form below—our team will respond promptly during business hours.
+                  Call us, email us, or send a message via the form below—our
+                  team will respond promptly during business hours.
                 </span>
               </p>
               <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mt-4">
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <MailOutlined style={{ fontSize: 18, color: "#2D6DFF" }} />
-                  <a href="mailto:truecolorcso@gmail.com" className="font-medium transition-colors duration-200 group-hover:text-[#2D6DFF]">
-                    truecolorcso@gmail.com
-                  </a>
-                </div>
+                {settingData?.contact &&
+                  contactOrder.map((key) => {
+                    const value = settingData.contact[key];
+                    if (!value) return null;
 
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <WhatsAppOutlined style={{ fontSize: 18, color: "#25D366" }} />
-                  <a
-                    href="https://wa.me/84339871448"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium transition-colors duration-200 group-hover:text-[#25D366]"
-                  >
-                    (+84) 339 871 448
-                  </a>
-                </div>
+                    const icon = iconsMap[key];
+                    const prefix = linkPrefix[key] || "";
+                    const href =
+                      key === "whatsapp" || key === "telegram"
+                        ? `${prefix}${value.replace(/\D/g, "")}`
+                        : `${prefix}${value}`;
 
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <SkypeOutlined style={{ fontSize: 18, color: "#00AFF0" }} />
-                  <a
-                    href="https://join.skype.com/invite/y68aYbgqRRAx"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium transition-colors duration-200 group-hover:text-[#00AFF0]"
-                  >
-                    join.skype.com/invite/y68aYbgqRRAx
-                  </a>
-                </div>
-
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <SendOutlined style={{ fontSize: 18, color: "#0088cc" }} />
-                  <span className="font-medium transition-colors duration-200 group-hover:text-[#0088cc]">(+84) 339 871 448</span>
-                </div>
-
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <FacebookOutlined style={{ fontSize: 18, color: "#1877F2" }} />
-                  <a
-                    href="https://facebook.com/Truecoloredit"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium transition-colors duration-200 group-hover:text-[#1877F2]"
-                  >
-                    facebook.com/Truecoloredit
-                  </a>
-                </div>
-
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <HomeOutlined style={{ fontSize: 18, color: "#2D6DFF" }} />
-                  <span className="font-medium transition-colors duration-200 group-hover:text-[#2D6DFF]">
-                    32-33 TT02, Tay Nam Linh Dam Urban Area, Hoang Liet Ward, Hoang Mai District, Hanoi City, Viet Nam
-                  </span>
-                </div>
+                    return (
+                      <div
+                        key={key}
+                        className="flex items-center gap-4 group cursor-pointer"
+                      >
+                        {icon}
+                        {key === "address" ||
+                        key === "telegram" ||
+                        key === "skype" ? (
+                          <span className="font-medium transition-colors duration-200 group-hover:text-current">
+                            {value}
+                          </span>
+                        ) : (
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium transition-colors duration-200 group-hover:text-current"
+                          >
+                            {value}
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })}
               </div>
             </div>
 

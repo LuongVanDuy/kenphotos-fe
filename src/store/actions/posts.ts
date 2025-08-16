@@ -22,7 +22,7 @@ import {
 } from "@/app/api/index";
 import postsEndpoint from "../endpoint/posts";
 import { postWithToken } from "@/app/api/index";
-import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
+import { asyncActionWrapper } from "@/utils/asyncAction";
 
 export const fetchPosts = (payload: any, accessToken: string) => {
   return (dispatch: AppDispatch) => {

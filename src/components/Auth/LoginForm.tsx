@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { customMessage } from "@/utils/messageHelper";
+import { customMessage } from "@/utils/message";
 import { Button, Form, Input } from "antd";
 import { signIn, getSession } from "next-auth/react";
 import Image from "next/image";

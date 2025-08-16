@@ -609,3 +609,9 @@ body {
     grid-column-end: 4;
   }
 }
+
+.min-w-\[20px\] svg {
+  min-width: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+}

@@ -9,8 +9,7 @@ import HowWeWork from "@/components/Client/Common/HowWeWork";
 import Info from "@/components/Client/Service/Info";
 import StepGrid from "@/components/Client/Service/StepGrid";
 import Related from "@/components/Client/Service/Related";
-import { createMetadata, createMetadataFromContent, fetchServiceMeta, stripHtml } from "@/utils/metadata";
-import { getImageUrl } from "@/utils";
+import { createMetadata, fetchServiceMeta } from "@/utils/metadata";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const service = await fetchServiceMeta(params.slug);
@@ -21,11 +20,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     });
   }
 
-  return createMetadataFromContent({
+  return createMetadata({
     title: service.title,
-    content: service.content,
-    image: getImageUrl(service.images[0]?.afterUrl) || "/default-preview.jpg",
-    url: `https://example.com/services/${params.slug}`,
+    description: service.content,
+    image: service.images[0].afterUrl,
+    url: `https://kenphotos.com/services/${params.slug}`,
   });
 }
 

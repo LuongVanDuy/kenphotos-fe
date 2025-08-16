@@ -1,4 +1,4 @@
-import { getImageUrl } from "@/utils";
+import { getImageUrl } from "@/utils/imageUrl";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -29,7 +29,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
           />
           <div className="absolute top-4 left-4 flex flex-wrap gap-2">
             {blog.categories.map((cat: any, index: any) => (
-              <span key={index} className="bg-[rgba(0,0,0,0.25)] text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
+              <span
+                key={index}
+                className="bg-[rgba(0,0,0,0.25)] text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm"
+              >
                 {cat.name}
               </span>
             ))}
@@ -37,9 +40,13 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
         </div>
       </Link>
       <Link href={`/blog/${blog.slug}`}>
-        <h3 className="mt-3 text-xl font-semibold hover:text-[#00A3FF] cursor-pointer transition">{blog.title}</h3>
+        <h3 className="mt-3 text-xl font-semibold hover:text-[#00A3FF] cursor-pointer transition">
+          {blog.title}
+        </h3>
       </Link>
-      <p className="text-sm text-gray-500 mt-1">{new Date(blog.createdTime).toLocaleDateString("vi-VN")}</p>{" "}
+      <p className="text-sm text-gray-500 mt-1">
+        {new Date(blog.createdTime).toLocaleDateString("vi-VN")}
+      </p>{" "}
     </div>
   );
 };

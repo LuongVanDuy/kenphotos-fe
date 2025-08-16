@@ -3,8 +3,8 @@ export const slugifyFileName = (originalName: string): string => {
   const ext = originalName.split(".").pop();
   const slug = baseName
     .toLowerCase()
-    .replace(/[^a-z0-9]/g, "-") // thay các ký tự lạ bằng -
+    .replace(/[^a-z0-9]/g, "-")
     .replace(/-+/g, "-")
-    .replace(/^-|-$/g, ""); // xóa - đầu/cuối
+    .replace(/^-|-$/g, "");
   return `${slug}.${ext}`;
 };

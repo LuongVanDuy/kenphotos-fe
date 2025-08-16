@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { customMessage } from "@/utils/messageHelper";
+import { customMessage } from "@/utils/message";
 import { Button, Form, Input } from "antd";
 import { postNoToken } from "@/app/api";
 import authEndpoint from "@/store/endpoint/auth";

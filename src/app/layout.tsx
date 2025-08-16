@@ -21,7 +21,10 @@ export default function RootLayout({
     <html lang="en" className={poppins.variable}>
       <body>
         <LayoutProvider>{children}</LayoutProvider>
-        <Script src={`https://www.google.com/recaptcha/api.js?render=6LfvyqYrAAAAACOms6yP9H3TowHoG082voRRc9sx`} strategy="afterInteractive" />
+        <Script
+          src={`https://www.google.com/recaptcha/api.js?render=6LfvyqYrAAAAACOms6yP9H3TowHoG082voRRc9sx`}
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

@@ -13,7 +13,7 @@ import {
 } from "../actionTypes";
 import { AppDispatch } from "../store";
 import media from "../endpoint/media";
-import { asyncActionWrapper } from "@/utils/asyncActionWrapper";
+import { asyncActionWrapper } from "@/utils/asyncAction";
 
 export const fetchMedia = (payload: any, accessToken: string) => {
   return (dispatch: AppDispatch) => {
