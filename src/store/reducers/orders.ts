@@ -1,12 +1,19 @@
-import { FETCH_ORDERS, FETCH_ORDERS_SUCCESS, FETCH_ORDERS_FAILURE, FETCH_ORDER, FETCH_ORDER_SUCCESS, FETCH_ORDER_FAILURE } from "../actionTypes";
+import {
+  FETCH_ORDERS,
+  FETCH_ORDERS_SUCCESS,
+  FETCH_ORDERS_FAILURE,
+  FETCH_ORDER,
+  FETCH_ORDER_SUCCESS,
+  FETCH_ORDER_FAILURE,
+} from '../actionTypes'
 
 interface ServiceState {
-  list: any[];
-  total: number;
-  detail: any;
-  loading: boolean;
-  error: boolean;
-  message: string;
+  list: any[]
+  total: number
+  detail: any
+  loading: boolean
+  error: boolean
+  message: string
 }
 
 const initialState: ServiceState = {
@@ -15,8 +22,8 @@ const initialState: ServiceState = {
   detail: null,
   loading: true,
   error: false,
-  message: "",
-};
+  message: '',
+}
 
 const ordersReducer = (state = initialState, action: any) => {
   switch (action.type) {
@@ -26,44 +33,45 @@ const ordersReducer = (state = initialState, action: any) => {
         ...state,
         loading: true,
         error: false,
-      };
+      }
     case FETCH_ORDERS_SUCCESS:
       return {
         ...state,
         loading: false,
         list: action.payload.data.data || [],
         total: action.payload.data.total || 0,
-      };
+      }
     case FETCH_ORDERS_FAILURE:
       return {
         ...state,
         loading: false,
         error: true,
         message: action.payload.error,
-      };
+      }
 
     case FETCH_ORDER:
       return {
         ...state,
         loading: true,
         error: false,
-      };
+      }
     case FETCH_ORDER_SUCCESS:
       return {
         ...state,
         loading: false,
         detail: action.payload.data,
-      };
+      }
     case FETCH_ORDER_FAILURE:
       return {
         ...state,
         loading: false,
         error: true,
         message: action.payload.error,
-      };
-    default:
-      return state;
-  }
-};
+      }
 
-export default ordersReducer;
+    default:
+      return state
+  }
+}
+
+export default ordersReducer
