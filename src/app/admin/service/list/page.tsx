@@ -145,24 +145,29 @@ const ServiceListPage: React.FC = () => {
           title: "Confirm",
           content: `Are you sure you want to move "${service.title}" to trash?`,
           okText: "Move to Trash",
-          action: () =>
-            deleteService(
-              { ids: [service.id] },
-              session?.accessToken || "",
-              onSuccess,
-              onFailure
-            ),
+          action: () => {
+            dispatch(
+              deleteService(
+                { ids: [service.id] },
+                session?.accessToken || "",
+                onSuccess,
+                onFailure
+              ) as any
+            );
+          },
         },
         restore: {
           title: "Confirm Restore",
           content: `Are you sure you want to restore "${service.title}"?`,
           okText: "Restore",
           action: () =>
-            restoreService(
-              { ids: [service.id] },
-              session?.accessToken || "",
-              onSuccess,
-              onFailure
+            dispatch(
+              restoreService(
+                { ids: [service.id] },
+                session?.accessToken || "",
+                onSuccess,
+                onFailure
+              ) as any
             ),
         },
         permanentDelete: {
@@ -170,11 +175,13 @@ const ServiceListPage: React.FC = () => {
           content: `Are you sure you want to permanently delete "${service.title}"? This action cannot be undone.`,
           okText: "Delete Permanently",
           action: () =>
-            permanentDeleteService(
-              { ids: [service.id] },
-              session?.accessToken || "",
-              onSuccess,
-              onFailure
+            dispatch(
+              permanentDeleteService(
+                { ids: [service.id] },
+                session?.accessToken || "",
+                onSuccess,
+                onFailure
+              ) as any
             ),
         },
       };
@@ -213,11 +220,13 @@ const ServiceListPage: React.FC = () => {
           content: `Are you sure you want to move ${selection.selectedServices.length} service(s) to trash?`,
           okText: "Move to Trash",
           action: () =>
-            deleteService(
-              { ids },
-              session?.accessToken || "",
-              onSuccess,
-              onFailure
+            dispatch(
+              deleteService(
+                { ids },
+                session?.accessToken || "",
+                onSuccess,
+                onFailure
+              ) as any
             ),
         },
         restore: {
@@ -225,11 +234,13 @@ const ServiceListPage: React.FC = () => {
           content: `Are you sure you want to restore ${selection.selectedServices.length} service(s)?`,
           okText: "Restore",
           action: () =>
-            restoreService(
-              { ids },
-              session?.accessToken || "",
-              onSuccess,
-              onFailure
+            dispatch(
+              restoreService(
+                { ids },
+                session?.accessToken || "",
+                onSuccess,
+                onFailure
+              ) as any
             ),
         },
         permanentDelete: {
@@ -237,11 +248,13 @@ const ServiceListPage: React.FC = () => {
           content: `Are you sure you want to permanently delete ${selection.selectedServices.length} service(s)? This action cannot be undone.`,
           okText: "Delete Permanently",
           action: () =>
-            permanentDeleteService(
-              { ids },
-              session?.accessToken || "",
-              onSuccess,
-              onFailure
+            dispatch(
+              permanentDeleteService(
+                { ids },
+                session?.accessToken || "",
+                onSuccess,
+                onFailure
+              ) as any
             ),
         },
       };
