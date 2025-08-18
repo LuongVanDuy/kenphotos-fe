@@ -1,9 +1,13 @@
+// app/(main)/layout.tsx (hoặc PageLayout.tsx)
 import BaseLayout from "@/components/Layout/BaseLayout";
+import { fetchSettings } from "@/utils/metadata";
 
-export default function PageLayout({
+export default async function PageLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  return <BaseLayout>{children}</BaseLayout>;
+}) {
+  const settings = await fetchSettings(["menuHeader", "menuFooter"]);
+
+  return <BaseLayout settings={settings}>{children}</BaseLayout>;
 }

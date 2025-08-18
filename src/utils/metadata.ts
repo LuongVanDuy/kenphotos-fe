@@ -38,6 +38,15 @@ export async function fetchPostMeta(slug: string) {
   }
 }
 
+export async function fetchSettings(namespaces: string[]) {
+  try {
+    const query = encodeURIComponent(namespaces.join(","));
+    return await fetchApi(`public/settings?namespaces=${query}`, "GET");
+  } catch {
+    return null;
+  }
+}
+
 export function stripHtml(html: string) {
   return html
     .replace(/<[^>]*>/g, "")

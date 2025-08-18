@@ -11,8 +11,10 @@ import { fetchPublicSetting } from "@/store/actions/settings";
 
 export default function BaseLayout({
   children,
+  settings,
 }: {
   children: React.ReactNode;
+  settings: any;
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const scrollToForm = useScrollToForm();
@@ -25,12 +27,12 @@ export default function BaseLayout({
 
   return (
     <>
-      <Navbar onSendFreeTest={scrollToForm} />
+      <Navbar menu={settings.menuHeader.data} onSendFreeTest={scrollToForm} />
       {children}
       {settingData?.contact && (
         <FloatingContacts contactsData={settingData.contact} />
       )}
-      <Footer />
+      <Footer menu={settings.menuFooter.data} />
     </>
   );
 }

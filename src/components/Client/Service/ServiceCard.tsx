@@ -22,6 +22,7 @@ interface ServiceCardProps {
   originalPrice?: number;
   discountedPrice?: number;
   images?: ImagePair[];
+  bg?: string;
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({
@@ -35,12 +36,15 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   discountedPrice,
   images,
   slug,
+  bg = "",
 }) => {
   const beforeImage = images?.[0]?.beforeUrl || "";
   const afterImage = images?.[0]?.afterUrl || "";
 
   return (
-    <Card className="p-0 overflow-hidden rounded-[12px] !bg-gradient-to-b !bg-blue-50 flex flex-col h-full">
+    <Card
+      className={`p-0 overflow-hidden rounded-[12px] !bg-gradient-to-b !bg-blue-50 flex flex-col h-full ${bg}`}
+    >
       <div className="relative h-80 card-image">
         <CompareSlider
           beforeImage={getImageUrl(beforeImage)}
@@ -48,7 +52,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
         />
       </div>
 
-      <div className="p-6 flex flex-col flex-1 justify-between text-start bg-blue-50">
+      <div
+        className={`p-6 flex flex-col flex-1 justify-between text-start bg-blue-50 ${bg}`}
+      >
         <Link href={`/services/${slug}`} className="text-decoration-none">
           <h3 className="text-[22px] leading-[30px] mb-4 font-bold text-[#161817] md:text-[24px] md:leading-[24px]">
             {title}
@@ -59,7 +65,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           {content.replace(/<[^>]+>/g, "")}
         </p>
 
-        <div className="flex justify-between  mt-auto">
+        <div className="flex justify-between  mt-auto text-[16px]">
           <div className="flex items-center gap-2">
             {rating !== undefined && (
               <div className="flex items-center">

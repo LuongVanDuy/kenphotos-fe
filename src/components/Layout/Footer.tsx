@@ -10,7 +10,12 @@ import { HomeFilled, HomeOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 
-const Footer: React.FC = () => {
+type FooterProps = {
+  menu: any;
+};
+
+const Footer: React.FC<FooterProps> = ({ menu }) => {
+  console.log("Footer menu:", menu);
   const settingData = useSelector((state: RootState) => state.settings.detail);
 
   return (

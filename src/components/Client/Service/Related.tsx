@@ -63,6 +63,7 @@ const Related: React.FC<InfoProps> = ({ relatedServices }) => {
                   discountedPrice={service.discountedPrice}
                   images={service.images}
                   slug={service.slug}
+                  bg="!bg-[#fff]"
                 />
               </SwiperSlide>
             ))}
