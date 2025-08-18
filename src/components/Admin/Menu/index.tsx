@@ -1,35 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Tabs,
-  Form,
-  message,
-  Typography,
-  Button,
-  Input,
-  Space,
-  Tooltip,
-  Modal,
-  Row,
-  Col,
-  List,
-  Tag,
-  Popconfirm,
-  Divider,
-} from "antd";
-import {
-  SaveOutlined,
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  MenuOutlined,
-  DragOutlined,
-  InfoCircleOutlined,
-  ArrowRightOutlined,
-  ArrowLeftOutlined,
-} from "@ant-design/icons";
+import React, { act, useEffect, useState } from "react";
+import { Card, Tabs, message, Typography, Button } from "antd";
+import { SaveOutlined, PlusOutlined, MenuOutlined } from "@ant-design/icons";
 import { useSession } from "next-auth/react";
 import { AppDispatch, RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,377 +16,29 @@ import {
   useSensors,
   DragEndEvent,
 } from "@dnd-kit/core";
+
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { FlatMenuItem, MenuFormData, MenuItem } from "@/types";
+import SortableMenuItem from "./SortableMenuItem";
+import MenuForm from "./MenuForm";
 
 const { Title, Text } = Typography;
-
-interface MenuItem {
-  id: string;
-  name: string;
-  slug: string;
-  children?: MenuItem[];
-  order: number;
-  parentId?: string;
-}
-
-interface MenuFormData {
-  name: string;
-  slug: string;
-  children?: MenuItem[];
-  order: number;
-}
-
-interface FlatMenuItem extends MenuItem {
-  level: number;
-  parentId?: string;
-}
-
-const SortableMenuItem: React.FC<{
-  item: FlatMenuItem;
-  onEdit: (item: MenuItem) => void;
-  onDelete: (id: string) => void;
-  onAddChild: (parentId: string) => void;
-  onPromote: (id: string) => void;
-  onDemote: (id: string) => void;
-  canPromote: boolean;
-  canDemote: boolean;
-}> = ({
-  item,
-  onEdit,
-  onDelete,
-  onAddChild,
-  onPromote,
-  onDemote,
-  canPromote,
-  canDemote,
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  // Dynamic margin based on level
-  const getMarginClass = (level: number) => {
-    const margins = {
-      0: "",
-      1: "ml-6",
-      2: "ml-12",
-      3: "ml-18",
-    };
-    return margins[level as keyof typeof margins] || `ml-${level * 6}`;
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`bg-white border border-gray-200 rounded-lg p-3 mb-2 ${getMarginClass(
-        item.level
-      )}`}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 flex-1">
-          <div
-            {...attributes}
-            {...listeners}
-            className="cursor-grab hover:bg-gray-100 p-1 rounded"
-          >
-            <DragOutlined className="text-gray-400" />
-          </div>
-          <div className="flex-1">
-            <div className="font-medium text-gray-800">{item.name}</div>
-            <div className="text-sm text-gray-500">/{item.slug}</div>
-            <div className="flex items-center gap-2 mt-1">
-              <Tag color="gray">Order: {item.order}</Tag>
-              <Tag color="purple">Level: {item.level}</Tag>
-              {item.children && item.children.length > 0 && (
-                <Tag color="blue">{item.children.length} sub-items</Tag>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          {/* Level Controls */}
-          <Tooltip title="Promote to higher level">
-            <Button
-              type="text"
-              size="small"
-              icon={<ArrowLeftOutlined />}
-              onClick={() => onPromote(item.id)}
-              disabled={!canPromote}
-              className={!canPromote ? "opacity-50" : ""}
-            />
-          </Tooltip>
-          <Tooltip title="Demote to lower level">
-            <Button
-              type="text"
-              size="small"
-              icon={<ArrowRightOutlined />}
-              onClick={() => onDemote(item.id)}
-              disabled={!canDemote}
-              className={!canDemote ? "opacity-50" : ""}
-            />
-          </Tooltip>
-
-          <Divider type="vertical" />
-
-          <Tooltip title="Add sub-menu">
-            <Button
-              type="text"
-              size="small"
-              icon={<PlusOutlined />}
-              onClick={() => onAddChild(item.id)}
-            />
-          </Tooltip>
-          <Tooltip title="Edit menu item">
-            <Button
-              type="text"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(item)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Delete menu item"
-            description="Are you sure you want to delete this menu item and all its children?"
-            onConfirm={() => onDelete(item.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Tooltip title="Delete menu item">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-              />
-            </Tooltip>
-          </Popconfirm>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const MenuForm: React.FC<{
-  visible: boolean;
-  onCancel: () => void;
-  onSubmit: (values: MenuFormData) => void;
-  initialValues?: MenuItem;
-  parentId?: string;
-}> = ({ visible, onCancel, onSubmit, initialValues, parentId }) => {
-  const [form] = Form.useForm();
-
-  useEffect(() => {
-    if (visible && initialValues) {
-      form.setFieldsValue({
-        name: initialValues.name,
-        slug: initialValues.slug,
-      });
-    } else if (visible) {
-      form.resetFields();
-    }
-  }, [visible, initialValues, form]);
-
-  const handleSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        onSubmit({
-          ...values,
-          order: initialValues?.order || 0,
-          children: initialValues?.children || [],
-        });
-        form.resetFields();
-      })
-      .catch((errorInfo) => {
-        console.log("Validation failed:", errorInfo);
-      });
-  };
-
-  return (
-    <Modal
-      title={initialValues ? "Edit Menu Item" : "Add Menu Item"}
-      open={visible}
-      onCancel={onCancel}
-      onOk={handleSubmit}
-      okText={initialValues ? "Update" : "Add"}
-      cancelText="Cancel"
-      width={500}
-    >
-      <Form form={form} layout="vertical">
-        <Form.Item
-          name="name"
-          label="Menu Name"
-          rules={[{ required: true, message: "Please enter menu name" }]}
-        >
-          <Input placeholder="Enter menu name" />
-        </Form.Item>
-        <Form.Item
-          name="slug"
-          label="Menu Slug"
-          rules={[
-            { required: true, message: "Please enter menu slug" },
-            {
-              pattern: /^[a-z0-9-]+$/,
-              message:
-                "Slug can only contain lowercase letters, numbers, and hyphens",
-            },
-          ]}
-        >
-          <Input placeholder="Enter menu slug (e.g., about-us)" />
-        </Form.Item>
-        {parentId && (
-          <div className="mb-4 p-3 bg-blue-50 rounded">
-            <Text type="secondary">
-              This item will be added as a sub-menu item.
-            </Text>
-          </div>
-        )}
-      </Form>
-    </Modal>
-  );
-};
 
 export default function MenuPage() {
   const { data: session } = useSession();
   const dispatch = useDispatch<AppDispatch>();
 
   const [isMobile, setIsMobile] = useState(false);
-  const [activeTab, setActiveTab] = useState("demo");
+  const [activeTab, setActiveTab] = useState("header");
   const [loading, setLoading] = useState(false);
   const [headerMenu, setHeaderMenu] = useState<MenuItem[]>([]);
   const [footerMenu, setFooterMenu] = useState<MenuItem[]>([]);
-  const [demoMenu, setDemoMenu] = useState<MenuItem[]>([
-    {
-      id: "demo-1",
-      name: "Home",
-      slug: "home",
-      order: 0,
-      children: [],
-    },
-    {
-      id: "demo-2",
-      name: "Services",
-      slug: "services",
-      order: 1,
-      children: [
-        {
-          id: "demo-2-1",
-          name: "Photo Editing",
-          slug: "photo-editing",
-          order: 0,
-          children: [],
-          parentId: "demo-2",
-        },
-        {
-          id: "demo-2-2",
-          name: "Video Editing",
-          slug: "video-editing",
-          order: 1,
-          children: [],
-          parentId: "demo-2",
-        },
-        {
-          id: "demo-2-3",
-          name: "Web Design",
-          slug: "web-design",
-          order: 2,
-          parentId: "demo-2",
-          children: [
-            {
-              id: "demo-2-3-1",
-              name: "Landing Pages",
-              slug: "landing-pages",
-              order: 0,
-              children: [],
-              parentId: "demo-2-3",
-            },
-            {
-              id: "demo-2-3-2",
-              name: "E-commerce",
-              slug: "e-commerce",
-              order: 1,
-              children: [],
-              parentId: "demo-2-3",
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "demo-3",
-      name: "About Us",
-      slug: "about-us",
-      order: 2,
-      children: [
-        {
-          id: "demo-3-1",
-          name: "Our Story",
-          slug: "our-story",
-          order: 0,
-          children: [],
-          parentId: "demo-3",
-        },
-        {
-          id: "demo-3-2",
-          name: "Team",
-          slug: "team",
-          order: 1,
-          children: [],
-          parentId: "demo-3",
-        },
-      ],
-    },
-    {
-      id: "demo-4",
-      name: "Blog",
-      slug: "blog",
-      order: 3,
-      children: [],
-    },
-    {
-      id: "demo-5",
-      name: "Contact",
-      slug: "contact",
-      order: 4,
-      children: [
-        {
-          id: "demo-5-1",
-          name: "Support",
-          slug: "support",
-          order: 0,
-          children: [],
-          parentId: "demo-5",
-        },
-        {
-          id: "demo-5-2",
-          name: "Sales",
-          slug: "sales",
-          order: 1,
-          children: [],
-          parentId: "demo-5",
-        },
-      ],
-    },
-  ]);
+
   const [formVisible, setFormVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | undefined>();
   const [parentId, setParentId] = useState<string | undefined>();
@@ -443,43 +68,38 @@ export default function MenuPage() {
   }, []);
 
   useEffect(() => {
-    if (session?.accessToken && activeTab !== "demo") {
-      loadMenuData();
+    if (session?.accessToken && activeTab === "header") {
+      dispatch(fetchSetting("menuHeader", session?.accessToken));
+    } else if (session?.accessToken && activeTab === "footer") {
+      dispatch(fetchSetting("menuFooter", session?.accessToken));
     }
   }, [activeTab, session?.accessToken]);
 
-  const loadMenuData = async () => {
-    try {
-      setLoading(true);
-      const response = await dispatch(
-        fetchSetting(activeTab, session?.accessToken || "") as any
-      );
-      if (response?.payload?.data?.settings) {
-        const menuData = response.payload.data.settings.find(
-          (s: any) => s.key === "menu"
-        );
-        if (menuData) {
-          const parsedMenu = JSON.parse(menuData.value);
-          const processedMenu = processMenuData(parsedMenu);
+  const settingData = useSelector((state: RootState) => state.settings.detail);
+  const settingLoading = useSelector(
+    (state: RootState) => state.settings.loading
+  );
 
-          if (activeTab === "header") {
-            setHeaderMenu(processedMenu || []);
-          } else {
-            setFooterMenu(processedMenu || []);
-          }
-        }
+  useEffect(() => {
+    if (settingLoading) return;
+
+    let processedMenu: MenuItem[] = [];
+
+    try {
+      if (settingData?.data) {
+        const menu = JSON.parse(settingData.data);
+        processedMenu = processMenuData(menu);
       }
-    } catch (error) {
-      console.error("Error loading menu data:", error);
-      if (activeTab === "header") {
-        setHeaderMenu([]);
-      } else {
-        setFooterMenu([]);
-      }
-    } finally {
-      setLoading(false);
+    } catch (e) {
+      console.error("Failed to parse menu data:", e);
     }
-  };
+
+    if (activeTab === "header") {
+      setHeaderMenu(processedMenu);
+    } else {
+      setFooterMenu(processedMenu);
+    }
+  }, [activeTab, settingData, settingLoading]);
 
   const processMenuData = (menu: any[]): MenuItem[] => {
     return menu.map((item: any, index: number) => ({
@@ -516,7 +136,7 @@ export default function MenuPage() {
   const getCurrentMenu = (): MenuItem[] => {
     if (activeTab === "header") return headerMenu;
     if (activeTab === "footer") return footerMenu;
-    return demoMenu;
+    return [];
   };
 
   const setCurrentMenu = (menu: MenuItem[]) => {
@@ -524,12 +144,9 @@ export default function MenuPage() {
       setHeaderMenu(menu);
     } else if (activeTab === "footer") {
       setFooterMenu(menu);
-    } else {
-      setDemoMenu(menu);
     }
   };
 
-  // Flatten menu structure for drag and drop with proper grouping
   const flattenMenu = (
     items: MenuItem[],
     level: number = 0,
@@ -542,7 +159,7 @@ export default function MenuPage() {
         ...item,
         level,
         parentId,
-        order: item.order, // Preserve original order
+        order: item.order,
       });
       if (item.children && item.children.length > 0) {
         result.push(...flattenMenu(item.children, level + 1, item.id));
@@ -552,13 +169,11 @@ export default function MenuPage() {
     return result;
   };
 
-  // Rebuild hierarchical structure from flat array
   const rebuildHierarchy = (flatItems: FlatMenuItem[]): MenuItem[] => {
     const itemMap: { [key: string]: MenuItem & { tempChildren: MenuItem[] } } =
       {};
     const result: MenuItem[] = [];
 
-    // Create item map and initialize
     flatItems.forEach((item) => {
       itemMap[item.id] = {
         id: item.id,
@@ -571,7 +186,6 @@ export default function MenuPage() {
       };
     });
 
-    // Build hierarchy
     flatItems.forEach((item) => {
       const currentItem = itemMap[item.id];
       if (item.parentId && itemMap[item.parentId]) {
@@ -581,7 +195,6 @@ export default function MenuPage() {
       }
     });
 
-    // Convert tempChildren to children and sort by order
     Object.values(itemMap).forEach((item) => {
       item.children = item.tempChildren.sort((a, b) => a.order - b.order);
       (item as any).tempChildren = undefined;
@@ -610,7 +223,6 @@ export default function MenuPage() {
     const activeItem = flatItems[activeIndex];
     const overItem = flatItems[overIndex];
 
-    // Check if we're trying to move a parent into its own descendant
     if (isDescendant(activeItem, overItem, flatItems)) {
       message.warning("Cannot move parent item into its own child");
       return;
@@ -619,12 +231,10 @@ export default function MenuPage() {
     let newFlatItems = [...flatItems];
     let successMessage = "Menu items reordered successfully";
 
-    // Determine the new position and parent
     const activeParentKey = activeItem.parentId || "root";
     const overParentKey = overItem.parentId || "root";
 
     if (activeParentKey === overParentKey) {
-      // Same parent group - simple reordering
       const itemsByParent: { [key: string]: FlatMenuItem[] } = {};
       flatItems.forEach((item) => {
         const parentKey = item.parentId || "root";
@@ -649,12 +259,10 @@ export default function MenuPage() {
           overLocalIndex
         );
 
-        // Update order numbers within the group
         reorderedGroup.forEach((item, index) => {
           item.order = index;
         });
 
-        // Rebuild the complete flat array with reordered group
         newFlatItems = flatItems.map((item) => {
           const itemParentKey = item.parentId || "root";
           if (itemParentKey === activeParentKey) {
@@ -666,21 +274,17 @@ export default function MenuPage() {
           return item;
         });
 
-        // Update orders for all parent groups to maintain proper sequence
         newFlatItems = updateAllParentGroupOrders(newFlatItems);
       }
     } else {
-      // Different parent groups - move to new parent and level
       const newParentId = overItem.parentId;
       const newLevel = overItem.level;
 
-      // Check level limit
       if (newLevel >= 3) {
         message.warning("Cannot move beyond 4 levels deep");
         return;
       }
 
-      // Check if moving descendants would exceed level limit
       const descendants = getDescendants(activeItem, flatItems);
       const maxDescendantLevel = Math.max(
         ...descendants.map((d) => d.level),
@@ -694,20 +298,17 @@ export default function MenuPage() {
         return;
       }
 
-      // Create updated items with new parent and level
       const updateItemAndDescendants = (
         items: FlatMenuItem[]
       ): FlatMenuItem[] => {
         return items.map((item) => {
           if (item.id === activeItem.id) {
-            // Update the main item
             return {
               ...item,
               level: newLevel,
               parentId: newParentId,
             };
           } else if (isDescendant(activeItem, item, items)) {
-            // Update descendants
             return {
               ...item,
               level: item.level + levelDiff,
@@ -717,11 +318,8 @@ export default function MenuPage() {
         });
       };
 
-      // Apply level and parent changes
       newFlatItems = updateItemAndDescendants(flatItems);
 
-      // Now handle the positioning within the new parent group
-      // Remove the item(s) from their current positions
       const itemsToMove: FlatMenuItem[] = [];
       const movedItemIds = new Set([
         activeItem.id,
@@ -736,54 +334,42 @@ export default function MenuPage() {
         }
       });
 
-      // Remove moved items from the flat array
       newFlatItems = newFlatItems.filter((item) => !movedItemIds.has(item.id));
 
-      // Find the correct insertion point in the new parent group
       const overItemInNewParent = newFlatItems.find(
         (item) => item.id === overItem.id
       );
 
       if (overItemInNewParent) {
-        // Find the position of the over item in the flat array
         const insertPosition = newFlatItems.findIndex(
           (item) => item.id === overItem.id
         );
 
-        // Insert moved items at the correct position
         newFlatItems.splice(insertPosition, 0, ...itemsToMove);
-
-        // Update orders for all parent groups to maintain proper sequence
         newFlatItems = updateAllParentGroupOrders(newFlatItems);
       } else {
-        // If over item not found, append to the end of new parent group
         const newParentItems = newFlatItems.filter(
           (item) => (item.parentId || "root") === (newParentId || "root")
         );
 
         if (newParentItems.length > 0) {
-          // Find the last item in the new parent group
           const lastNewParentItem = newParentItems[newParentItems.length - 1];
           const lastIndex = newFlatItems.findIndex(
             (item) => item.id === lastNewParentItem.id
           );
           newFlatItems.splice(lastIndex + 1, 0, ...itemsToMove);
         } else {
-          // No items in new parent group, add at end
           newFlatItems.push(...itemsToMove);
         }
 
-        // Update orders for all parent groups to maintain proper sequence
         newFlatItems = updateAllParentGroupOrders(newFlatItems);
       }
 
       successMessage = `Item moved successfully (Level ${activeItem.level} → ${newLevel})`;
     }
 
-    // Rebuild hierarchy and update orders properly
     const newHierarchy = rebuildHierarchy(newFlatItems);
 
-    // Update orders within each parent group to be sequential
     const updateOrdersRecursively = (items: MenuItem[]): MenuItem[] => {
       return items.map((item, index) => ({
         ...item,
@@ -823,19 +409,16 @@ export default function MenuPage() {
     return descendants;
   };
 
-  // Helper function to update orders for all parent groups
   const updateAllParentGroupOrders = (
     flatItems: FlatMenuItem[]
   ): FlatMenuItem[] => {
     const parentGroups = new Set<string>();
 
-    // Collect all parent groups
     flatItems.forEach((item) => {
       const parentKey = item.parentId || "root";
       parentGroups.add(parentKey);
     });
 
-    // Update orders for each parent group
     parentGroups.forEach((parentKey) => {
       const groupItems = flatItems.filter(
         (item) => (item.parentId || "root") === parentKey
@@ -854,7 +437,6 @@ export default function MenuPage() {
     return flatItems;
   };
 
-  // Promote item to higher level (reduce indent)
   const handlePromote = (itemId: string) => {
     const currentMenu = getCurrentMenu();
     const flatItems = flattenMenu(currentMenu);
@@ -867,7 +449,6 @@ export default function MenuPage() {
 
     const newFlatItems = flatItems.map((flatItem) => {
       if (flatItem.id === itemId) {
-        // Find the parent's parent to become the new parent
         const currentParent = flatItems.find((p) => p.id === flatItem.parentId);
         const newParentId = currentParent?.parentId;
 
@@ -885,7 +466,6 @@ export default function MenuPage() {
     message.success("Item promoted successfully");
   };
 
-  // Demote item to lower level (increase indent)
   const handleDemote = (itemId: string) => {
     const currentMenu = getCurrentMenu();
     const flatItems = flattenMenu(currentMenu);
@@ -893,12 +473,10 @@ export default function MenuPage() {
     const item = flatItems[itemIndex];
 
     if (!item || item.level >= 3) {
-      // Limit to 4 levels (0,1,2,3)
       message.warning("Cannot demote beyond 4 levels");
       return;
     }
 
-    // Find a potential new parent (previous sibling at the same level)
     let newParentId = item.parentId;
     for (let i = itemIndex - 1; i >= 0; i--) {
       const prevItem = flatItems[i];
@@ -935,12 +513,10 @@ export default function MenuPage() {
     message.success("Item demoted successfully");
   };
 
-  // Check if item can be promoted
   const canPromote = (item: FlatMenuItem): boolean => {
     return item.level > 0;
   };
 
-  // Check if item can be demoted
   const canDemote = (itemId: string): boolean => {
     const currentMenu = getCurrentMenu();
     const flatItems = flattenMenu(currentMenu);
@@ -1064,59 +640,47 @@ export default function MenuPage() {
     setParentId(undefined);
   };
 
-  const handleSaveMenu = async () => {
-    try {
-      setLoading(true);
-      const currentMenu = getCurrentMenu();
+  const handleSaveMenu = async (values: any) => {
+    setLoading(true);
 
-      const processedMenu = currentMenu.map((item, index) => ({
-        name: item.name,
-        slug: item.slug,
-        children: processMenuForSave(item.children || []),
-        order: index,
-      }));
+    const currentMenu = getCurrentMenu();
+    const processedMenu = processMenuForSave(currentMenu);
 
-      const settingsArray = JSON.stringify(processedMenu);
+    const menuString = JSON.stringify(processedMenu);
 
-      console.log({
-        namespace: activeTab,
-        data: settingsArray,
-      });
+    const settingsArray = [
+      {
+        key: "data",
+        value: menuString,
+      },
+    ];
 
-      //   await dispatch(
-      //     upsertSetting(
-      //       {
-      //         namespace: activeTab,
-      //         data: settingsArray
-      //       },
-      //       session?.accessToken || "",
-      //       () => {
-      //         message.success(
-      //           `${
-      //             activeTab.charAt(0).toUpperCase() + activeTab.slice(1)
-      //           } menu saved successfully!`
-      //         );
-      //         setLoading(false);
-      //       },
-      //       (error: any) => {
-      //         message.error(`Save failed: ${error}`);
-      //         setLoading(false);
-      //       }
-      //     ) as any
-      //   );
-    } catch (error) {
-      message.error("Failed to save menu");
-      setLoading(false);
-    }
+    dispatch(
+      upsertSetting(
+        {
+          namespace: activeTab === "header" ? "menuHeader" : "menuFooter",
+          data: { settings: settingsArray },
+        },
+        session?.accessToken || "",
+        () => setLoading(false),
+        () => setLoading(false)
+      ) as any
+    );
   };
 
   const processMenuForSave = (items: MenuItem[]): any[] => {
-    return items.map((item, index) => ({
-      name: item.name,
-      slug: item.slug,
-      children: item.children ? processMenuForSave(item.children) : [],
-      order: index,
-    }));
+    return items.map((item) => {
+      const processed: any = {
+        name: item.name,
+        slug: item.slug,
+      };
+
+      if (item.children && item.children.length > 0) {
+        processed.children = processMenuForSave(item.children);
+      }
+
+      return processed;
+    });
   };
 
   const renderMenuContent = (menu: MenuItem[], menuType: string) => {
@@ -1206,11 +770,6 @@ export default function MenuPage() {
   };
 
   const tabItems = [
-    {
-      key: "demo",
-      label: "Demo",
-      children: renderMenuContent(demoMenu, "Demo"),
-    },
     {
       key: "header",
       label: "Header Menu",

@@ -128,16 +128,37 @@ export interface Media {
   };
 }
 
-export interface MenuItem {
-  key: string;
-  icon?: React.ReactNode;
-  label: string;
-  path?: string;
-  children?: MenuItem[];
-  onClick?: () => void;
-}
+// export interface MenuItem {
+//   key: string;
+//   icon?: React.ReactNode;
+//   label: string;
+//   path?: string;
+//   children?: MenuItem[];
+//   onClick?: () => void;
+// }
 
 export interface BreadcrumbItem {
   title: string;
   path?: string;
+}
+
+export interface MenuFormData {
+  name: string;
+  slug: string;
+  children?: MenuItem[];
+  order: number;
+}
+
+export interface MenuItem {
+  id: string;
+  name: string;
+  slug: string;
+  children?: MenuItem[];
+  order: number;
+  parentId?: string;
+}
+
+export interface FlatMenuItem extends MenuItem {
+  level: number;
+  parentId?: string;
 }

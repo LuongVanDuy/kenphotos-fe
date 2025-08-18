@@ -11,7 +11,6 @@ import {
   Button,
   Input,
   Select,
-  Upload,
   Space,
   Tooltip,
   Modal,
@@ -25,7 +24,6 @@ import {
   PictureOutlined,
   DeleteOutlined,
   EyeOutlined,
-  UploadOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
 import { useSession } from "next-auth/react";
