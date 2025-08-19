@@ -21,18 +21,22 @@ import { asyncActionWrapper } from "@/utils/asyncAction";
 export const fetchSetting = (payload: any, accessToken: any) => {
   return (dispatch: AppDispatch) => {
     dispatch({ type: FETCH_SETTING });
-    fetchWithToken(settings.fetchSetting(payload), accessToken)
+    return fetchWithToken(settings.fetchSetting(payload), accessToken)
       .then((response) => {
-        dispatch({
+        const action = {
           type: FETCH_SETTING_SUCCESS,
           payload: { data: response },
-        });
+        };
+        dispatch(action);
+        return action; // Return the action so component can access the data
       })
       .catch((error) => {
-        dispatch({
+        const action = {
           type: FETCH_SETTING_FAILURE,
           payload: { error: error.message },
-        });
+        };
+        dispatch(action);
+        throw error; // Re-throw so component can handle error
       });
   };
 };

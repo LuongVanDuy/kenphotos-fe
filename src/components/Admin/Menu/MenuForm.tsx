@@ -1,9 +1,15 @@
-// MenuForm.tsx
 import React, { useEffect } from "react";
 import { Modal, Form, Input, Typography } from "antd";
-import { MenuFormData, MenuItem } from "@/types";
+import { MenuItem } from "./menuUtils";
 
 const { Text } = Typography;
+
+interface MenuFormData {
+  name: string;
+  slug: string;
+  children?: MenuItem[];
+  order: number;
+}
 
 interface MenuFormProps {
   visible: boolean;
@@ -67,7 +73,18 @@ const MenuForm: React.FC<MenuFormProps> = ({
         >
           <Input placeholder="Enter menu name" />
         </Form.Item>
-        <Form.Item name="slug" label="Menu Slug">
+        <Form.Item
+          name="slug"
+          label="Menu Slug"
+          rules={[
+            { required: true, message: "Please enter menu slug" },
+            {
+              pattern: /^[a-z0-9-]+$/,
+              message:
+                "Slug can only contain lowercase letters, numbers, and hyphens",
+            },
+          ]}
+        >
           <Input placeholder="Enter menu slug (e.g., about-us)" />
         </Form.Item>
         {parentId && (
@@ -83,3 +100,4 @@ const MenuForm: React.FC<MenuFormProps> = ({
 };
 
 export default MenuForm;
+export type { MenuFormData };
