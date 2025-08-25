@@ -5,17 +5,11 @@ import {
   Input,
   Select,
   InputNumber,
-  Card,
-  Space,
-  Divider,
-  Typography,
   Row,
   Col,
-  Upload,
   message,
   Image,
   Tabs,
-  Collapse,
 } from "antd";
 import {
   PlusOutlined,
@@ -32,9 +26,6 @@ import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
 import { getImageUrl } from "@/utils/imageUrl";
 import { slugify } from "@/utils/slugify";
 import CustomQuill from "../Common/CustomQuill";
-
-const { TextArea } = Input;
-const { Panel } = Collapse;
 
 interface ServiceFormProps {
   form?: any;
@@ -53,6 +44,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   loading,
   initialValues,
 }) => {
+  // State management
   const [isModalMediaOpen, setIsModalMediaOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState<any[]>([]);
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
@@ -62,18 +54,31 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     "before"
   );
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(-1);
-
-  // Steps state management
   const [steps, setSteps] = useState<any[]>([]);
-  const [currentStepImageType, setCurrentStepImageType] = useState<
-    "before" | "after"
-  >("before");
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1);
   const [currentStepDetailIndex, setCurrentStepDetailIndex] =
     useState<number>(-1);
   const [currentStepDetailImageType, setCurrentStepDetailImageType] = useState<
     "before" | "after"
   >("before");
+  const [formKey, setFormKey] = useState<number>(0);
+
+  // Options
+  const statusOptions = [
+    { value: 0, label: "Draft" },
+    { value: 1, label: "Published" },
+  ];
+
+  const typeOptions = [
+    { value: 1, label: "Photo Editing" },
+    { value: 2, label: "3D Visualizations" },
+    { value: 3, label: "Advanced Editing" },
+  ];
+
+  const mediaTypeOptions = [
+    { value: "image", label: "Image (Before/After)" },
+    { value: "video", label: "Video" },
+  ];
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -84,36 +89,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     };
   }, [slugDebounceTimer]);
 
-  const handleTitleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const title = e.target.value;
-
-      if (slugDebounceTimer) {
-        clearTimeout(slugDebounceTimer);
-      }
-
-      const timer = setTimeout(() => {
-        if (!isSlugManuallyEdited && title) {
-          const generatedSlug = slugify(title);
-          form.setFieldsValue({ slug: generatedSlug });
-        }
-      }, 500);
-
-      setSlugDebounceTimer(timer);
-    },
-    [form, isSlugManuallyEdited, slugDebounceTimer]
-  );
-
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const slug = e.target.value;
-    setIsSlugManuallyEdited(true);
-
-    const cleanedSlug = slugify(slug);
-    if (cleanedSlug !== slug) {
-      form.setFieldsValue({ slug: cleanedSlug });
-    }
-  };
-
+  // Initialize form data
   useEffect(() => {
     if (mode === "create") {
       setIsSlugManuallyEdited(false);
@@ -137,9 +113,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
       const defaultSteps = [
         {
           id: undefined,
-          beforeUrl: "",
-          afterUrl: "",
-          videoUrl: "",
           steps: [
             {
               id: undefined,
@@ -147,6 +120,8 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
               content: "",
               beforeUrl: "",
               afterUrl: "",
+              videoUrl: "",
+              type: "image",
             },
           ],
         },
@@ -156,26 +131,40 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     }
   }, [initialValues, mode, form]);
 
-  const statusOptions = [
-    { value: 0, label: "Draft" },
-    { value: 1, label: "Published" },
-  ];
+  // Event handlers
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const title = e.target.value;
+      if (slugDebounceTimer) {
+        clearTimeout(slugDebounceTimer);
+      }
+      const timer = setTimeout(() => {
+        if (!isSlugManuallyEdited && title) {
+          const generatedSlug = slugify(title);
+          form.setFieldsValue({ slug: generatedSlug });
+        }
+      }, 500);
+      setSlugDebounceTimer(timer);
+    },
+    [form, isSlugManuallyEdited, slugDebounceTimer]
+  );
 
-  const typeOptions = [
-    { value: 1, label: "Photo Editing" },
-    { value: 2, label: "3D Visualizations" },
-    { value: 3, label: "Advanced Editing" },
-  ];
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const slug = e.target.value;
+    setIsSlugManuallyEdited(true);
+    const cleanedSlug = slugify(slug);
+    if (cleanedSlug !== slug) {
+      form.setFieldsValue({ slug: cleanedSlug });
+    }
+  };
 
   const handleMediaSelect = (media: any) => {
     const newImages = [...selectedImages];
-
     if (currentImageType === "before") {
       newImages[currentImageIndex].beforeUrl = media.url || media.slug;
     } else {
       newImages[currentImageIndex].afterUrl = media.url || media.slug;
     }
-
     setSelectedImages(newImages);
     form.setFieldsValue({ images: newImages });
     setIsModalMediaOpen(false);
@@ -185,7 +174,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const handleStepMediaSelect = (media: any) => {
     const currentSteps = form.getFieldValue("steps") || [];
     const newSteps = [...currentSteps];
-
     if (currentStepDetailIndex >= 0) {
       if (currentStepDetailImageType === "before") {
         newSteps[currentStepIndex].steps[currentStepDetailIndex].beforeUrl =
@@ -194,14 +182,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         newSteps[currentStepIndex].steps[currentStepDetailIndex].afterUrl =
           media.url || media.slug;
       }
-    } else {
-      if (currentStepImageType === "before") {
-        newSteps[currentStepIndex].beforeUrl = media.url || media.slug;
-      } else {
-        newSteps[currentStepIndex].afterUrl = media.url || media.slug;
-      }
     }
-
     setSteps(newSteps);
     form.setFieldsValue({ steps: newSteps });
     setIsModalMediaOpen(false);
@@ -209,33 +190,61 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     setCurrentStepDetailIndex(-1);
   };
 
-  const handleRemoveImage = (index: number) => {
-    const newImages = selectedImages.filter((_, i) => i !== index);
-    setSelectedImages(newImages);
-    form.setFieldsValue({ images: newImages });
-  };
-
-  const handleSelectImage = (type: "before" | "after", index: number) => {
-    setCurrentImageType(type);
-    setCurrentImageIndex(index);
+  const handleSelectImage = (
+    type: "before" | "after",
+    index: number,
+    isStepDetail = false,
+    stepIndex = -1,
+    detailIndex = -1
+  ) => {
+    if (isStepDetail) {
+      setCurrentStepDetailImageType(type);
+      setCurrentStepDetailIndex(detailIndex);
+      setCurrentStepIndex(stepIndex);
+    } else {
+      setCurrentImageType(type);
+      setCurrentImageIndex(index);
+    }
     setIsModalMediaOpen(true);
   };
 
   const handleSelectStepImage = (
     type: "before" | "after",
     stepIndex: number,
-    detailIndex?: number
+    detailIndex: number
   ) => {
-    if (detailIndex !== undefined) {
-      setCurrentStepDetailImageType(type);
-      setCurrentStepDetailIndex(detailIndex);
-      setCurrentStepIndex(stepIndex);
-    } else {
-      setCurrentStepImageType(type);
-      setCurrentStepIndex(stepIndex);
-      setCurrentStepDetailIndex(-1);
-    }
+    setCurrentStepDetailImageType(type);
+    setCurrentStepDetailIndex(detailIndex);
+    setCurrentStepIndex(stepIndex);
     setIsModalMediaOpen(true);
+  };
+
+  const handleTypeChange = (
+    value: string,
+    stepIndex: number,
+    detailIndex: number
+  ) => {
+    const currentSteps = form.getFieldValue("steps") || [];
+    const newSteps = [...currentSteps];
+    newSteps[stepIndex].steps[detailIndex].type = value;
+
+    // Clear fields based on type
+    if (value === "image") {
+      newSteps[stepIndex].steps[detailIndex].videoUrl = "";
+    } else if (value === "video") {
+      newSteps[stepIndex].steps[detailIndex].beforeUrl = "";
+      newSteps[stepIndex].steps[detailIndex].afterUrl = "";
+    }
+
+    setSteps(newSteps);
+    form.setFieldsValue({ steps: newSteps });
+    setFormKey((prev) => prev + 1);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const newImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(newImages);
+    form.setFieldsValue({ images: newImages });
   };
 
   const handleAddImagePair = () => {
@@ -249,24 +258,80 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
       message.error("Please add at least one image pair");
       return;
     }
-
     const hasValidImagePair = values.images.some(
       (image: any) => image.beforeUrl && image.afterUrl
     );
-
     if (!hasValidImagePair) {
       message.error(
         "Please add at least one complete image pair (both before and after images)"
       );
       return;
     }
-
-    onFinish(values);
+    const data = {
+      ...values,
+      steps: JSON.stringify(values.steps),
+    };
+    onFinish(data);
   };
 
-  const handleDraft = (values: any) => {
-    onSaveDraft(values);
-  };
+  // Render helpers
+  const renderImagePreview = (imageUrl: string, alt: string) => (
+    <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
+      <Image
+        src={getImageUrl(imageUrl)}
+        alt={alt}
+        className="object-cover w-full h-full"
+        sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
+        preview={false}
+      />
+    </div>
+  );
+
+  const renderImagePlaceholder = () => (
+    <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="text-gray-400 mb-2">
+          <UploadOutlined className="text-xl lg:text-2xl" />
+        </div>
+        <span className="text-xs text-gray-500">No image selected</span>
+      </div>
+    </div>
+  );
+
+  const renderImageField = (
+    type: "before" | "after",
+    index: number,
+    image: any
+  ) => (
+    <div className="bg-white rounded-lg">
+      {image[`${type}Url`] ? (
+        <div className="relative">
+          {renderImagePreview(
+            image[`${type}Url`],
+            `${type} Image ${index + 1}`
+          )}
+          <EditOutlined
+            onClick={() => handleSelectImage(type, index, false)}
+            className="absolute text-[20px] top-4 right-4 p-1 rounded-sm bg-white"
+          />
+        </div>
+      ) : (
+        <div>
+          <span className="text-sm font-medium text-gray-600 block mb-4">
+            {type.charAt(0).toUpperCase() + type.slice(1)} Image
+          </span>
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => handleSelectImage(type, index, false)}
+            className="text-blue-600 hover:text-blue-700"
+          >
+            Select Image
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -299,6 +364,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
             <div className="flex-1 min-w-0">
               <div className="space-y-4 lg:space-y-6">
+                {/* Title */}
                 <div>
                   <Form.Item
                     name="title"
@@ -317,6 +383,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </Form.Item>
                 </div>
 
+                {/* Permalink */}
                 <div>
                   <h3 className="text-sm font-semibold text-gray-700">
                     Permalink
@@ -352,6 +419,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   )}
                 </div>
 
+                {/* Content */}
                 <div className="rounded-lg border border-gray-300 overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -379,6 +447,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </div>
                 </div>
 
+                {/* Service Images */}
                 <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -396,7 +465,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                           {selectedImages.map((image, index) => (
                             <div
                               key={index}
-                              className={`p-3 lg:p-5 border-2 rounded-lg`}
+                              className="p-3 lg:p-5 border-2 rounded-lg"
                             >
                               <div className="flex items-center justify-between mb-3 lg:mb-4">
                                 <h4 className="text-base lg:text-lg font-semibold text-gray-700">
@@ -413,79 +482,9 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                   />
                                 )}
                               </div>
-
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-                                <div className="bg-white rounded-lg">
-                                  {image.beforeUrl ? (
-                                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
-                                      <Image
-                                        src={getImageUrl(image.beforeUrl)}
-                                        alt={`Before Image ${index + 1}`}
-                                        className="object-cover w-full h-full"
-                                        sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
-                                        preview={false}
-                                      />
-                                      <EditOutlined
-                                        onClick={() =>
-                                          handleSelectImage("before", index)
-                                        }
-                                        className=" absolute text-[20px] top-4 right-4 p-1 rounded-sm bg-white"
-                                      />
-                                    </div>
-                                  ) : (
-                                    <div className="">
-                                      <span className="text-sm font-medium text-gray-600 block mb-4">
-                                        Before Image
-                                      </span>
-                                      <Button
-                                        type="primary"
-                                        size="small"
-                                        onClick={() =>
-                                          handleSelectImage("before", index)
-                                        }
-                                        className="text-blue-600 hover:text-blue-700"
-                                      >
-                                        Select Image
-                                      </Button>
-                                    </div>
-                                  )}
-                                </div>
-
-                                <div className="bg-white rounded-lg">
-                                  {image.afterUrl ? (
-                                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
-                                      <Image
-                                        src={getImageUrl(image.afterUrl)}
-                                        alt={`After Image ${index + 1}`}
-                                        className="object-cover w-full h-full"
-                                        sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
-                                        preview={false}
-                                      />
-                                      <EditOutlined
-                                        onClick={() =>
-                                          handleSelectImage("after", index)
-                                        }
-                                        className=" absolute text-[20px] top-4 right-4 p-1 rounded-sm bg-white"
-                                      />
-                                    </div>
-                                  ) : (
-                                    <div className="">
-                                      <span className="text-sm font-medium text-gray-600 block mb-4">
-                                        After Image
-                                      </span>
-                                      <Button
-                                        type="primary"
-                                        size="small"
-                                        onClick={() =>
-                                          handleSelectImage("after", index)
-                                        }
-                                        className="text-blue-600 hover:text-blue-700"
-                                      >
-                                        Select Image
-                                      </Button>
-                                    </div>
-                                  )}
-                                </div>
+                                {renderImageField("before", index, image)}
+                                {renderImageField("after", index, image)}
                               </div>
                             </div>
                           ))}
@@ -506,6 +505,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </div>
                 </div>
 
+                {/* Service Steps */}
                 <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -537,408 +537,346 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       />
                                     )}
                                   </div>
+                                  <Form.List name={[name, "steps"]}>
+                                    {(
+                                      detailFields,
+                                      { add: addDetail, remove: removeDetail }
+                                    ) => (
+                                      <>
+                                        <div className="space-y-4">
+                                          {detailFields.map(
+                                            (
+                                              {
+                                                key: detailKey,
+                                                name: detailName,
+                                                ...detailRestField
+                                              },
+                                              detailIndex
+                                            ) => (
+                                              <div
+                                                key={detailKey}
+                                                className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                                              >
+                                                <div className="flex items-center justify-between mb-4">
+                                                  <h6 className="text-sm font-medium text-gray-600">
+                                                    Detail {detailIndex + 1}
+                                                  </h6>
+                                                  {detailFields.length > 1 && (
+                                                    <Button
+                                                      type="text"
+                                                      icon={<DeleteOutlined />}
+                                                      onClick={() =>
+                                                        removeDetail(detailName)
+                                                      }
+                                                      size="small"
+                                                      className="text-gray-400 hover:text-red-500"
+                                                    />
+                                                  )}
+                                                </div>
 
-                                  {/* Step Images */}
-                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                                    {/* Before Image */}
-                                    <div className="bg-white rounded-lg">
-                                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                        <span className="text-sm font-medium text-gray-600">
-                                          Before Image
-                                        </span>
-                                        <Button
-                                          type="primary"
-                                          size="small"
-                                          onClick={() =>
-                                            handleSelectStepImage(
-                                              "before",
-                                              stepIndex
-                                            )
-                                          }
-                                          className="text-blue-600 hover:text-blue-700"
-                                        >
-                                          Select Image
-                                        </Button>
-                                      </div>
-                                      <Form.Item
-                                        {...restField}
-                                        name={[name, "beforeUrl"]}
-                                        className="!mb-0"
-                                      >
-                                        <Input type="hidden" />
-                                      </Form.Item>
-                                      {form.getFieldValue([
-                                        "steps",
-                                        stepIndex,
-                                        "beforeUrl",
-                                      ]) ? (
-                                        <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
-                                          <Image
-                                            src={getImageUrl(
-                                              form.getFieldValue([
-                                                "steps",
-                                                stepIndex,
-                                                "beforeUrl",
-                                              ])
-                                            )}
-                                            alt={`Step ${stepIndex + 1} Before`}
-                                            className="object-cover w-full h-full"
-                                            sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
-                                          />
-                                        </div>
-                                      ) : (
-                                        <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                                          <div className="text-center">
-                                            <div className="text-gray-400 mb-2">
-                                              <UploadOutlined className="text-xl lg:text-2xl" />
-                                            </div>
-                                            <span className="text-xs text-gray-500">
-                                              No image selected
-                                            </span>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
+                                                {/* Split Layout: Form on left, Media on right */}
+                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                                  {/* Left Side - Form */}
+                                                  <div className="space-y-4">
+                                                    <Form.Item
+                                                      {...detailRestField}
+                                                      name={[
+                                                        detailName,
+                                                        "title",
+                                                      ]}
+                                                      label="Title"
+                                                      className="!mb-0"
+                                                    >
+                                                      <Input
+                                                        placeholder="Detail title"
+                                                        className="!rounded-lg"
+                                                      />
+                                                    </Form.Item>
 
-                                    {/* After Image */}
-                                    <div className="bg-white rounded-lg">
-                                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                        <span className="text-sm font-medium text-gray-600">
-                                          After Image
-                                        </span>
-                                        <Button
-                                          type="primary"
-                                          size="small"
-                                          onClick={() =>
-                                            handleSelectStepImage(
-                                              "after",
-                                              stepIndex
-                                            )
-                                          }
-                                          className="text-blue-600 hover:text-blue-700"
-                                        >
-                                          Select Image
-                                        </Button>
-                                      </div>
-                                      <Form.Item
-                                        {...restField}
-                                        name={[name, "afterUrl"]}
-                                        className="!mb-0"
-                                      >
-                                        <Input type="hidden" />
-                                      </Form.Item>
-                                      {form.getFieldValue([
-                                        "steps",
-                                        stepIndex,
-                                        "afterUrl",
-                                      ]) ? (
-                                        <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
-                                          <Image
-                                            src={getImageUrl(
-                                              form.getFieldValue([
-                                                "steps",
-                                                stepIndex,
-                                                "afterUrl",
-                                              ])
-                                            )}
-                                            alt={`Step ${stepIndex + 1} After`}
-                                            className="object-cover w-full h-full"
-                                            sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
-                                          />
-                                        </div>
-                                      ) : (
-                                        <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                                          <div className="text-center">
-                                            <div className="text-gray-400 mb-2">
-                                              <UploadOutlined className="text-xl lg:text-2xl" />
-                                            </div>
-                                            <span className="text-xs text-gray-500">
-                                              No image selected
-                                            </span>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
+                                                    <Form.Item
+                                                      {...detailRestField}
+                                                      name={[
+                                                        detailName,
+                                                        "content",
+                                                      ]}
+                                                      label="Content"
+                                                      className="!mb-0"
+                                                    >
+                                                      <Input
+                                                        placeholder="Detail content"
+                                                        className="!rounded-lg"
+                                                      />
+                                                    </Form.Item>
+                                                  </div>
 
-                                  {/* Video URL */}
-                                  <div className="mb-4">
-                                    <Form.Item
-                                      {...restField}
-                                      name={[name, "videoUrl"]}
-                                      label="Video URL (Optional)"
-                                      className="!mb-0"
-                                    >
-                                      <Input
-                                        placeholder="Enter video URL"
-                                        className="!rounded-lg"
-                                        prefix={
-                                          <PlayCircleOutlined className="text-gray-400" />
-                                        }
-                                      />
-                                    </Form.Item>
-                                  </div>
-
-                                  {/* Step Details */}
-                                  <div className="border-t border-gray-200 pt-4">
-                                    <div className="flex items-center justify-between mb-4">
-                                      <h5 className="text-md font-semibold text-gray-600">
-                                        Step Details
-                                      </h5>
-                                    </div>
-
-                                    <Form.List name={[name, "steps"]}>
-                                      {(
-                                        detailFields,
-                                        { add: addDetail, remove: removeDetail }
-                                      ) => (
-                                        <>
-                                          <div className="space-y-4">
-                                            {detailFields.map(
-                                              (
-                                                {
-                                                  key: detailKey,
-                                                  name: detailName,
-                                                  ...detailRestField
-                                                },
-                                                detailIndex
-                                              ) => (
-                                                <div
-                                                  key={detailKey}
-                                                  className="border border-gray-200 rounded-lg p-4 bg-gray-50"
-                                                >
-                                                  <div className="flex items-center justify-between mb-3">
-                                                    <h6 className="text-sm font-medium text-gray-600">
-                                                      Detail {detailIndex + 1}
-                                                    </h6>
-                                                    {detailFields.length >
-                                                      1 && (
-                                                      <Button
-                                                        type="text"
-                                                        icon={
-                                                          <DeleteOutlined />
+                                                  <div className="space-y-4 ">
+                                                    {/* Type Selection */}
+                                                    <Form.Item
+                                                      {...detailRestField}
+                                                      name={[
+                                                        detailName,
+                                                        "type",
+                                                      ]}
+                                                      label="Media Type"
+                                                      className="!mb-0"
+                                                    >
+                                                      <Select
+                                                        placeholder="Select media type"
+                                                        className="!rounded-lg"
+                                                        options={
+                                                          mediaTypeOptions
                                                         }
-                                                        onClick={() =>
-                                                          removeDetail(
-                                                            detailName
+                                                        onChange={(value) =>
+                                                          handleTypeChange(
+                                                            value,
+                                                            stepIndex,
+                                                            detailIndex
                                                           )
                                                         }
-                                                        size="small"
-                                                        className="text-gray-400 hover:text-red-500"
                                                       />
+                                                    </Form.Item>
+
+                                                    {form.getFieldValue([
+                                                      "steps",
+                                                      stepIndex,
+                                                      "steps",
+                                                      detailIndex,
+                                                      "type",
+                                                    ]) === "video" && (
+                                                      <Form.Item
+                                                        {...detailRestField}
+                                                        name={[
+                                                          detailName,
+                                                          "videoUrl",
+                                                        ]}
+                                                        label="Video URL"
+                                                        className="!mb-0"
+                                                      >
+                                                        <Input
+                                                          placeholder="Enter video URL"
+                                                          className="!rounded-lg"
+                                                          prefix={
+                                                            <PlayCircleOutlined className="text-gray-400" />
+                                                          }
+                                                        />
+                                                      </Form.Item>
+                                                    )}
+
+                                                    {/* Image Type Preview */}
+                                                    {form.getFieldValue([
+                                                      "steps",
+                                                      stepIndex,
+                                                      "steps",
+                                                      detailIndex,
+                                                      "type",
+                                                    ]) === "image" && (
+                                                      <div
+                                                        key={`image-preview-${formKey}`}
+                                                        className="space-y-4"
+                                                      >
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                          <div className="rounded-lg">
+                                                            <Form.Item
+                                                              name={[
+                                                                "steps",
+                                                                stepIndex,
+                                                                "steps",
+                                                                detailIndex,
+                                                                "beforeUrl",
+                                                              ]}
+                                                              className="!mb-0 hidden"
+                                                            >
+                                                              <Input type="hidden" />
+                                                            </Form.Item>
+                                                            {form.getFieldValue(
+                                                              [
+                                                                "steps",
+                                                                stepIndex,
+                                                                "steps",
+                                                                detailIndex,
+                                                                "beforeUrl",
+                                                              ]
+                                                            ) ? (
+                                                              <div className="relative">
+                                                                {renderImagePreview(
+                                                                  form.getFieldValue(
+                                                                    [
+                                                                      "steps",
+                                                                      stepIndex,
+                                                                      "steps",
+                                                                      detailIndex,
+                                                                      "beforeUrl",
+                                                                    ]
+                                                                  ),
+                                                                  `Before Image ${
+                                                                    detailIndex +
+                                                                    1
+                                                                  }`
+                                                                )}
+                                                                <EditOutlined
+                                                                  onClick={() =>
+                                                                    handleSelectImage(
+                                                                      "before",
+                                                                      detailIndex,
+                                                                      true,
+                                                                      stepIndex,
+                                                                      detailIndex
+                                                                    )
+                                                                  }
+                                                                  className="absolute text-[20px] top-4 right-4 p-1 rounded-sm bg-white"
+                                                                />
+                                                              </div>
+                                                            ) : (
+                                                              <div>
+                                                                <span className="text-sm font-medium text-gray-600 block mb-4">
+                                                                  Before Image
+                                                                </span>
+                                                                <Button
+                                                                  type="primary"
+                                                                  size="small"
+                                                                  onClick={() =>
+                                                                    handleSelectImage(
+                                                                      "before",
+                                                                      detailIndex,
+                                                                      true,
+                                                                      stepIndex,
+                                                                      detailIndex
+                                                                    )
+                                                                  }
+                                                                  className="text-blue-600 hover:text-blue-700"
+                                                                >
+                                                                  Select Image
+                                                                </Button>
+                                                              </div>
+                                                            )}
+                                                          </div>
+                                                          <div className="rounded-lg">
+                                                            <Form.Item
+                                                              name={[
+                                                                "steps",
+                                                                stepIndex,
+                                                                "steps",
+                                                                detailIndex,
+                                                                "afterUrl",
+                                                              ]}
+                                                              className="!mb-0 hidden"
+                                                            >
+                                                              <Input type="hidden" />
+                                                            </Form.Item>
+                                                            {form.getFieldValue(
+                                                              [
+                                                                "steps",
+                                                                stepIndex,
+                                                                "steps",
+                                                                detailIndex,
+                                                                "afterUrl",
+                                                              ]
+                                                            ) ? (
+                                                              <div className="relative">
+                                                                {renderImagePreview(
+                                                                  form.getFieldValue(
+                                                                    [
+                                                                      "steps",
+                                                                      stepIndex,
+                                                                      "steps",
+                                                                      detailIndex,
+                                                                      "afterUrl",
+                                                                    ]
+                                                                  ),
+                                                                  `After Image ${
+                                                                    detailIndex +
+                                                                    1
+                                                                  }`
+                                                                )}
+                                                                <EditOutlined
+                                                                  onClick={() =>
+                                                                    handleSelectImage(
+                                                                      "after",
+                                                                      detailIndex,
+                                                                      true,
+                                                                      stepIndex,
+                                                                      detailIndex
+                                                                    )
+                                                                  }
+                                                                  className="absolute text-[20px] top-4 right-4 p-1 rounded-sm bg-white"
+                                                                />
+                                                              </div>
+                                                            ) : (
+                                                              <div>
+                                                                <span className="text-sm font-medium text-gray-600 block mb-4">
+                                                                  After Image
+                                                                </span>
+                                                                <Button
+                                                                  type="primary"
+                                                                  size="small"
+                                                                  onClick={() =>
+                                                                    handleSelectImage(
+                                                                      "after",
+                                                                      detailIndex,
+                                                                      true,
+                                                                      stepIndex,
+                                                                      detailIndex
+                                                                    )
+                                                                  }
+                                                                  className="text-blue-600 hover:text-blue-700"
+                                                                >
+                                                                  Select Image
+                                                                </Button>
+                                                              </div>
+                                                            )}
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    )}
+
+                                                    {!form.getFieldValue([
+                                                      "steps",
+                                                      stepIndex,
+                                                      "steps",
+                                                      detailIndex,
+                                                      "type",
+                                                    ]) && (
+                                                      <div className="aspect-video border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                                                        <div className="text-center">
+                                                          <div className="text-gray-400 mb-2">
+                                                            <UploadOutlined className="text-2xl lg:text-3xl" />
+                                                          </div>
+                                                          <span className="text-xs text-gray-500">
+                                                            Select media type to
+                                                            preview
+                                                          </span>
+                                                        </div>
+                                                      </div>
                                                     )}
                                                   </div>
-
-                                                  <Row
-                                                    gutter={16}
-                                                    className="mb-3"
-                                                  >
-                                                    <Col span={12}>
-                                                      <Form.Item
-                                                        {...detailRestField}
-                                                        name={[
-                                                          detailName,
-                                                          "title",
-                                                        ]}
-                                                        label="Title"
-                                                        className="!mb-0"
-                                                      >
-                                                        <Input
-                                                          placeholder="Detail title"
-                                                          className="!rounded-lg"
-                                                        />
-                                                      </Form.Item>
-                                                    </Col>
-                                                    <Col span={12}>
-                                                      <Form.Item
-                                                        {...detailRestField}
-                                                        name={[
-                                                          detailName,
-                                                          "content",
-                                                        ]}
-                                                        label="Content"
-                                                        className="!mb-0"
-                                                      >
-                                                        <Input
-                                                          placeholder="Detail content"
-                                                          className="!rounded-lg"
-                                                        />
-                                                      </Form.Item>
-                                                    </Col>
-                                                  </Row>
-
-                                                  {/* Detail Images */}
-                                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    {/* Detail Before Image */}
-                                                    <div className=" rounded-lg">
-                                                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                                        <span className="text-sm font-medium text-gray-600">
-                                                          Before Image
-                                                        </span>
-                                                        <Button
-                                                          type="primary"
-                                                          size="small"
-                                                          onClick={() =>
-                                                            handleSelectStepImage(
-                                                              "before",
-                                                              stepIndex,
-                                                              detailIndex
-                                                            )
-                                                          }
-                                                          className="text-blue-600 hover:text-blue-700"
-                                                        >
-                                                          Select Image
-                                                        </Button>
-                                                      </div>
-                                                      <Form.Item
-                                                        {...detailRestField}
-                                                        name={[
-                                                          detailName,
-                                                          "beforeUrl",
-                                                        ]}
-                                                        className="!mb-0"
-                                                      >
-                                                        <Input type="hidden" />
-                                                      </Form.Item>
-                                                      {form.getFieldValue([
-                                                        "steps",
-                                                        stepIndex,
-                                                        "steps",
-                                                        detailIndex,
-                                                        "beforeUrl",
-                                                      ]) ? (
-                                                        <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
-                                                          <Image
-                                                            src={getImageUrl(
-                                                              form.getFieldValue(
-                                                                [
-                                                                  "steps",
-                                                                  stepIndex,
-                                                                  "steps",
-                                                                  detailIndex,
-                                                                  "beforeUrl",
-                                                                ]
-                                                              )
-                                                            )}
-                                                            alt={`Detail ${
-                                                              detailIndex + 1
-                                                            } Before`}
-                                                            className="object-cover w-full h-full"
-                                                            sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
-                                                          />
-                                                        </div>
-                                                      ) : (
-                                                        <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                                                          <div className="text-center">
-                                                            <div className="text-gray-400 mb-2">
-                                                              <UploadOutlined className="text-xl lg:text-2xl" />
-                                                            </div>
-                                                            <span className="text-xs text-gray-500">
-                                                              No image selected
-                                                            </span>
-                                                          </div>
-                                                        </div>
-                                                      )}
-                                                    </div>
-
-                                                    {/* Detail After Image */}
-                                                    <div className=" rounded-lg">
-                                                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                                        <span className="text-sm font-medium text-gray-600">
-                                                          After Image
-                                                        </span>
-                                                        <Button
-                                                          type="primary"
-                                                          size="small"
-                                                          onClick={() =>
-                                                            handleSelectStepImage(
-                                                              "after",
-                                                              stepIndex,
-                                                              detailIndex
-                                                            )
-                                                          }
-                                                          className="text-blue-600 hover:text-blue-700"
-                                                        >
-                                                          Select Image
-                                                        </Button>
-                                                      </div>
-                                                      <Form.Item
-                                                        {...detailRestField}
-                                                        name={[
-                                                          detailName,
-                                                          "afterUrl",
-                                                        ]}
-                                                        className="!mb-0"
-                                                      >
-                                                        <Input type="hidden" />
-                                                      </Form.Item>
-                                                      {form.getFieldValue([
-                                                        "steps",
-                                                        stepIndex,
-                                                        "steps",
-                                                        detailIndex,
-                                                        "afterUrl",
-                                                      ]) ? (
-                                                        <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
-                                                          <Image
-                                                            src={getImageUrl(
-                                                              form.getFieldValue(
-                                                                [
-                                                                  "steps",
-                                                                  stepIndex,
-                                                                  "steps",
-                                                                  detailIndex,
-                                                                  "afterUrl",
-                                                                ]
-                                                              )
-                                                            )}
-                                                            alt={`Detail ${
-                                                              detailIndex + 1
-                                                            } After`}
-                                                            className="object-cover w-full h-full"
-                                                            sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
-                                                          />
-                                                        </div>
-                                                      ) : (
-                                                        <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                                                          <div className="text-center">
-                                                            <div className="text-gray-400 mb-2">
-                                                              <UploadOutlined className="text-xl lg:text-2xl" />
-                                                            </div>
-                                                            <span className="text-xs text-gray-500">
-                                                              No image selected
-                                                            </span>
-                                                          </div>
-                                                        </div>
-                                                      )}
-                                                    </div>
-                                                  </div>
                                                 </div>
-                                              )
-                                            )}
-                                          </div>
-                                          <div className="flex justify-end mt-4">
-                                            <Button
-                                              type="primary"
-                                              icon={<PlusOutlined />}
-                                              onClick={() =>
-                                                addDetail({
-                                                  id: undefined,
-                                                  title: "",
-                                                  content: "",
-                                                  beforeUrl: "",
-                                                  afterUrl: "",
-                                                })
-                                              }
-                                              size="small"
-                                            >
-                                              Add Detail
-                                            </Button>
-                                          </div>
-                                        </>
-                                      )}
-                                    </Form.List>
-                                  </div>
+                                              </div>
+                                            )
+                                          )}
+                                        </div>
+                                        <div className="flex justify-end mt-4">
+                                          <Button
+                                            type="primary"
+                                            icon={<PlusOutlined />}
+                                            onClick={() =>
+                                              addDetail({
+                                                id: undefined,
+                                                title: "",
+                                                content: "",
+                                                beforeUrl: "",
+                                                afterUrl: "",
+                                                videoUrl: "",
+                                                type: "image",
+                                              })
+                                            }
+                                            size="small"
+                                          >
+                                            Add Detail
+                                          </Button>
+                                        </div>
+                                      </>
+                                    )}
+                                  </Form.List>
                                 </div>
                               )
                             )}
@@ -950,9 +888,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                               onClick={() =>
                                 add({
                                   id: undefined,
-                                  beforeUrl: "",
-                                  afterUrl: "",
-                                  videoUrl: "",
                                   steps: [
                                     {
                                       id: undefined,
@@ -960,6 +895,8 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       content: "",
                                       beforeUrl: "",
                                       afterUrl: "",
+                                      videoUrl: "",
+                                      type: "image",
                                     },
                                   ],
                                 })
@@ -976,6 +913,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </div>
                 </div>
 
+                {/* Service Details */}
                 <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -1005,7 +943,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       ({ key, name, ...restField }, idx) => (
                                         <div
                                           key={key}
-                                          className="  bg-white rounded  flex items-start group"
+                                          className="bg-white rounded flex items-start group"
                                         >
                                           <Form.Item
                                             {...restField}
@@ -1031,7 +969,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                   </div>
                                 )}
                               </Form.List>
-
                               <div className="flex justify-end mt-5">
                                 <Button
                                   type="primary"
@@ -1075,7 +1012,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       ({ key, name, ...restField }, idx) => (
                                         <div
                                           key={key}
-                                          className="  bg-white rounded  flex items-start group"
+                                          className="bg-white rounded flex items-start group"
                                         >
                                           <Form.Item
                                             {...restField}
@@ -1101,7 +1038,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                   </div>
                                 )}
                               </Form.List>
-
                               <div className="flex justify-end items-center mt-5">
                                 <Button
                                   type="primary"
@@ -1144,7 +1080,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                       ({ key, name, ...restField }, idx) => (
                                         <div
                                           key={key}
-                                          className="flex  gap-3  bg-white "
+                                          className="flex gap-3 bg-white"
                                         >
                                           <Row gutter={16} className="flex-1">
                                             <Col span={12}>
@@ -1178,13 +1114,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                               </Form.Item>
                                             </Col>
                                           </Row>
-
                                           <Button
                                             type="text"
                                             icon={<DeleteOutlined />}
                                             onClick={() => remove(name)}
                                             size="small"
-                                            className="text-gray-400 hover:text-red-500 "
+                                            className="text-gray-400 hover:text-red-500"
                                           />
                                         </div>
                                       )
@@ -1192,7 +1127,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                   </div>
                                 )}
                               </Form.List>
-
                               <div className="flex justify-end items-center mb-4">
                                 <Button
                                   type="primary"
@@ -1227,8 +1161,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
               </div>
             </div>
 
+            {/* Sidebar */}
             <div className="w-full lg:w-80 flex-shrink-0">
               <div className="space-y-4 lg:space-y-6">
+                {/* Publish */}
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -1280,6 +1216,8 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Button>
                   </div>
                 </div>
+
+                {/* Pricing */}
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
@@ -1325,6 +1263,8 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </Form.Item>
                   </div>
                 </div>
+
+                {/* Statistics */}
                 <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
