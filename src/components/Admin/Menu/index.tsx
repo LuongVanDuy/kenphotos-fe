@@ -1,6 +1,6 @@
 "use client";
 
-import React, { act, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Tabs, message, Typography, Button } from "antd";
 import { SaveOutlined, PlusOutlined, MenuOutlined } from "@ant-design/icons";
 import { useSession } from "next-auth/react";
@@ -16,16 +16,26 @@ import {
   useSensors,
   DragEndEvent,
 } from "@dnd-kit/core";
-
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { FlatMenuItem, MenuFormData, MenuItem } from "@/types";
+import { MenuItem, FlatMenuItem } from "./menuUtils";
+import {
+  generateId,
+  processMenuData,
+  processMenuForSave,
+  flattenMenu,
+  rebuildHierarchy,
+  normalizeOrdersRecursively,
+  isDescendant,
+  getDescendants,
+  updateAllParentGroupOrders,
+} from "./menuUtils";
 import SortableMenuItem from "./SortableMenuItem";
-import MenuForm from "./MenuForm";
+import MenuForm, { MenuFormData } from "./MenuForm";
 
 const { Title, Text } = Typography;
 
@@ -34,11 +44,10 @@ export default function MenuPage() {
   const dispatch = useDispatch<AppDispatch>();
 
   const [isMobile, setIsMobile] = useState(false);
-  const [activeTab, setActiveTab] = useState("header");
+  const [activeTab, setActiveTab] = useState("menuHeader");
   const [loading, setLoading] = useState(false);
   const [headerMenu, setHeaderMenu] = useState<MenuItem[]>([]);
   const [footerMenu, setFooterMenu] = useState<MenuItem[]>([]);
-
   const [formVisible, setFormVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | undefined>();
   const [parentId, setParentId] = useState<string | undefined>();
@@ -68,147 +77,260 @@ export default function MenuPage() {
   }, []);
 
   useEffect(() => {
-    if (session?.accessToken && activeTab === "header") {
-      dispatch(fetchSetting("menuHeader", session?.accessToken));
-    } else if (session?.accessToken && activeTab === "footer") {
-      dispatch(fetchSetting("menuFooter", session?.accessToken));
+    if (session?.accessToken) {
+      loadMenuData();
     }
   }, [activeTab, session?.accessToken]);
 
-  const settingData = useSelector((state: RootState) => state.settings.detail);
-  const settingLoading = useSelector(
-    (state: RootState) => state.settings.loading
-  );
-
-  useEffect(() => {
-    if (settingLoading) return;
-
-    let processedMenu: MenuItem[] = [];
-
+  const loadMenuData = async () => {
     try {
-      if (settingData?.data) {
-        const menu = JSON.parse(settingData.data);
-        processedMenu = processMenuData(menu);
+      setLoading(true);
+      const response = await dispatch(
+        fetchSetting(activeTab, session?.accessToken || "") as any
+      );
+
+      let menuData = null;
+
+      // Handle different API response formats
+      if (response?.payload?.data?.settings) {
+        // Original format: array of settings with key-value pairs
+        menuData = response.payload.data.settings.find(
+          (s: any) => s.key === "menu"
+        );
+
+        if (menuData) {
+          const parsedMenu = JSON.parse(menuData.value);
+          const processedMenu = processMenuData(parsedMenu);
+
+          if (activeTab === "menuHeader") {
+            setHeaderMenu(processedMenu || []);
+          } else {
+            setFooterMenu(processedMenu || []);
+          }
+        }
+      } else if (response?.payload?.data?.data) {
+        // New format: data field contains stringified JSON
+        try {
+          const parsedData = JSON.parse(response.payload.data.data);
+          const processedMenu = processMenuData(parsedData);
+
+          if (activeTab === "menuHeader") {
+            setHeaderMenu(processedMenu || []);
+          } else {
+            setFooterMenu(processedMenu || []);
+          }
+        } catch (parseError) {
+          console.error("Error parsing menu data:", parseError);
+          if (activeTab === "menuHeader") {
+            setHeaderMenu([]);
+          } else {
+            setFooterMenu([]);
+          }
+        }
+      } else if (
+        response?.payload?.data &&
+        typeof response.payload.data === "string"
+      ) {
+        // Direct string format
+        try {
+          const parsedData = JSON.parse(response.payload.data);
+          const processedMenu = processMenuData(parsedData);
+
+          if (activeTab === "menuHeader") {
+            setHeaderMenu(processedMenu || []);
+          } else {
+            setFooterMenu(processedMenu || []);
+          }
+        } catch (parseError) {
+          console.error("Error parsing string data:", parseError);
+          if (activeTab === "menuHeader") {
+            setHeaderMenu([]);
+          } else {
+            setFooterMenu([]);
+          }
+        }
+      } else {
+        // No menu data found
+        if (activeTab === "menuHeader") {
+          setHeaderMenu([]);
+        } else {
+          setFooterMenu([]);
+        }
       }
-    } catch (e) {
-      console.error("Failed to parse menu data:", e);
+    } catch (error) {
+      console.error("Error loading menu data:", error);
+      if (activeTab === "menuHeader") {
+        setHeaderMenu([]);
+      } else {
+        setFooterMenu([]);
+      }
+    } finally {
+      setLoading(false);
     }
-
-    if (activeTab === "header") {
-      setHeaderMenu(processedMenu);
-    } else {
-      setFooterMenu(processedMenu);
-    }
-  }, [activeTab, settingData, settingLoading]);
-
-  const processMenuData = (menu: any[]): MenuItem[] => {
-    return menu.map((item: any, index: number) => ({
-      id: item.id || generateId(),
-      name: item.name,
-      slug: item.slug,
-      children: item.children
-        ? processChildrenData(item.children, item.id)
-        : [],
-      order: item.order || index,
-    }));
-  };
-
-  const processChildrenData = (
-    children: any[],
-    parentId: string
-  ): MenuItem[] => {
-    return children.map((child: any, childIndex: number) => ({
-      id: child.id || generateId(),
-      name: child.name,
-      slug: child.slug,
-      children: child.children
-        ? processChildrenData(child.children, child.id)
-        : [],
-      order: child.order || childIndex,
-      parentId: parentId,
-    }));
-  };
-
-  const generateId = (): string => {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
   };
 
   const getCurrentMenu = (): MenuItem[] => {
-    if (activeTab === "header") return headerMenu;
-    if (activeTab === "footer") return footerMenu;
-    return [];
+    if (activeTab === "menuHeader") return headerMenu;
+    return footerMenu;
   };
 
   const setCurrentMenu = (menu: MenuItem[]) => {
-    if (activeTab === "header") {
+    if (activeTab === "menuHeader") {
       setHeaderMenu(menu);
-    } else if (activeTab === "footer") {
+    } else {
       setFooterMenu(menu);
     }
   };
 
-  const flattenMenu = (
-    items: MenuItem[],
-    level: number = 0,
-    parentId?: string
+  // Handle reordering within same parent group
+  const handleSameParentReorder = (
+    flatItems: FlatMenuItem[],
+    activeItem: FlatMenuItem,
+    overItem: FlatMenuItem,
+    active: any,
+    over: any
   ): FlatMenuItem[] => {
-    const result: FlatMenuItem[] = [];
+    const activeParentKey = activeItem.parentId || "root";
 
-    items.forEach((item, index) => {
-      result.push({
-        ...item,
-        level,
-        parentId,
-        order: item.order,
-      });
-      if (item.children && item.children.length > 0) {
-        result.push(...flattenMenu(item.children, level + 1, item.id));
+    // Group items by parent
+    const itemsByParent: { [key: string]: FlatMenuItem[] } = {};
+    flatItems.forEach((item) => {
+      const parentKey = item.parentId || "root";
+      if (!itemsByParent[parentKey]) {
+        itemsByParent[parentKey] = [];
       }
+      itemsByParent[parentKey].push(item);
     });
 
-    return result;
+    // Sort each parent group by current order in flatItems array
+    Object.keys(itemsByParent).forEach((parentKey) => {
+      itemsByParent[parentKey].sort((a, b) => {
+        const aIndex = flatItems.findIndex((fi) => fi.id === a.id);
+        const bIndex = flatItems.findIndex((fi) => fi.id === b.id);
+        return aIndex - bIndex;
+      });
+    });
+
+    const parentGroup = itemsByParent[activeParentKey];
+    const activeLocalIndex = parentGroup.findIndex(
+      (item) => item.id === active.id
+    );
+    const overLocalIndex = parentGroup.findIndex((item) => item.id === over.id);
+
+    if (activeLocalIndex === -1 || overLocalIndex === -1) {
+      return flatItems;
+    }
+
+    const reorderedGroup = arrayMove(
+      parentGroup,
+      activeLocalIndex,
+      overLocalIndex
+    );
+    reorderedGroup.forEach((item, index) => {
+      item.order = index;
+    });
+
+    // Rebuild flat array with reordered group
+    const newFlatItems: FlatMenuItem[] = [];
+    const itemsByParentAll: { [key: string]: FlatMenuItem[] } = {};
+
+    flatItems.forEach((item) => {
+      const parentKey = item.parentId || "root";
+      if (!itemsByParentAll[parentKey]) {
+        itemsByParentAll[parentKey] = [];
+      }
+      itemsByParentAll[parentKey].push(item);
+    });
+
+    itemsByParentAll[activeParentKey] = reorderedGroup;
+
+    const addItemsToFlat = (parentKey: string, level: number) => {
+      const items = itemsByParentAll[parentKey] || [];
+      items.forEach((item) => {
+        newFlatItems.push({ ...item, level });
+        addItemsToFlat(item.id, level + 1);
+      });
+    };
+
+    addItemsToFlat("root", 0);
+    return newFlatItems;
   };
 
-  const rebuildHierarchy = (flatItems: FlatMenuItem[]): MenuItem[] => {
-    const itemMap: { [key: string]: MenuItem & { tempChildren: MenuItem[] } } =
-      {};
-    const result: MenuItem[] = [];
+  // Handle moving to different parent group
+  const handleDifferentParentMove = (
+    flatItems: FlatMenuItem[],
+    activeItem: FlatMenuItem,
+    overItem: FlatMenuItem
+  ): { newFlatItems: FlatMenuItem[]; successMessage: string } | null => {
+    const newParentId = overItem.parentId;
+    const newLevel = overItem.level;
 
-    flatItems.forEach((item) => {
-      itemMap[item.id] = {
-        id: item.id,
-        name: item.name,
-        slug: item.slug,
-        order: item.order,
-        parentId: item.parentId,
-        children: [],
-        tempChildren: [],
-      };
+    // Check level limit
+    if (newLevel >= 3) {
+      message.warning("Cannot move beyond 4 levels deep");
+      return null;
+    }
+
+    // Check if moving descendants would exceed level limit
+    const descendants = getDescendants(activeItem, flatItems);
+    const maxDescendantLevel = Math.max(
+      ...descendants.map((d) => d.level),
+      activeItem.level
+    );
+    const levelDiff = newLevel - activeItem.level;
+    if (maxDescendantLevel + levelDiff > 3) {
+      message.warning("Cannot move: would create nesting deeper than 4 levels");
+      return null;
+    }
+
+    // Update items with new parent and level
+    let newFlatItems = flatItems.map((item) => {
+      if (item.id === activeItem.id) {
+        return { ...item, level: newLevel, parentId: newParentId };
+      } else if (isDescendant(activeItem, item, flatItems)) {
+        return { ...item, level: item.level + levelDiff };
+      }
+      return item;
     });
 
-    flatItems.forEach((item) => {
-      const currentItem = itemMap[item.id];
-      if (item.parentId && itemMap[item.parentId]) {
-        itemMap[item.parentId].tempChildren.push(currentItem);
-      } else if (!item.parentId || item.level === 0) {
-        result.push(currentItem);
+    // Handle positioning
+    const itemsToMove: FlatMenuItem[] = [];
+    const movedItemIds = new Set([
+      activeItem.id,
+      ...getDescendants(activeItem, flatItems).map((d) => d.id),
+    ]);
+
+    newFlatItems.forEach((item) => {
+      if (movedItemIds.has(item.id)) {
+        itemsToMove.push(
+          newFlatItems.find((updatedItem) => updatedItem.id === item.id)!
+        );
       }
     });
 
-    Object.values(itemMap).forEach((item) => {
-      item.children = item.tempChildren.sort((a, b) => a.order - b.order);
-      (item as any).tempChildren = undefined;
-    });
+    newFlatItems = newFlatItems.filter((item) => !movedItemIds.has(item.id));
 
-    return result.sort((a, b) => a.order - b.order);
+    const insertPosition = newFlatItems.findIndex(
+      (item) => item.id === overItem.id
+    );
+    if (insertPosition !== -1) {
+      newFlatItems.splice(insertPosition, 0, ...itemsToMove);
+    } else {
+      newFlatItems.push(...itemsToMove);
+    }
+
+    newFlatItems = updateAllParentGroupOrders(newFlatItems);
+
+    return {
+      newFlatItems,
+      successMessage: `Item moved successfully (Level ${activeItem.level} → ${newLevel})`,
+    };
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over || active.id === over.id) {
-      return;
-    }
+    if (!over || active.id === over.id) return;
 
     const currentMenu = getCurrentMenu();
     const flatItems = flattenMenu(currentMenu);
@@ -216,225 +338,43 @@ export default function MenuPage() {
     const activeIndex = flatItems.findIndex((item) => item.id === active.id);
     const overIndex = flatItems.findIndex((item) => item.id === over.id);
 
-    if (activeIndex === -1 || overIndex === -1) {
-      return;
-    }
+    if (activeIndex === -1 || overIndex === -1) return;
 
     const activeItem = flatItems[activeIndex];
     const overItem = flatItems[overIndex];
 
+    // Check if we're trying to move a parent into its own descendant
     if (isDescendant(activeItem, overItem, flatItems)) {
       message.warning("Cannot move parent item into its own child");
       return;
     }
 
-    let newFlatItems = [...flatItems];
+    let newFlatItems: FlatMenuItem[];
     let successMessage = "Menu items reordered successfully";
 
     const activeParentKey = activeItem.parentId || "root";
     const overParentKey = overItem.parentId || "root";
 
     if (activeParentKey === overParentKey) {
-      const itemsByParent: { [key: string]: FlatMenuItem[] } = {};
-      flatItems.forEach((item) => {
-        const parentKey = item.parentId || "root";
-        if (!itemsByParent[parentKey]) {
-          itemsByParent[parentKey] = [];
-        }
-        itemsByParent[parentKey].push(item);
-      });
-
-      const parentGroup = itemsByParent[activeParentKey];
-      const activeLocalIndex = parentGroup.findIndex(
-        (item) => item.id === active.id
+      newFlatItems = handleSameParentReorder(
+        flatItems,
+        activeItem,
+        overItem,
+        active,
+        over
       );
-      const overLocalIndex = parentGroup.findIndex(
-        (item) => item.id === over.id
-      );
-
-      if (activeLocalIndex !== -1 && overLocalIndex !== -1) {
-        const reorderedGroup = arrayMove(
-          parentGroup,
-          activeLocalIndex,
-          overLocalIndex
-        );
-
-        reorderedGroup.forEach((item, index) => {
-          item.order = index;
-        });
-
-        newFlatItems = flatItems.map((item) => {
-          const itemParentKey = item.parentId || "root";
-          if (itemParentKey === activeParentKey) {
-            return (
-              reorderedGroup.find((groupItem) => groupItem.id === item.id) ||
-              item
-            );
-          }
-          return item;
-        });
-
-        newFlatItems = updateAllParentGroupOrders(newFlatItems);
-      }
     } else {
-      const newParentId = overItem.parentId;
-      const newLevel = overItem.level;
-
-      if (newLevel >= 3) {
-        message.warning("Cannot move beyond 4 levels deep");
-        return;
-      }
-
-      const descendants = getDescendants(activeItem, flatItems);
-      const maxDescendantLevel = Math.max(
-        ...descendants.map((d) => d.level),
-        activeItem.level
-      );
-      const levelDiff = newLevel - activeItem.level;
-      if (maxDescendantLevel + levelDiff > 3) {
-        message.warning(
-          "Cannot move: would create nesting deeper than 4 levels"
-        );
-        return;
-      }
-
-      const updateItemAndDescendants = (
-        items: FlatMenuItem[]
-      ): FlatMenuItem[] => {
-        return items.map((item) => {
-          if (item.id === activeItem.id) {
-            return {
-              ...item,
-              level: newLevel,
-              parentId: newParentId,
-            };
-          } else if (isDescendant(activeItem, item, items)) {
-            return {
-              ...item,
-              level: item.level + levelDiff,
-            };
-          }
-          return item;
-        });
-      };
-
-      newFlatItems = updateItemAndDescendants(flatItems);
-
-      const itemsToMove: FlatMenuItem[] = [];
-      const movedItemIds = new Set([
-        activeItem.id,
-        ...getDescendants(activeItem, flatItems).map((d) => d.id),
-      ]);
-
-      newFlatItems.forEach((item) => {
-        if (movedItemIds.has(item.id)) {
-          itemsToMove.push(
-            newFlatItems.find((updatedItem) => updatedItem.id === item.id)!
-          );
-        }
-      });
-
-      newFlatItems = newFlatItems.filter((item) => !movedItemIds.has(item.id));
-
-      const overItemInNewParent = newFlatItems.find(
-        (item) => item.id === overItem.id
-      );
-
-      if (overItemInNewParent) {
-        const insertPosition = newFlatItems.findIndex(
-          (item) => item.id === overItem.id
-        );
-
-        newFlatItems.splice(insertPosition, 0, ...itemsToMove);
-        newFlatItems = updateAllParentGroupOrders(newFlatItems);
-      } else {
-        const newParentItems = newFlatItems.filter(
-          (item) => (item.parentId || "root") === (newParentId || "root")
-        );
-
-        if (newParentItems.length > 0) {
-          const lastNewParentItem = newParentItems[newParentItems.length - 1];
-          const lastIndex = newFlatItems.findIndex(
-            (item) => item.id === lastNewParentItem.id
-          );
-          newFlatItems.splice(lastIndex + 1, 0, ...itemsToMove);
-        } else {
-          newFlatItems.push(...itemsToMove);
-        }
-
-        newFlatItems = updateAllParentGroupOrders(newFlatItems);
-      }
-
-      successMessage = `Item moved successfully (Level ${activeItem.level} → ${newLevel})`;
+      const result = handleDifferentParentMove(flatItems, activeItem, overItem);
+      if (!result) return;
+      newFlatItems = result.newFlatItems;
+      successMessage = result.successMessage;
     }
 
     const newHierarchy = rebuildHierarchy(newFlatItems);
+    const finalHierarchy = normalizeOrdersRecursively(newHierarchy);
 
-    const updateOrdersRecursively = (items: MenuItem[]): MenuItem[] => {
-      return items.map((item, index) => ({
-        ...item,
-        order: index,
-        children: item.children ? updateOrdersRecursively(item.children) : [],
-      }));
-    };
-
-    const finalHierarchy = updateOrdersRecursively(newHierarchy);
     setCurrentMenu(finalHierarchy);
     message.success(successMessage);
-  };
-
-  const isDescendant = (
-    parent: FlatMenuItem,
-    potentialChild: FlatMenuItem,
-    flatItems: FlatMenuItem[]
-  ): boolean => {
-    const descendants = getDescendants(parent, flatItems);
-    return descendants.some(
-      (descendant) => descendant.id === potentialChild.id
-    );
-  };
-
-  const getDescendants = (
-    parent: FlatMenuItem,
-    flatItems: FlatMenuItem[]
-  ): FlatMenuItem[] => {
-    const descendants: FlatMenuItem[] = [];
-    const children = flatItems.filter((item) => item.parentId === parent.id);
-
-    children.forEach((child) => {
-      descendants.push(child);
-      descendants.push(...getDescendants(child, flatItems));
-    });
-
-    return descendants;
-  };
-
-  const updateAllParentGroupOrders = (
-    flatItems: FlatMenuItem[]
-  ): FlatMenuItem[] => {
-    const parentGroups = new Set<string>();
-
-    flatItems.forEach((item) => {
-      const parentKey = item.parentId || "root";
-      parentGroups.add(parentKey);
-    });
-
-    parentGroups.forEach((parentKey) => {
-      const groupItems = flatItems.filter(
-        (item) => (item.parentId || "root") === parentKey
-      );
-
-      groupItems.forEach((item, index) => {
-        const itemIndex = flatItems.findIndex(
-          (flatItem) => flatItem.id === item.id
-        );
-        if (itemIndex !== -1) {
-          flatItems[itemIndex].order = index;
-        }
-      });
-    });
-
-    return flatItems;
   };
 
   const handlePromote = (itemId: string) => {
@@ -451,7 +391,6 @@ export default function MenuPage() {
       if (flatItem.id === itemId) {
         const currentParent = flatItems.find((p) => p.id === flatItem.parentId);
         const newParentId = currentParent?.parentId;
-
         return {
           ...flatItem,
           level: flatItem.level - 1,
@@ -461,8 +400,11 @@ export default function MenuPage() {
       return flatItem;
     });
 
-    const newHierarchy = rebuildHierarchy(newFlatItems);
-    setCurrentMenu(newHierarchy);
+    const updatedFlatItems = updateAllParentGroupOrders(newFlatItems);
+    const newHierarchy = rebuildHierarchy(updatedFlatItems);
+    const finalHierarchy = normalizeOrdersRecursively(newHierarchy);
+
+    setCurrentMenu(finalHierarchy);
     message.success("Item promoted successfully");
   };
 
@@ -477,6 +419,7 @@ export default function MenuPage() {
       return;
     }
 
+    // Find a potential new parent (previous sibling at the same level)
     let newParentId = item.parentId;
     for (let i = itemIndex - 1; i >= 0; i--) {
       const prevItem = flatItems[i];
@@ -487,9 +430,7 @@ export default function MenuPage() {
         newParentId = prevItem.id;
         break;
       }
-      if (prevItem.level < item.level) {
-        break; // No suitable parent found
-      }
+      if (prevItem.level < item.level) break;
     }
 
     if (newParentId === item.parentId) {
@@ -508,15 +449,20 @@ export default function MenuPage() {
       return flatItem;
     });
 
-    const newHierarchy = rebuildHierarchy(newFlatItems);
-    setCurrentMenu(newHierarchy);
+    const updatedFlatItems = updateAllParentGroupOrders(newFlatItems);
+    const newHierarchy = rebuildHierarchy(updatedFlatItems);
+    const finalHierarchy = normalizeOrdersRecursively(newHierarchy);
+
+    setCurrentMenu(finalHierarchy);
     message.success("Item demoted successfully");
   };
 
+  // Check if item can be promoted
   const canPromote = (item: FlatMenuItem): boolean => {
     return item.level > 0;
   };
 
+  // Check if item can be demoted
   const canDemote = (itemId: string): boolean => {
     const currentMenu = getCurrentMenu();
     const flatItems = flattenMenu(currentMenu);
@@ -658,7 +604,7 @@ export default function MenuPage() {
     dispatch(
       upsertSetting(
         {
-          namespace: activeTab === "header" ? "menuHeader" : "menuFooter",
+          namespace: activeTab,
           data: { settings: settingsArray },
         },
         session?.accessToken || "",
@@ -668,23 +614,10 @@ export default function MenuPage() {
     );
   };
 
-  const processMenuForSave = (items: MenuItem[]): any[] => {
-    return items.map((item) => {
-      const processed: any = {
-        name: item.name,
-        slug: item.slug,
-      };
-
-      if (item.children && item.children.length > 0) {
-        processed.children = processMenuForSave(item.children);
-      }
-
-      return processed;
-    });
-  };
-
   const renderMenuContent = (menu: MenuItem[], menuType: string) => {
-    const flatItems = flattenMenu(menu);
+    // Ensure menu is sorted before flattening
+    const sortedMenu = [...menu].sort((a, b) => a.order - b.order);
+    const flatItems = flattenMenu(sortedMenu);
 
     return (
       <Card loading={loading}>
@@ -759,9 +692,7 @@ export default function MenuPage() {
               size="middle"
               block={isMobile}
             >
-              {activeTab === "demo"
-                ? "Try Save (Demo Mode)"
-                : `Save ${menuType} Menu`}
+              Save {menuType} Menu
             </Button>
           </div>
         )}
@@ -771,12 +702,12 @@ export default function MenuPage() {
 
   const tabItems = [
     {
-      key: "header",
+      key: "menuHeader",
       label: "Header Menu",
       children: renderMenuContent(headerMenu, "Header"),
     },
     {
-      key: "footer",
+      key: "menuFooter",
       label: "Footer Menu",
       children: renderMenuContent(footerMenu, "Footer"),
     },

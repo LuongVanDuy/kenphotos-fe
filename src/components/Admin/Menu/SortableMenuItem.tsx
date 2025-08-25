@@ -1,17 +1,16 @@
-// SortableMenuItem.tsx
 import React from "react";
-import { Button, Divider, Tooltip, Popconfirm } from "antd";
+import { Button, Tag, Tooltip, Popconfirm, Divider } from "antd";
 import {
-  DragOutlined,
-  PlusOutlined,
   EditOutlined,
   DeleteOutlined,
-  ArrowLeftOutlined,
+  PlusOutlined,
+  DragOutlined,
   ArrowRightOutlined,
+  ArrowLeftOutlined,
 } from "@ant-design/icons";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { FlatMenuItem, MenuItem } from "@/types";
+import { MenuItem, FlatMenuItem, getMarginClass } from "./menuUtils";
 
 interface SortableMenuItemProps {
   item: FlatMenuItem;
@@ -49,17 +48,6 @@ const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  // Dynamic margin based on level
-  const getMarginClass = (level: number) => {
-    const margins: Record<number, string> = {
-      0: "",
-      1: "ml-6",
-      2: "ml-12",
-      3: "ml-18",
-    };
-    return margins[level] || `ml-${level * 6}`;
-  };
-
   return (
     <div
       ref={setNodeRef}
@@ -79,7 +67,14 @@ const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
           </div>
           <div className="flex-1">
             <div className="font-medium text-gray-800">{item.name}</div>
-            <div className="text-sm text-gray-500">{item.slug}</div>
+            <div className="text-sm text-gray-500">/{item.slug}</div>
+            <div className="flex items-center gap-2 mt-1">
+              <Tag color="gray">Order: {item.order}</Tag>
+              <Tag color="purple">Level: {item.level}</Tag>
+              {item.children && item.children.length > 0 && (
+                <Tag color="blue">{item.children.length} sub-items</Tag>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-1">

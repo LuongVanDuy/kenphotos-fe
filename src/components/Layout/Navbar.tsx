@@ -11,85 +11,44 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 
 export interface MenuGroup {
-  title: string;
-  items: { label: string; href: string }[];
+  name: string;
+  slug: string;
+  children?: MenuGroup[];
 }
 
 export interface MenuItem {
-  label: string;
-  href?: string;
-  active?: boolean;
-  groups?: MenuGroup[];
+  name: string;
+  slug: string;
+  children?: MenuGroup[];
 }
-
-const menuItems: MenuItem[] = [
-  { label: "HOME", href: "/", active: true },
-  { label: "ABOUT US", href: "/about-us/" },
-  {
-    label: "SERVICES",
-    groups: [
-      {
-        title: "Photo Editing",
-        items: [
-          { label: "Single Exposure", href: "/services/single-exposure" },
-          { label: "HDR Bracket", href: "/services/hdr-bracket" },
-          { label: "Flambient", href: "/services/flambient" },
-          {
-            label: "Day To Twilight or Dusk",
-            href: "/services/day-to-twilight",
-          },
-          { label: "Water in Pool", href: "/services/water-in-pool" },
-        ],
-      },
-      {
-        title: "3D Visualizations",
-        items: [
-          { label: "360° Image Enhancement", href: "/services/360-image" },
-          { label: "Virtual Staging", href: "/services/virtual-staging" },
-          {
-            label: "Virtual Renovations",
-            href: "/services/virtual-renovations",
-          },
-          {
-            label: "360° Virtual Staging",
-            href: "/services/360-virtual-staging",
-          },
-          { label: "Changing Seasons", href: "/services/changing-seasons" },
-        ],
-      },
-      {
-        title: "Advanced Editing",
-        items: [
-          {
-            label: "Real Estate Video Editing",
-            href: "/services/video-editing",
-          },
-          { label: "Item Removal", href: "/services/item-removal" },
-          { label: "Aerial/ Drone Highlight", href: "/services/aerial-drone" },
-          { label: "Yacht", href: "/services/yacht" },
-          { label: "Lawn Replacement", href: "/services/lawn-replacement" },
-        ],
-      },
-    ],
-  },
-  { label: "BLOG", href: "/blog/" },
-  { label: "CONTACT", href: "/contact/" },
-];
 
 const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
   onSendFreeTest,
   menu,
 }) => {
+  console.log("menu:", menu);
   const pathname = usePathname();
   const router = useRouter();
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<number | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [selectedMobileGroup, setSelectedMobileGroup] = useState<
-    MenuGroup[] | null
-  >(null);
+  const [selectedMobileGroup, setSelectedMobileGroup] = useState<{
+    groups: MenuGroup[];
+    parentSlug: string;
+  } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const parsedMenu: MenuItem[] = React.useMemo(() => {
+    if (typeof menu === "string") {
+      try {
+        return JSON.parse(menu);
+      } catch (error) {
+        return [];
+      }
+    }
+    return Array.isArray(menu) ? menu : [];
+  }, [menu]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -99,6 +58,59 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const isPathActive = (slug: string) => {
+    if (slug === "home") return pathname === "/";
+    if (slug === "services") {
+      return pathname === "/services" || pathname.startsWith("/services/");
+    }
+    return pathname === `/${slug}` || pathname.startsWith(`/${slug}/`);
+  };
+
+  const hasActiveChild = (item: MenuItem) => {
+    if (!item.children) return false;
+    return item.children.some((group) =>
+      group.children?.some((child) =>
+        isNestedChildActive(child.slug, item.slug)
+      )
+    );
+  };
+
+  const generateHref = (item: MenuItem, parentSlug?: string) => {
+    if (item.slug === "home") return "/";
+    if (parentSlug) {
+      return `/${parentSlug}/${item.slug}`;
+    }
+    return `/${item.slug}`;
+  };
+
+  const isNestedChildActive = (slug: string, parentSlug: string) => {
+    return (
+      pathname === `/${parentSlug}/${slug}` ||
+      pathname.startsWith(`/${parentSlug}/${slug}/`)
+    );
+  };
+
+  if (!parsedMenu || parsedMenu.length === 0) {
+    return (
+      <div className="fixed top-0 left-0 w-full z-50">
+        <header className="bg-white shadow-[0px_4px_8px_0px_rgba(21,58,160,0.1)] md:mx-auto px-4 py-3 md:py-5 relative z-50">
+          <div className="max-w-content mx-auto px-4 flex items-center justify-between">
+            <Link href="/">
+              <Image
+                src="/images/logo.png"
+                alt="Logo"
+                width={130}
+                height={50}
+                className="object-contain"
+              />
+            </Link>
+            <div className="text-gray-500">Menu loading...</div>
+          </div>
+        </header>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed top-0 left-0 w-full z-50">
       <div
@@ -106,7 +118,7 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
           fixed inset-0 z-40 bg-black/50 backdrop-blur-sm
           transition-all duration-300 ease-in-out
           ${
-            isMegaMenuOpen !== null && menuItems[isMegaMenuOpen]?.groups
+            isMegaMenuOpen !== null && parsedMenu[isMegaMenuOpen]?.children
               ? "opacity-100 pointer-events-auto"
               : "opacity-0 pointer-events-none"
           }
@@ -138,32 +150,23 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
             />
           </Link>
           <ul className="hidden md:flex gap-6 text-sm font-medium">
-            {menuItems.map((item, idx) => (
+            {parsedMenu.map((item, idx) => (
               <li
-                key={item.label}
+                key={item.slug}
                 className="relative"
                 onMouseEnter={() => setIsMegaMenuOpen(idx)}
                 onMouseLeave={() => setIsMegaMenuOpen(null)}
               >
-                {item.groups ? (
+                {item.children ? (
                   <>
                     <button
                       className={`text-[16px] flex items-center gap-1 hover:text-black/80 transition ${
-                        pathname === item.href ||
-                        (item.groups &&
-                          item.groups.some((group) =>
-                            group.items.some(
-                              (subItem) =>
-                                pathname === subItem.href ||
-                                pathname.startsWith(subItem.href + "/") ||
-                                pathname === subItem.href + "/"
-                            )
-                          ))
+                        isPathActive(item.slug) || hasActiveChild(item)
                           ? "text-blue-600 font-semibold"
                           : "text-black"
                       }`}
                     >
-                      {item.label} <ChevronDownIcon size={16} />
+                      {item.name} <ChevronDownIcon size={16} />
                     </button>
 
                     {isMegaMenuOpen === idx && (
@@ -188,26 +191,24 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
                       onMouseEnter={() => setIsMegaMenuOpen(idx)}
                       onMouseLeave={() => setIsMegaMenuOpen(null)}
                     >
-                      {item.groups.map((group) => (
-                        <div key={group.title} className="min-w-[200px]">
+                      {item.children.map((group) => (
+                        <div key={group.slug} className="min-w-[200px]">
                           <div className="font-semibold text-blue-600 mb-3">
-                            {group.title}
+                            {group.name}
                           </div>
                           <ul className="space-y-2">
-                            {group.items.map((sub) => (
-                              <li key={sub.label}>
+                            {group.children?.map((sub) => (
+                              <li key={sub.slug}>
                                 <Link
-                                  href={sub.href}
+                                  href={generateHref(sub, item.slug)}
                                   onClick={() => setIsMegaMenuOpen(null)}
                                   className={`transition ${
-                                    pathname === sub.href ||
-                                    pathname.startsWith(sub.href + "/") ||
-                                    pathname === sub.href + "/"
+                                    isNestedChildActive(sub.slug, item.slug)
                                       ? "text-blue-600 font-semibold"
                                       : "text-black/80 hover:text-black"
                                   }`}
                                 >
-                                  {sub.label}
+                                  {sub.name}
                                 </Link>
                               </li>
                             ))}
@@ -218,14 +219,14 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
                   </>
                 ) : (
                   <Link
-                    href={item.href!}
+                    href={item.slug === "home" ? "/" : `/${item.slug}`}
                     className={`transition text-[16px] font-medium hover:text-black ${
-                      pathname === item.href
+                      isPathActive(item.slug)
                         ? "text-blue-600 font-semibold"
                         : "text-black"
                     }`}
                   >
-                    {item.label}
+                    {item.name}
                   </Link>
                 )}
               </li>
@@ -255,22 +256,27 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
           <div className="bg-white rounded-3xl p-4 space-y-4 transition-all">
             {!selectedMobileGroup ? (
               <>
-                {menuItems.map((item) => (
-                  <div key={item.label}>
-                    {item.groups ? (
+                {parsedMenu.map((item) => (
+                  <div key={item.slug}>
+                    {item.children ? (
                       <button
-                        onClick={() => setSelectedMobileGroup(item.groups!)}
+                        onClick={() =>
+                          setSelectedMobileGroup({
+                            groups: item.children!,
+                            parentSlug: item.slug,
+                          })
+                        }
                         className="w-full text-left py-2 px-3 text-black font-medium flex justify-between items-center"
                       >
-                        {item.label} <ChevronDownIcon size={16} />
+                        {item.name} <ChevronDownIcon size={16} />
                       </button>
                     ) : (
                       <Link
-                        href={item.href!}
+                        href={item.slug === "home" ? "/" : `/${item.slug}`}
                         onClick={() => setIsMobileOpen(false)}
                         className="block py-2 px-3 text-black font-medium"
                       >
-                        {item.label}
+                        {item.name}
                       </Link>
                     )}
                   </div>
@@ -284,20 +290,23 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
                 >
                   ← Back
                 </button>
-                {selectedMobileGroup.map((group) => (
-                  <div key={group.title}>
+                {selectedMobileGroup.groups.map((group) => (
+                  <div key={group.slug}>
                     <div className="font-semibold text-[#A78956] mb-2">
-                      {group.title}
+                      {group.name}
                     </div>
                     <ul className="space-y-2">
-                      {group.items.map((sub) => (
-                        <li key={sub.label}>
+                      {group.children?.map((sub) => (
+                        <li key={sub.slug}>
                           <Link
-                            href={sub.href}
+                            href={generateHref(
+                              sub,
+                              selectedMobileGroup.parentSlug
+                            )}
                             onClick={() => setIsMobileOpen(false)}
                             className="text-black/80 hover:text-black transition block px-3"
                           >
-                            {sub.label}
+                            {sub.name}
                           </Link>
                         </li>
                       ))}

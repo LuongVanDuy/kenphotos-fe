@@ -9,6 +9,13 @@ import { RootState } from "@/store/store";
 import { HomeFilled, HomeOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import React from "react";
+
+interface FooterMenuItem {
+  name: string;
+  slug: string;
+  children?: FooterMenuItem[];
+}
 
 type FooterProps = {
   menu: any;
@@ -17,77 +24,49 @@ type FooterProps = {
 const Footer: React.FC<FooterProps> = ({ menu }) => {
   const settingData = useSelector((state: RootState) => state.settings.detail);
 
+  const parsedMenu: FooterMenuItem[] = React.useMemo(() => {
+    if (typeof menu === "string") {
+      try {
+        return JSON.parse(menu);
+      } catch (error) {
+        return [];
+      }
+    }
+    return Array.isArray(menu) ? menu : [];
+  }, [menu]);
+
+  const generateFooterHref = (slug: string) => {
+    return `/services/${slug}`;
+  };
+
   return (
     <footer className="bg-[#151515] text-white py-10 md:py-[120px] mb-[30px] md:mb-0 relative">
       <div className=" max-w-content mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-8">
-          <div className="space-y-4">
-            <span className="text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">
-              Leistungen
-            </span>
-            <ul className="space-y-3 text-[#ccc] text-[16px]">
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webshops
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Barrierefreie Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webapplikationen
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                SEO
-              </li>
-            </ul>
-          </div>
-          <div className="space-y-4">
-            <span className="text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">
-              Leistungen
-            </span>
-            <ul className="space-y-3 text-[#ccc] text-[16px]">
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webshops
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Barrierefreie Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webapplikationen
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                SEO
-              </li>
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <span className="text-[16px]  font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">
-              Leistungen
-            </span>
-            <ul className="space-y-3 text-[#ccc] text-[16px]">
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webshops
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Barrierefreie Websites
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                Webapplikationen
-              </li>
-              <li className="hover:text-white transition-colors cursor-pointer">
-                SEO
-              </li>
-            </ul>
-          </div>
+          {parsedMenu
+            .slice(0, 3)
+            .map((group: FooterMenuItem, index: number) => (
+              <div key={group.slug} className="space-y-4">
+                <span className="text-[16px] font-semibold capitalize leading-[1.2em] tracking-[0px] text-white">
+                  {group.name}
+                </span>
+                <ul className="space-y-3 text-[#ccc] text-[16px]">
+                  {group.children?.map((item: FooterMenuItem) => (
+                    <li
+                      key={item.slug}
+                      className="hover:text-white transition-colors cursor-pointer"
+                    >
+                      <Link
+                        href={generateFooterHref(item.slug)}
+                        className="hover:text-white transition-colors"
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
           <div className="space-y-4">
             <div className="flex flex-col gap-[24px]">
