@@ -91,8 +91,6 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
 
   const [isScrolled, setIsScrolled] = useState(false);
 
-  console.log("Header menu:", menu);
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);

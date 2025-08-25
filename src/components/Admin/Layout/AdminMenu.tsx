@@ -192,18 +192,14 @@ const handleLogout = () => {
     okType: "danger",
     onOk: async () => {
       try {
-        // Xóa session và redirect về frontend
         await signOut({
           redirect: false,
         });
 
-        // Redirect thủ công về trang login của frontend
         const loginUrl = `${window.location.origin}/auth/login`;
-        console.log("Redirecting to:", loginUrl);
         window.location.href = loginUrl;
       } catch (error) {
         console.error("Lỗi đăng xuất:", error);
-        // Fallback: redirect trực tiếp
         window.location.href = `${window.location.origin}/auth/login`;
       }
     },

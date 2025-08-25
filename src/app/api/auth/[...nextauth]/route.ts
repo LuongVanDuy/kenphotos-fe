@@ -92,7 +92,6 @@ export const authOptions: NextAuthOptions = {
           if (refreshed?.accessToken) {
             token.accessToken = refreshed.accessToken;
             token.refreshToken = refreshed.refreshToken;
-            console.log("Token refreshed");
           } else {
             console.warn("Failed to refresh token");
           }

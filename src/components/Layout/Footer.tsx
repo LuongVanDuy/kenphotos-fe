@@ -15,7 +15,6 @@ type FooterProps = {
 };
 
 const Footer: React.FC<FooterProps> = ({ menu }) => {
-  console.log("Footer menu:", menu);
   const settingData = useSelector((state: RootState) => state.settings.detail);
 
   return (

@@ -26,6 +26,7 @@ import {
   GiftOutlined,
   PlayCircleOutlined,
   StepForwardOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
 import { getImageUrl } from "@/utils/imageUrl";
@@ -87,18 +88,16 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const title = e.target.value;
 
-      // Clear existing timer
       if (slugDebounceTimer) {
         clearTimeout(slugDebounceTimer);
       }
 
-      // Set new timer for debounced slug generation
       const timer = setTimeout(() => {
         if (!isSlugManuallyEdited && title) {
           const generatedSlug = slugify(title);
           form.setFieldsValue({ slug: generatedSlug });
         }
-      }, 500); // 500ms debounce
+      }, 500);
 
       setSlugDebounceTimer(timer);
     },
@@ -109,7 +108,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     const slug = e.target.value;
     setIsSlugManuallyEdited(true);
 
-    // Clean the slug input (remove special characters, convert to lowercase)
     const cleanedSlug = slugify(slug);
     if (cleanedSlug !== slug) {
       form.setFieldsValue({ slug: cleanedSlug });
@@ -131,7 +129,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     }
   }, [initialValues, mode, form]);
 
-  // Initialize steps
   useEffect(() => {
     if (initialValues?.steps && mode === "edit") {
       setSteps(initialValues.steps);
@@ -173,7 +170,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const handleMediaSelect = (media: any) => {
     const newImages = [...selectedImages];
 
-    // Updating existing image
     if (currentImageType === "before") {
       newImages[currentImageIndex].beforeUrl = media.url || media.slug;
     } else {
@@ -186,13 +182,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     setCurrentImageIndex(-1);
   };
 
-  // Handle step media selection
   const handleStepMediaSelect = (media: any) => {
     const currentSteps = form.getFieldValue("steps") || [];
     const newSteps = [...currentSteps];
 
     if (currentStepDetailIndex >= 0) {
-      // Updating step detail image
       if (currentStepDetailImageType === "before") {
         newSteps[currentStepIndex].steps[currentStepDetailIndex].beforeUrl =
           media.url || media.slug;
@@ -201,7 +195,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
           media.url || media.slug;
       }
     } else {
-      // Updating main step image
       if (currentStepImageType === "before") {
         newSteps[currentStepIndex].beforeUrl = media.url || media.slug;
       } else {
@@ -228,7 +221,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     setIsModalMediaOpen(true);
   };
 
-  // Handle step image selection
   const handleSelectStepImage = (
     type: "before" | "after",
     stepIndex: number,
@@ -253,13 +245,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   };
 
   const handleFinish = (values: any) => {
-    // Validate required arrays
     if (!values.images || values.images.length === 0) {
       message.error("Please add at least one image pair");
       return;
     }
 
-    // Validate that at least one image pair has both before and after images
     const hasValidImagePair = values.images.some(
       (image: any) => image.beforeUrl && image.afterUrl
     );
@@ -425,23 +415,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                               </div>
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-                                {/* Before Image */}
                                 <div className="bg-white rounded-lg">
-                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                    <span className="text-sm font-medium text-gray-600">
-                                      Before Image
-                                    </span>
-                                    <Button
-                                      type="primary"
-                                      size="small"
-                                      onClick={() =>
-                                        handleSelectImage("before", index)
-                                      }
-                                      className="text-blue-600 hover:text-blue-700"
-                                    >
-                                      Select Image
-                                    </Button>
-                                  </div>
                                   {image.beforeUrl ? (
                                     <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
                                       <Image
@@ -449,39 +423,35 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                         alt={`Before Image ${index + 1}`}
                                         className="object-cover w-full h-full"
                                         sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
+                                        preview={false}
+                                      />
+                                      <EditOutlined
+                                        onClick={() =>
+                                          handleSelectImage("before", index)
+                                        }
+                                        className=" absolute text-[20px] top-4 right-4 p-1 rounded-sm bg-white"
                                       />
                                     </div>
                                   ) : (
-                                    <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                                      <div className="text-center">
-                                        <div className="text-gray-400 mb-2">
-                                          <UploadOutlined className="text-xl lg:text-2xl" />
-                                        </div>
-                                        <span className="text-xs text-gray-500">
-                                          No image selected
-                                        </span>
-                                      </div>
+                                    <div className="">
+                                      <span className="text-sm font-medium text-gray-600 block mb-4">
+                                        Before Image
+                                      </span>
+                                      <Button
+                                        type="primary"
+                                        size="small"
+                                        onClick={() =>
+                                          handleSelectImage("before", index)
+                                        }
+                                        className="text-blue-600 hover:text-blue-700"
+                                      >
+                                        Select Image
+                                      </Button>
                                     </div>
                                   )}
                                 </div>
 
-                                {/* After Image */}
                                 <div className="bg-white rounded-lg">
-                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                    <span className="text-sm font-medium text-gray-600">
-                                      After Image
-                                    </span>
-                                    <Button
-                                      type="primary"
-                                      size="small"
-                                      onClick={() =>
-                                        handleSelectImage("after", index)
-                                      }
-                                      className="text-blue-600 hover:text-blue-700"
-                                    >
-                                      Select Image
-                                    </Button>
-                                  </div>
                                   {image.afterUrl ? (
                                     <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200">
                                       <Image
@@ -489,18 +459,30 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                         alt={`After Image ${index + 1}`}
                                         className="object-cover w-full h-full"
                                         sizes="(max-width: 768px) 100px, (max-width: 1024px) 120px, 150px"
+                                        preview={false}
+                                      />
+                                      <EditOutlined
+                                        onClick={() =>
+                                          handleSelectImage("after", index)
+                                        }
+                                        className=" absolute text-[20px] top-4 right-4 p-1 rounded-sm bg-white"
                                       />
                                     </div>
                                   ) : (
-                                    <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                                      <div className="text-center">
-                                        <div className="text-gray-400 mb-2">
-                                          <UploadOutlined className="text-xl lg:text-2xl" />
-                                        </div>
-                                        <span className="text-xs text-gray-500">
-                                          No image selected
-                                        </span>
-                                      </div>
+                                    <div className="">
+                                      <span className="text-sm font-medium text-gray-600 block mb-4">
+                                        After Image
+                                      </span>
+                                      <Button
+                                        type="primary"
+                                        size="small"
+                                        onClick={() =>
+                                          handleSelectImage("after", index)
+                                        }
+                                        className="text-blue-600 hover:text-blue-700"
+                                      >
+                                        Select Image
+                                      </Button>
                                     </div>
                                   )}
                                 </div>
@@ -508,7 +490,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                             </div>
                           ))}
                         </div>
-                        <div className="flex justify-center items-center mt-4 lg:mt-6">
+                        <div className="flex justify-end items-center mt-4 lg:mt-6">
                           <Button
                             type="primary"
                             icon={<PlusOutlined />}
