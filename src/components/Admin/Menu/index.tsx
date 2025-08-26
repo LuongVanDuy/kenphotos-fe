@@ -405,7 +405,6 @@ export default function MenuPage() {
     const finalHierarchy = normalizeOrdersRecursively(newHierarchy);
 
     setCurrentMenu(finalHierarchy);
-    message.success("Item promoted successfully");
   };
 
   const handleDemote = (itemId: string) => {
@@ -454,7 +453,6 @@ export default function MenuPage() {
     const finalHierarchy = normalizeOrdersRecursively(newHierarchy);
 
     setCurrentMenu(finalHierarchy);
-    message.success("Item demoted successfully");
   };
 
   // Check if item can be promoted

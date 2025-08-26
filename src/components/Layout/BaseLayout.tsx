@@ -27,12 +27,12 @@ export default function BaseLayout({
 
   return (
     <>
-      <Navbar menu={settings.menuHeader.data} onSendFreeTest={scrollToForm} />
+      <Navbar menu={settings?.menuHeader?.data} onSendFreeTest={scrollToForm} />
       {children}
       {settingData?.contact && (
         <FloatingContacts contactsData={settingData.contact} />
       )}
-      <Footer menu={settings.menuFooter.data} />
+      <Footer menu={settings?.menuFooter?.data} />
     </>
   );
 }

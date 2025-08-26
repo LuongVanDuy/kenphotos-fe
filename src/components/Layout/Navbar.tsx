@@ -26,7 +26,6 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({
   onSendFreeTest,
   menu,
 }) => {
-  console.log("menu:", menu);
   const pathname = usePathname();
   const router = useRouter();
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<number | null>(null);

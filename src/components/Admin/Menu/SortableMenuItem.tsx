@@ -68,13 +68,6 @@ const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
           <div className="flex-1">
             <div className="font-medium text-gray-800">{item.name}</div>
             <div className="text-sm text-gray-500">/{item.slug}</div>
-            <div className="flex items-center gap-2 mt-1">
-              <Tag color="gray">Order: {item.order}</Tag>
-              <Tag color="purple">Level: {item.level}</Tag>
-              {item.children && item.children.length > 0 && (
-                <Tag color="blue">{item.children.length} sub-items</Tag>
-              )}
-            </div>
           </div>
         </div>
         <div className="flex items-center gap-1">
