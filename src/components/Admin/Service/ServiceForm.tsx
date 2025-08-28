@@ -10,6 +10,7 @@ import {
   message,
   Image,
   Tabs,
+  Divider,
 } from "antd";
 import {
   PlusOutlined,
@@ -107,8 +108,24 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
   useEffect(() => {
     if (initialValues?.steps && mode === "edit") {
-      setSteps(initialValues.steps);
-      form.setFieldsValue({ steps: initialValues.steps });
+      // Parse steps from JSON string to array when editing
+      let parsedSteps;
+      try {
+        parsedSteps =
+          typeof initialValues.steps === "string"
+            ? JSON.parse(initialValues.steps)
+            : initialValues.steps;
+      } catch (error) {
+        console.error("Error parsing steps:", error);
+        parsedSteps = [];
+      }
+      console.log("parsedSteps", parsedSteps);
+      setSteps(parsedSteps);
+
+      // Use setTimeout to ensure form is fully mounted
+      setTimeout(() => {
+        form.setFieldsValue({ steps: parsedSteps });
+      }, 0);
     } else if (mode === "create") {
       const defaultSteps = [
         {
@@ -130,6 +147,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
       form.setFieldsValue({ steps: defaultSteps });
     }
   }, [initialValues, mode, form]);
+
+  // Update form when steps state changes
+  useEffect(() => {
+    if (steps.length > 0 && mode === "edit") {
+      form.setFieldsValue({ steps: steps });
+    }
+  }, [steps, mode, form]);
 
   // Event handlers
   const handleTitleChange = useCallback(
@@ -447,11 +471,10 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   </div>
                 </div>
 
-                {/* Service Images */}
                 <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
-                      Service Images
+                      Detail
                     </h3>
                   </div>
                   <div className="bg-white p-3 lg:p-6">
@@ -503,15 +526,9 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       </div>
                     </Form.Item>
                   </div>
-                </div>
 
-                {/* Service Steps */}
-                <div className="border border-gray-300 rounded-lg overflow-hidden">
-                  <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Service Steps
-                    </h3>
-                  </div>
+                  <div className="w-full h-[1px] px-5 bg-gray-200" />
+
                   <div className="bg-white p-3 lg:p-6">
                     <Form.List name="steps">
                       {(fields, { add, remove }) => (
@@ -582,6 +599,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                                       {...detailRestField}
                                                       name={[
                                                         detailName,
+
                                                         "title",
                                                       ]}
                                                       label="Title"
@@ -836,7 +854,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                                       detailIndex,
                                                       "type",
                                                     ]) && (
-                                                      <div className="aspect-video border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                                                      <div className="aspect-video border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center bg-gray-50">
                                                         <div className="text-center">
                                                           <div className="text-gray-400 mb-2">
                                                             <UploadOutlined className="text-2xl lg:text-3xl" />
@@ -911,15 +929,9 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                       )}
                     </Form.List>
                   </div>
-                </div>
 
-                {/* Service Details */}
-                <div className="border border-gray-300 rounded-lg overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Service Details
-                    </h3>
-                  </div>
+                  <div className="w-full h-[1px] px-5 bg-gray-200" />
+
                   <div className="bg-white">
                     <Tabs
                       defaultActiveKey="idealFor"
