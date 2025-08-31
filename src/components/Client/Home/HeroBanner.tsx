@@ -48,7 +48,7 @@ const HeroBanner = ({
   return (
     <section className="w-full bg-section pt-[100px] md:pt-[180px]">
       <div className="max-w-content mx-auto px-4">
-        <div className="flex flex-col md:flex-row w-full min-h-[580px] py-16 md:py-0 gap-5 md:gap-0">
+        <div className="flex flex-col md:flex-row w-full min-h-[580px] pb-16 pt-3 md:py-0 gap-5 md:gap-0">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}

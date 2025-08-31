@@ -65,7 +65,7 @@ const WindowViewStyles: React.FC = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="flex flex-col items-center justify-center lg:items-center min-h-[220px] w-full"
+            className="flex flex-col border rounded-xl items-center justify-center p-2 lg:items-center min-h-[220px] w-full"
           >
             <h3 className="text-[24px] md:text-[28px] font-semibold text-[#2C6BFF] mb-4 text-center lg:text-left">Window View Style</h3>
             <ul className="text-[22px] md:text-[24px] text-[#1C244B] space-y-1 text-center lg:text-left">
