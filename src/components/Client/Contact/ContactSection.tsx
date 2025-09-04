@@ -127,7 +127,7 @@ const ContactSection: React.FC = () => {
 
   return (
     <section
-      className='py-10 md:py-[120px] md:pt-[180px] bg-[rgba(220,237,248,0.6)]'
+      className='pb-10 pt-24  md:py-[120px] md:pt-[180px] bg-[rgba(220,237,248,0.6)]'
       aria-labelledby='free-test-heading'
     >
       <div className='max-w-content mx-auto px-4'>

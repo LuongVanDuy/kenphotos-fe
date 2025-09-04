@@ -1,30 +1,30 @@
-"use client";
+'use client'
 
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
-import SwiperCore from "swiper";
-import "swiper/css";
-import "swiper/css/navigation";
-import { useEffect, useRef, useState } from "react";
-import { CompareSlider } from "../Common/CompareSlider";
-import ServiceCard from "./ServiceCard";
-import MainTitle from "../Common/Title/MainTitle";
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation } from 'swiper/modules'
+import SwiperCore from 'swiper'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { CompareSlider } from '../Common/CompareSlider'
+import ServiceCard from './ServiceCard'
+import MainTitle from '../Common/Title/MainTitle'
 
 interface InfoProps {
-  relatedServices: any;
+  relatedServices: any
 }
 
 const Related: React.FC<InfoProps> = ({ relatedServices }) => {
-  const swiperRef = useRef<SwiperCore>();
+  const swiperRef = useRef<SwiperCore>()
 
   return (
-    <section className="py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)]">
-      <div className="max-w-content mx-auto px-4">
-        <MainTitle title="Related Sevices" align="left" />
-        <div className="relative mt-12">
+    <section className='py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)] overflow-hidden'>
+      <div className='max-w-content mx-auto px-4'>
+        <MainTitle title='Related Sevices' align='left' />
+        <div className='relative mt-12 overflow-hidden'>
           <button
             onClick={() => swiperRef.current?.slidePrev()}
-            className="absolute left-0 md:-left-5 top-1/2 -translate-y-1/2 z-10 text-[32px] text-[#333] border border-[#eee] bg-white shadow-lg w-9 h-9 rounded-full flex items-center justify-center"
+            className='absolute left-0 md:-left-5 top-1/2 -translate-y-1/2 z-10 text-[32px] text-[#333] border border-[#eee] bg-white shadow-lg w-9 h-9 rounded-full flex items-center justify-center'
           >
             &lt;
           </button>
@@ -43,10 +43,10 @@ const Related: React.FC<InfoProps> = ({ relatedServices }) => {
               1280: { slidesPerView: 3 },
             }}
             onSwiper={(swiper) => {
-              swiperRef.current = swiper;
+              swiperRef.current = swiper
             }}
             onBeforeInit={(swiper) => {
-              swiperRef.current = swiper;
+              swiperRef.current = swiper
             }}
           >
             {relatedServices.map((service: any, index: any) => (
@@ -63,21 +63,21 @@ const Related: React.FC<InfoProps> = ({ relatedServices }) => {
                   discountedPrice={service.discountedPrice}
                   images={service.images}
                   slug={service.slug}
-                  bg="!bg-[#fff]"
+                  bg='!bg-[#fff]'
                 />
               </SwiperSlide>
             ))}
           </Swiper>
           <button
             onClick={() => swiperRef.current?.slideNext()}
-            className="absolute right-0 md:-right-5 top-1/2 -translate-y-1/2 z-10 text-[32px] text-[#333] shadow-lg border border-[#eee] bg-white font-thin w-9 h-9 rounded-full flex items-center justify-center"
+            className='absolute right-0 md:-right-5 top-1/2 -translate-y-1/2 z-10 text-[32px] text-[#333] shadow-lg border border-[#eee] bg-white font-thin w-9 h-9 rounded-full flex items-center justify-center'
           >
             &gt;
           </button>
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default Related;
+export default Related

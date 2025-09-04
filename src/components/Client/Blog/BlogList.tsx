@@ -41,7 +41,7 @@ const BlogList = ({ fetchPublicPosts, postList, postTotal, postLoading }: any) =
 
   return (
     <>
-      <section className="py-10 md:pt-[180px]">
+      <section className="pb-10 pt-24 md:pt-[180px]">
         <div className="max-w-content px-4 mx-auto">
           <div className="max-w-2xl mb-8">
             <MainTitle

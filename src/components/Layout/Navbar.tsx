@@ -171,6 +171,7 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({ onSendFr
                       absolute top-[calc(100%+40px)] left-1/2 -translate-x-1/2
                       bg-white shadow-2xl rounded-3xl p-10 flex gap-12 z-50
                       transition-all duration-300 ease-in-out
+                      w-auto min-w-max
                       ${
                         isMegaMenuOpen === idx
                           ? 'opacity-100 translate-y-0 pointer-events-auto'
@@ -224,7 +225,7 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({ onSendFr
             Send Free Test <ArrowRightIcon />
           </button>
           <button
-            className='md:hidden bg-white w-[44px] h-[44px] flex items-center justify-center shadow'
+            className='md:hidden bg-white w-[44px] h-[44px] flex items-center justify-center border border-[#eee] rounded-lg'
             onClick={() => {
               setIsMobileOpen(!isMobileOpen)
               setSelectedMobileGroup(null)
@@ -298,7 +299,12 @@ const Navbar: React.FC<{ onSendFreeTest?: () => void; menu: any }> = ({ onSendFr
               </div>
             )}
             <button
-              onClick={onSendFreeTest}
+              onClick={() => {
+                setIsMobileOpen(false)
+                if (onSendFreeTest) {
+                  onSendFreeTest()
+                }
+              }}
               className='bg-[#2D6DFF] rounded-full text-white px-6 py-3 text-sm font-medium w-full flex items-center justify-center gap-2 shadow hover:bg-black/90 transition'
             >
               Send Free Test <ArrowRightIcon />
