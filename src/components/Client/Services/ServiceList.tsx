@@ -8,8 +8,14 @@ import ServiceCard from "@/components/Client/Service/ServiceCard";
 import ServiceFilterBar from "@/components/Client/Services/ServiceFilterBar";
 import ServiceCardLoading from "@/components/Client/Services/ServiceCardLoading";
 import { Empty } from "antd";
+import { motion } from "framer-motion";
 
-const ServiceList = ({ fetchPublicServices, serviceList, serviceTotal = 1, serviceLoading }: any) => {
+const ServiceList = ({
+  fetchPublicServices,
+  serviceList,
+  serviceTotal = 1,
+  serviceLoading,
+}: any) => {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
@@ -41,7 +47,8 @@ const ServiceList = ({ fetchPublicServices, serviceList, serviceTotal = 1, servi
     handleQuery(search, value, 1, pageSize);
   };
 
-  const displayedServiceList = serviceList.length > 0 ? serviceList : Array(6).fill({});
+  const displayedServiceList =
+    serviceList.length > 0 ? serviceList : Array(6).fill({});
 
   const totalPages = Math.ceil(serviceTotal / pageSize);
 
@@ -74,9 +81,23 @@ const ServiceList = ({ fetchPublicServices, serviceList, serviceTotal = 1, servi
             onCategoryChange={onCategoryChange}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mt-12">
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: { staggerChildren: 0.12, delayChildren: 0.05 },
+              },
+            }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mt-12"
+          >
             {serviceLoading
-              ? Array.from({ length: 6 }).map((_, index) => <ServiceCardLoading key={index} />)
+              ? Array.from({ length: 6 }).map((_, index) => (
+                  <ServiceCardLoading key={index} />
+                ))
               : serviceList && serviceTotal
               ? displayedServiceList.map((service: any, index: any) => (
                   <ServiceCard
@@ -94,7 +115,7 @@ const ServiceList = ({ fetchPublicServices, serviceList, serviceTotal = 1, servi
                   />
                 ))
               : null}
-          </div>
+          </motion.div>
 
           {!serviceLoading && totalPages === 0 && (
             <div className="w-full flex justify-center py-16">
@@ -110,8 +131,14 @@ const ServiceList = ({ fetchPublicServices, serviceList, serviceTotal = 1, servi
                 return (
                   <button
                     key={page}
-                    className={`px-4 w-10 h-10 py-2 rounded ${isActive ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
-                    onClick={() => handleQuery(search, category, page, pageSize)}
+                    className={`px-4 w-10 h-10 py-2 rounded ${
+                      isActive
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                    onClick={() =>
+                      handleQuery(search, category, page, pageSize)
+                    }
                   >
                     {page}
                   </button>

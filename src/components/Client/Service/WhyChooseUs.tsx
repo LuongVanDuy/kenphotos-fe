@@ -1,9 +1,29 @@
+"use client";
+
 import React from "react";
 import MainTitle from "../Common/Title/MainTitle";
 import { CompareSlider } from "../Common/CompareSlider";
 import CheckIcon from "@/components/Icons/CheckIcon";
+import { motion } from "framer-motion";
 
 const WhyChooseUs: React.FC = () => {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2, delayChildren: 0.1 },
+    },
+  };
+
+  const item: any = {
+    hidden: { opacity: 0, y: 40 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
+  };
+
   const features = [
     {
       beforeImage: "/images/view-4.jpg",
@@ -86,10 +106,17 @@ const WhyChooseUs: React.FC = () => {
           content="From advanced photo editing to stunning 3D visualizations, we focus on quality, speed, and consistency. Our dedicated team ensures every project enhances your property’s value and gives you a competitive edge."
         />
 
-        <div className="mt-12 md:mt-16 space-y-16 md:space-y-24">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+          className="mt-12 md:mt-16 space-y-16 md:space-y-24"
+        >
           {features.map((feature, index) => (
-            <div
+            <motion.div
               key={index}
+              variants={item}
               className={`flex flex-col ${
                 index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
               } gap-8 md:gap-12 items-center`}
@@ -119,9 +146,9 @@ const WhyChooseUs: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

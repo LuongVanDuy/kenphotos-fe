@@ -161,10 +161,22 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
               </motion.div>
             </div>
 
-            <div className="flex flex-col md:flex-row bg-transparent rounded-lg border border-gray-200">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{
+                duration: 0.6,
+                ease: [0.22, 1, 0.36, 1],
+                delay: 1.0,
+              }}
+              className="flex flex-col md:flex-row bg-transparent rounded-lg border border-gray-200"
+            >
               <div className="flex flex-row md:flex-col min-w-full md:min-w-[200px]">
                 {accordionData.map((item, index) => (
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     type="button"
                     key={index}
                     onClick={() => setActiveTab(index)}
@@ -202,19 +214,31 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                         />
                       </>
                     )}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
 
-              <div className="flex-1 border-t md:border-t-0 md:border-l border-gray-200 p-6">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="flex-1 border-t md:border-t-0 md:border-l border-gray-200 p-6"
+              >
                 <div className="text-gray-700">
                   {accordionData[activeTab].content}
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
 
-          <div className="md:col-span-6">
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+            className="md:col-span-6"
+          >
             <Swiper
               modules={[Navigation]}
               navigation
@@ -246,7 +270,7 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                 </SwiperSlide>
               ))}
             </Swiper>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

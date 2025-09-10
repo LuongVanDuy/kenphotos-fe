@@ -13,6 +13,7 @@ import { fetchPublicPosts } from "@/store/actions/posts";
 import { useParams } from "next/navigation";
 import { getImageUrl } from "@/utils/imageUrl";
 import { message } from "antd";
+import { motion } from "framer-motion";
 
 const BlogDetail = ({
   postDetail,
@@ -48,16 +49,26 @@ const BlogDetail = ({
   return (
     <section className="bg-white relative py-10 md:pt-[180px]">
       <div className="max-w-content mx-auto px-4 text-center">
-        <h1
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="text-[24px] leading-[30px] mb-3 font-semibold
          md:text-[52px] md:leading-[62px] md:mb-0"
         >
           {postDetail.title}
-        </h1>
+        </motion.h1>
         {postDetail.excerpt && (
-          <p className="text-base md:text-lg text-gray-600 mt-6 max-w-3xl mx-auto">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+            className="text-base md:text-lg text-gray-600 mt-6 max-w-3xl mx-auto"
+          >
             {postDetail.excerpt}
-          </p>
+          </motion.p>
         )}
         <div className="mt-10 text-sm text-gray-500">
           Written by{" "}
@@ -73,7 +84,13 @@ const BlogDetail = ({
         </div>
 
         {postDetail?.thumbnail && (
-          <div className="mt-16 w-full aspect-[5/2] relative overflow-hidden rounded-xl shadow">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+            className="mt-16 w-full aspect-[5/2] relative overflow-hidden rounded-xl shadow"
+          >
             <Image
               src={getImageUrl(postDetail.thumbnail)}
               alt={postDetail.title || "Blog detail image"}
@@ -81,7 +98,7 @@ const BlogDetail = ({
               className="object-cover"
               priority
             />
-          </div>
+          </motion.div>
         )}
 
         <div className="relative flex gap-10 mt-16">
@@ -254,7 +271,11 @@ const BlogDetail = ({
             </a>
           </div>
 
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="flex-1 text-start m-auto w-full sm:max-w-[592px] md:max-w-[600px] lg:max-w-[690px] xl:max-w-[792px] mb-24"
             dangerouslySetInnerHTML={{ __html: postDetail.content }}
           />
@@ -266,7 +287,13 @@ const BlogDetail = ({
               You may also like
             </h3>
 
-            <div className="relative mt-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="relative mt-8"
+            >
               <button
                 onClick={() => swiperRef.current?.slidePrev()}
                 className="absolute left-0 md:-left-5 top-1/2 -translate-y-1/2 z-10 text-[32px] text-[#333] border border-[#eee] bg-white shadow-lg w-9 h-9 rounded-full flex items-center justify-center"
@@ -328,7 +355,7 @@ const BlogDetail = ({
               >
                 &gt;
               </button>
-            </div>
+            </motion.div>
           </div>
         )}
       </div>

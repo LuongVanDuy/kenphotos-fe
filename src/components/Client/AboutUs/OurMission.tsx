@@ -1,7 +1,13 @@
 "use client";
 
 import MainTitle from "../Common/Title/MainTitle";
-import { StarOutlined, AimOutlined, TeamOutlined, TrophyOutlined } from "@ant-design/icons";
+import {
+  StarOutlined,
+  AimOutlined,
+  TeamOutlined,
+  TrophyOutlined,
+} from "@ant-design/icons";
+import { motion } from "framer-motion";
 
 const data = [
   {
@@ -27,6 +33,19 @@ const data = [
 ];
 
 const OurMission: React.FC = () => {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.14, delayChildren: 0.1 },
+    },
+  };
+
+  const item: any = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  };
+
   return (
     <section className="relative py-10 md:pt-[70px] md:pb-[120px] bg-[rgba(220,237,248,0.6)]">
       <div className="max-w-content mx-auto px-4">
@@ -43,23 +62,49 @@ const OurMission: React.FC = () => {
           content="True Color has built a global reputation for delivering exceptional, on-time results. Clients praise our detail, clear communication, and ability to turn ordinary images into stunning, market-ready visuals."
         />
 
-        <ul className="md:flex mt-16">
-          {data.map((item, index) => {
-            const Icon = item.icon;
+        <motion.ul
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+          className="md:flex mt-16"
+        >
+          {data.map((itemData, index) => {
+            const Icon = itemData.icon;
             return (
-              <li key={index} className="md:flex-col flex-1 justify-between flex gap-10">
+              <motion.li
+                key={index}
+                variants={item}
+                className="md:flex-col flex-1 justify-between flex gap-10"
+              >
                 <div className="md:flex-row flex flex-col items-center gap-[12px] md:gap-[10px]">
                   <div className="h-3 w-3 md:mx-[4px]">
                     <svg fill="none" height="24" viewBox="0 0 24 24" width="24">
-                      <rect height="23" rx="11.5" stroke="#2D6DFF" width="23" x="0.5" y="0.500488"></rect>
-                      <circle cx="12" cy="12.0005" fill="#2D6DFF" r="6"></circle>
+                      <rect
+                        height="23"
+                        rx="11.5"
+                        stroke="#2D6DFF"
+                        width="23"
+                        x="0.5"
+                        y="0.500488"
+                      ></rect>
+                      <circle
+                        cx="12"
+                        cy="12.0005"
+                        fill="#2D6DFF"
+                        r="6"
+                      ></circle>
                     </svg>
                   </div>
-                  {index !== data.length - 1 && <div className="md:h-[1px] md:w-full h-full w-[1px] ml-[10px] md:ml-0 md:mt-3 bg-[#2D6DFF]"></div>}
+                  {index !== data.length - 1 && (
+                    <div className="md:h-[1px] md:w-full h-full w-[1px] ml-[10px] md:ml-0 md:mt-3 bg-[#2D6DFF]"></div>
+                  )}
                 </div>
 
                 <div
-                  className={`flex-1 p-6 rounded-xl ${index !== data.length - 1 ? "md:mr-[24px]" : ""}`}
+                  className={`flex-1 p-6 rounded-xl ${
+                    index !== data.length - 1 ? "md:mr-[24px]" : ""
+                  }`}
                   style={{
                     backdropFilter: "blur(8px)",
                     backgroundColor: "#fffc",
@@ -68,13 +113,15 @@ const OurMission: React.FC = () => {
                   <div className="w-[50px] h-[50px] bg-[rgba(220,237,248,0.6)] flex items-center justify-center rounded-md mb-4">
                     <Icon style={{ fontSize: 24, color: "#2D6DFF" }} />
                   </div>
-                  <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">{item.title}</h3>
-                  <p className="text-black text-[16px]">{item.content}</p>
+                  <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px]">
+                    {itemData.title}
+                  </h3>
+                  <p className="text-black text-[16px]">{itemData.content}</p>
                 </div>
-              </li>
+              </motion.li>
             );
           })}
-        </ul>
+        </motion.ul>
       </div>
     </section>
   );

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import MainTitle from "../Common/Title/MainTitle";
+import { motion } from "framer-motion";
 
 import {
   RocketOutlined,
@@ -74,6 +75,23 @@ const data = [
 ];
 
 const OurStory: React.FC = () => {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+    },
+  };
+
+  const item: any = {
+    hidden: { opacity: 0, y: 40 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
+  };
+
   return (
     <section className="relative py-10 px-5 md:px-0 md:pt-[70px] md:pb-[120px]">
       <div className="max-w-content mx-auto">
@@ -89,28 +107,34 @@ const OurStory: React.FC = () => {
           subTitle="Passionate About Perfecting Every Shot"
           content="From humble beginnings to a global clientele, True Color delivers vibrant, accurate, and market-ready images that make every property shine."
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-12 mt-12">
-          {data.map((item, index) => {
-            const Icon = item.icon;
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 md:gap-12 mt-12"
+        >
+          {data.map((itemData, index) => {
+            const Icon = itemData.icon;
             return (
-              <div key={index}>
+              <motion.div key={index} variants={item}>
                 <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
                   <Image
-                    src={`/images/${item.image}`}
-                    alt={item.title}
+                    src={`/images/${itemData.image}`}
+                    alt={itemData.title}
                     width={600}
                     height={400}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
                 <h3 className="text-[22px] leading-[30px] mb-4 font-semibold text-[#161817] md:text-[24px] md:leading-[24px] flex items-center gap-2">
-                  <Icon style={{ color: "#2D6DFF" }} /> {item.title}
+                  <Icon style={{ color: "#2D6DFF" }} /> {itemData.title}
                 </h3>
-                <p className="text-gray-600 mt-2">{item.description}</p>
-              </div>
+                <p className="text-gray-600 mt-2">{itemData.description}</p>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
