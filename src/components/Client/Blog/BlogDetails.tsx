@@ -6,6 +6,7 @@ import { Navigation, Autoplay } from "swiper/modules";
 import SwiperCore from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
+import "../../../../public/css/blog-detail.css";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { connect } from "react-redux";
@@ -276,7 +277,7 @@ const BlogDetail = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="flex-1 text-start m-auto w-full sm:max-w-[592px] md:max-w-[600px] lg:max-w-[690px] xl:max-w-[792px] mb-24"
+            className="flex-1 text-start m-auto w-full sm:max-w-[592px] md:max-w-[600px] lg:max-w-[690px] xl:max-w-[792px] mb-24 blog-detail-content"
             dangerouslySetInnerHTML={{ __html: postDetail.content }}
           />
         </div>

@@ -1,24 +1,28 @@
-import { notFound } from 'next/navigation'
+import { notFound } from "next/navigation";
 
-import 'swiper/css'
-import 'swiper/css/navigation'
-import '../../../../../public/css/ServiceSlide.css'
+import "swiper/css";
+import "swiper/css/navigation";
+import "../../../../../public/css/ServiceSlide.css";
 
-import FormService from '@/components/Client/Common/FormService'
-import HowWeWork from '@/components/Client/Common/HowWeWork'
-import Info from '@/components/Client/Service/Info'
-import StepGrid from '@/components/Client/Service/StepGrid'
-import Related from '@/components/Client/Service/Related'
-import { createMetadata, fetchServiceMeta } from '@/utils/metadata'
-import WhyChooseUs from '@/components/Client/Service/WhyChooseUs'
+import FormService from "@/components/Client/Common/FormService";
+import HowWeWork from "@/components/Client/Common/HowWeWork";
+import Info from "@/components/Client/Service/Info";
+import StepGrid from "@/components/Client/Service/StepGrid";
+import Related from "@/components/Client/Service/Related";
+import { createMetadata, fetchServiceMeta } from "@/utils/metadata";
+import WhyChooseUs from "@/components/Client/Service/WhyChooseUs";
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const service = await fetchServiceMeta(params.slug)
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const service = await fetchServiceMeta(params.slug);
   if (!service) {
     return createMetadata({
-      title: 'Page Not Found',
-      description: 'Service information not found.',
-    })
+      title: "Page Not Found",
+      description: "Service information not found.",
+    });
   }
 
   return createMetadata({
@@ -26,25 +30,31 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     description: service.content,
     image: service.images[0].afterUrl,
     url: `https://kenphotos.com/services/${params.slug}`,
-  })
+  });
 }
 
-export default async function ServiceDetails({ params }: { params: { slug: string[] | string } }) {
-  const slugPath = Array.isArray(params.slug) ? params.slug.join('/') : params.slug
-  const service = await fetchServiceMeta(slugPath)
-
+export default async function ServiceDetails({
+  params,
+}: {
+  params: { slug: string[] | string };
+}) {
+  const slugPath = Array.isArray(params.slug)
+    ? params.slug.join("/")
+    : params.slug;
+  const service = await fetchServiceMeta(slugPath);
+  console.log("service", service.steps);
   if (!service) {
-    notFound()
+    notFound();
   }
 
   return (
     <>
       <Info serviceDetail={service} />
       {/* <StepGrid /> */}
-      <WhyChooseUs />
+      <WhyChooseUs steps={service.steps} />
       <Related relatedServices={service.relatedServices} />
       <HowWeWork />
-      <FormService dataKey='formService' />
+      <FormService dataKey="formService" />
     </>
-  )
+  );
 }
