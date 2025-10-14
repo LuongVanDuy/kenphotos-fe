@@ -1,6 +1,7 @@
 "use client";
 import { useScrollToForm } from "@/utils/scrollToForm";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const HeroBanner: React.FC = () => {
   const scrollToForm = useScrollToForm();
@@ -8,7 +9,7 @@ const HeroBanner: React.FC = () => {
   return (
     <section className="w-full bg-section pt-[100px] md:pt-[180px]">
       <div className="max-w-content mx-auto px-4">
-        <div className="flex flex-col md:flex-row w-full min-h-[580px] py-5 md:py-0 gap-5 md:gap-0">
+        <div className="flex flex-col items-center md:flex-row w-full min-h-[580px] py-5 md:py-0 gap-5 md:gap-0">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -104,23 +105,13 @@ const HeroBanner: React.FC = () => {
             className="w-[100%] lg:w-[50%] flex-1 h-full"
           >
             <div className="relative w-full h-full rounded-xl overflow-hidden">
-              <video
-                className="w-full h-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              >
-                <source
-                  src="https://firebasestorage.googleapis.com/v0/b/video-cdn-518f9.appspot.com/o/EARTH-web.mp4?alt=media&token=36f3207d-c171-4526-89c9-a950645dfe4c"
-                  type="video/webm"
-                />
-                <source
-                  src="https://firebasestorage.googleapis.com/v0/b/video-cdn-518f9.appspot.com/o/EARTH-web.mp4?alt=media&token=36f3207d-c171-4526-89c9-a950645dfe4c"
-                  type="video/mp4"
-                />
-                Your browser does not support the video tag.
-              </video>
+              <Image
+                src="/images/style-10.webp"
+                width={600}
+                height={500}
+                alt=""
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              />
             </div>
           </motion.div>
         </div>

@@ -6,7 +6,7 @@
 .blog-detail-content h5,
 .blog-detail-content h6 {
   color: #555;
-  margin-bottom: 0.5em;
+  margin-bottom: 15px;
   margin-top: 0;
   text-rendering: optimizeSpeed;
   width: 100%;
@@ -48,4 +48,8 @@
 .blog-detail-content h6 {
   font-size: 0.85em;
   opacity: 0.8;
+}
+
+.blog-detail-content p {
+  margin-bottom: 16px;
 }

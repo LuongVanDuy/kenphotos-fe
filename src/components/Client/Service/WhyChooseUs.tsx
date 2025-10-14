@@ -52,6 +52,10 @@ const WhyChooseUs: React.FC<{ steps: any }> = ({ steps }) => {
     setActiveStepIndex(newActiveSteps);
   };
 
+  if (!parsedSteps || parsedSteps.length === 0) {
+    return null; // Don't render the section if there are no steps
+  }
+
   return (
     <section className="bg-white relative py-10 md:pt-[70px] md:pb-[120px]">
       <div className="max-w-content mx-auto px-4">

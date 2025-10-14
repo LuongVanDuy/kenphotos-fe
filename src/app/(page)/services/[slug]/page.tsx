@@ -42,7 +42,6 @@ export default async function ServiceDetails({
     ? params.slug.join("/")
     : params.slug;
   const service = await fetchServiceMeta(slugPath);
-  console.log("service", service.steps);
   if (!service) {
     notFound();
   }

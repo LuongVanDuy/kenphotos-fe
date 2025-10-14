@@ -27,6 +27,7 @@ import MediaLibraryModal from "@/components/Admin/Common/MediaLibraryModal";
 import { getImageUrl } from "@/utils/imageUrl";
 import { slugify } from "@/utils/slugify";
 import CustomQuill from "../Common/CustomQuill";
+import TextArea from "antd/es/input/TextArea";
 
 interface ServiceFormProps {
   form?: any;
@@ -119,10 +120,8 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         console.error("Error parsing steps:", error);
         parsedSteps = [];
       }
-      console.log("parsedSteps", parsedSteps);
       setSteps(parsedSteps);
 
-      // Use setTimeout to ensure form is fully mounted
       setTimeout(() => {
         form.setFieldsValue({ steps: parsedSteps });
       }, 0);
@@ -620,7 +619,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                                       label="Content"
                                                       className="!mb-0"
                                                     >
-                                                      <Input
+                                                      <TextArea
                                                         placeholder="Detail content"
                                                         className="!rounded-lg"
                                                       />
