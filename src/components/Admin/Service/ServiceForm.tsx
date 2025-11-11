@@ -446,7 +446,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                 <div className="rounded-lg border border-gray-300 overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
-                      Content
+                      Short description
                     </h3>
                   </div>
                   <div className="bg-white">
@@ -473,10 +473,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                 <div className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-3 lg:px-4 py-2 lg:py-3 border-b border-gray-300">
                     <h3 className="text-sm font-semibold text-gray-700">
-                      Detail
+                      Detail information
                     </h3>
                   </div>
                   <div className="bg-white p-3 lg:p-6">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                      Service gallery
+                    </h3>
                     <Form.Item
                       name="images"
                       labelCol={{ style: { width: "100%" } }}
@@ -487,23 +490,17 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                           {selectedImages.map((image, index) => (
                             <div
                               key={index}
-                              className="p-3 lg:p-5 border-2 rounded-lg"
+                              className="p-3 lg:p-5 border-2 rounded-lg relative"
                             >
-                              <div className="flex items-center justify-between mb-3 lg:mb-4">
-                                <h4 className="text-base lg:text-lg font-semibold text-gray-700">
-                                  Image Pair {index + 1}
-                                </h4>
-                                {selectedImages.length > 1 && (
-                                  <Button
-                                    type="text"
-                                    icon={<DeleteOutlined />}
-                                    onClick={() => handleRemoveImage(index)}
-                                    size="small"
-                                    className="ml-2 text-gray-400 hover:text-red-500"
-                                    style={{ marginTop: 2 }}
-                                  />
-                                )}
-                              </div>
+                              {selectedImages.length > 1 && (
+                                <Button
+                                  type="text"
+                                  icon={<DeleteOutlined />}
+                                  onClick={() => handleRemoveImage(index)}
+                                  size="small"
+                                  className="!absolute top-0 right-0 max-h-[24px] text-gray-400 hover:text-red-500"
+                                />
+                              )}
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                                 {renderImageField("before", index, image)}
                                 {renderImageField("after", index, image)}
@@ -519,7 +516,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                             className="hover:border-blue-500"
                             size="middle"
                           >
-                            Add Image Pair
+                            Add
                           </Button>
                         </div>
                       </div>
@@ -529,6 +526,9 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                   <div className="w-full h-[1px] px-5 bg-gray-200" />
 
                   <div className="bg-white p-3 lg:p-6">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                      Why Choose Us Steps
+                    </h3>
                     <Form.List name="steps">
                       {(fields, { add, remove }) => (
                         <div>
@@ -888,7 +888,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                                             }
                                             size="small"
                                           >
-                                            Add Detail
+                                            Add
                                           </Button>
                                         </div>
                                       </>

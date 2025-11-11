@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import ServiceCard from "../Service/ServiceCard";
 import { ArrowRightIcon } from "@/components/Icons";
 import { connect } from "react-redux";
@@ -54,17 +53,12 @@ const Services = ({ serviceList, serviceTotal, serviceLoading }: any) => {
             : null}
         </div>
 
-        <motion.button
+        <button
           onClick={() => router.push("/services")}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
-          whileHover={{ scale: 1.05 }}
           className="px-[30px] py-[15px] text-[18px] mt-10 md:mt-20 bg-[#2D6DFF] min-w-[180px]  text-white rounded-full text-sm font-medium hover:opacity-90"
         >
           View all <ArrowRightIcon className="ml-2" />
-        </motion.button>
+        </button>
       </div>
     </section>
   );

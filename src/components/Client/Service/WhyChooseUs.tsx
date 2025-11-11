@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import MainTitle from "../Common/Title/MainTitle";
 import { CompareSlider } from "../Common/CompareSlider";
 import CheckIcon from "@/components/Icons/CheckIcon";
-import { motion } from "framer-motion";
 import { getImageUrl } from "@/utils/imageUrl";
 
 const WhyChooseUs: React.FC<{ steps: any }> = ({ steps }) => {
@@ -72,19 +71,12 @@ const WhyChooseUs: React.FC<{ steps: any }> = ({ steps }) => {
           content="From advanced photo editing to stunning 3D visualizations, we focus on quality, speed, and consistency. Our dedicated team ensures every project enhances your property’s value and gives you a competitive edge."
         />
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          className="mt-12 md:mt-16 space-y-16 md:space-y-24"
-        >
+        <div className="mt-12 md:mt-16 space-y-16 md:space-y-24">
           {parsedSteps?.map((feature: any, featureIndex: any) => {
             const activeStep = feature.steps[activeStepIndex[featureIndex]];
             return (
-              <motion.div
+              <div
                 key={featureIndex}
-                variants={item}
                 className={`flex flex-col ${
                   featureIndex % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
                 } gap-8 md:gap-12 items-center`}
@@ -168,10 +160,10 @@ const WhyChooseUs: React.FC<{ steps: any }> = ({ steps }) => {
                     </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -321,7 +321,7 @@ const ServiceListPage: React.FC = () => {
 
   const handleView = useCallback(
     (service: Service) => {
-      router.push(`/admin/service/${service.id}`);
+      router.push(`/admin/services/${service.slug}`);
     },
     [router]
   );
@@ -432,12 +432,12 @@ const ServiceListPage: React.FC = () => {
               },
             ]
           : [
-              {
-                key: "view",
-                label: "View",
-                icon: <EyeOutlined />,
-                onClick: () => handleView(record),
-              },
+              // {
+              //   key: "view",
+              //   label: "View",
+              //   icon: <EyeOutlined />,
+              //   onClick: () => handleView(record),
+              // },
               {
                 key: "edit",
                 label: "Edit",

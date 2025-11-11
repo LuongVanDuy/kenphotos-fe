@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import SwiperCore from "swiper";
-import { motion } from "framer-motion";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -65,28 +64,16 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
       <div className="max-w-content mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-10 gap-10 items-start">
           {/* LEFT CONTENT */}
-          <div className="md:col-span-4 text-left space-y-6">
+          <div className="order-2 md:order-1 md:col-span-4 text-left space-y-6">
             <div className="text-center md:text-left">
               <p className="text-[22px] leading-[30px] text-center md:text-[24px] md:text-left">
                 Photo Editing
               </p>
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                className="p-0 my-5 text-[26px] leading-[32px] font-semibold max-w-full text-center md:text-left md:my-[35px] md:mb-[34px] md:text-[60px] md:leading-[66px]"
-              >
+              <h1 className="p-0 my-5 text-[26px] leading-[32px] font-semibold max-w-full text-center md:text-left md:my-[35px] md:mb-[34px] md:text-[60px] md:leading-[66px]">
                 {serviceDetail?.title}
-              </motion.h1>
+              </h1>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.8 }}
-                className="flex gap-8 items-center justify-center md:justify-start mb-6"
-              >
+              <div className="flex gap-8 items-center justify-center md:justify-start mb-6">
                 <div className="flex items-center  gap-2 text-center">
                   {serviceDetail?.originalPrice &&
                   serviceDetail?.discountedPrice ? (
@@ -132,25 +119,15 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                     </span>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
+              <div
                 className="text-[18px] md:max-w-[90%]"
                 dangerouslySetInnerHTML={{
                   __html: serviceDetail?.content || "",
                 }}
-              ></motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.8 }}
-                className="flex flex-col sm:flex-row items-center gap-4 mt-8"
-              >
+              ></div>
+              <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
                 <button
                   type="button"
                   onClick={scrollToForm}
@@ -158,25 +135,13 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                 >
                   Send Free Test
                 </button>
-              </motion.div>
+              </div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{
-                duration: 0.6,
-                ease: [0.22, 1, 0.36, 1],
-                delay: 1.0,
-              }}
-              className="flex flex-col md:flex-row bg-transparent rounded-lg border border-gray-200"
-            >
+            <div className="flex flex-col md:flex-row bg-transparent rounded-lg border border-gray-200">
               <div className="flex flex-row md:flex-col min-w-full md:min-w-[200px]">
                 {accordionData.map((item, index) => (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                  <button
                     type="button"
                     key={index}
                     onClick={() => setActiveTab(index)}
@@ -214,31 +179,22 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                         />
                       </>
                     )}
-                  </motion.button>
+                  </button>
                 ))}
               </div>
 
-              <motion.div
+              <div
                 key={activeTab}
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 className="flex-1 border-t md:border-t-0 md:border-l border-gray-200 p-6"
               >
                 <div className="text-gray-700">
                   {accordionData[activeTab].content}
                 </div>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-            className="md:col-span-6"
-          >
+          <div className="order-1 md:order-2 md:col-span-6">
             <Swiper
               modules={[Navigation]}
               navigation
@@ -270,7 +226,7 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                 </SwiperSlide>
               ))}
             </Swiper>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

@@ -1,6 +1,5 @@
 "use client";
 import { useScrollToForm } from "@/utils/scrollToForm";
-import { motion } from "framer-motion";
 import Image from "next/image";
 
 const HeroBanner: React.FC = () => {
@@ -10,51 +9,29 @@ const HeroBanner: React.FC = () => {
     <section className="w-full bg-section pt-[100px] md:pt-[180px]">
       <div className="max-w-content mx-auto px-4">
         <div className="flex flex-col items-center md:flex-row w-full min-h-[580px] py-5 md:py-0 gap-5 md:gap-0">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-[100%] lg:w-[50%] flex-1 h-full"
-          >
+          <div className="w-[100%] lg:w-[50%] flex-1 h-full">
             <div className="text-center md:text-left">
               <p className="text-[22px] leading-[30px] text-center md:text-[24px] md:text-left">
                 About Us
               </p>
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                className="p-0 my-5 text-[26px] leading-[32px] font-semibold max-w-full text-center md:text-left md:my-[35px] md:mb-[34px] md:text-[60px] md:leading-[66px]"
-              >
+              <h1 className="p-0 my-5 text-[26px] leading-[32px] font-semibold max-w-full text-center md:text-left md:my-[35px] md:mb-[34px] md:text-[60px] md:leading-[66px]">
                 True Color Real Estate Visual Solutions
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
+              </h1>
+              <p
                 className="font-semibold bg-gradient-to-t from-[#184BF8] to-[#2C6BFF] bg-clip-text text-transparent -webkit-background-clip-text -webkit-text-fill-transparent
                 text-[16px] leading-[20px] mt-2 mb-0 text-center
                 md:text-[20px] md:leading-[25px] md:mb-6 md:mt-0 md:text-left"
               >
                 Premium Editing & Visualization Services
-              </motion.p>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-                className="text-[18px] md:max-w-[90%]"
-              >
+              </p>
+              <p className="text-[18px] md:max-w-[90%]">
                 From precise color correction and realistic virtual staging to
                 immersive 3D visualizations, True Color elevates ordinary
                 property photos into powerful marketing assets. Our fast
                 turnaround and meticulous attention to detail help you attract
                 more buyers and close deals faster.
-              </motion.p>
-              <motion.div
+              </p>
+              {/* <div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
@@ -68,14 +45,8 @@ const HeroBanner: React.FC = () => {
                 >
                   Send Free Test
                 </button>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.6 }}
-                className="flex items-center flex-col md:flex-row gap-2 mt-8 "
-              >
+              </div> */}
+              <div className="flex items-center flex-col md:flex-row gap-2 mt-8 ">
                 <div className="flex items-center  gap-1">
                   {[...Array(5)].map((_, index) => (
                     <svg
@@ -94,16 +65,10 @@ const HeroBanner: React.FC = () => {
                   <span className="font-bold text-black">5-star</span>
                   <span>reviews on Google.</span>
                 </p>
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-            className="w-[100%] lg:w-[50%] flex-1 h-full"
-          >
+          </div>
+          <div className="w-[100%] lg:w-[50%] flex-1 h-full">
             <div className="relative w-full h-full rounded-xl overflow-hidden">
               <Image
                 src="/images/style-10.webp"
@@ -113,7 +78,7 @@ const HeroBanner: React.FC = () => {
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

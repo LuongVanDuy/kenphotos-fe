@@ -10,7 +10,11 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import FloatingContacts from "./Contacts";
 
-export default function LayoutProvider({ children }: { children: React.ReactNode }) {
+export default function LayoutProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const [isHydrated, setIsHydrated] = useState(false);
   const isAdminRoute = pathname?.startsWith("/admin");

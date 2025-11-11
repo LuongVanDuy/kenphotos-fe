@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 import MainTitle from "./Title/MainTitle";
 
 const reviews = [
@@ -52,7 +51,7 @@ interface ReviewsProps {
 }
 
 const ReviewCard = ({ item }: { item: (typeof reviews)[0] }) => (
-  <motion.div whileHover={{ scale: 1.05, y: -5 }} className="flex-shrink-0 w-80 p-4 bg-white shadow-md rounded-xl mx-3">
+  <div className="flex-shrink-0 w-80 p-4 bg-white shadow-md rounded-xl mx-3">
     <div className="flex mb-2">
       {[...Array(5)].map((_, i) => (
         <svg
@@ -83,15 +82,29 @@ const ReviewCard = ({ item }: { item: (typeof reviews)[0] }) => (
     >
       {item.text}
     </p>
-  </motion.div>
+  </div>
 );
 
-const ReviewRow = ({ direction = "left", speed = "slow" }: { direction?: "left" | "right"; speed?: "slow" | "medium" | "fast" }) => {
+const ReviewRow = ({
+  direction = "left",
+  speed = "slow",
+}: {
+  direction?: "left" | "right";
+  speed?: "slow" | "medium" | "fast";
+}) => {
   const getAnimationClass = () => {
     if (direction === "right") {
-      return speed === "slow" ? "animate-scroll-right-slow" : speed === "medium" ? "animate-scroll-right-medium" : "animate-scroll-right-fast";
+      return speed === "slow"
+        ? "animate-scroll-right-slow"
+        : speed === "medium"
+        ? "animate-scroll-right-medium"
+        : "animate-scroll-right-fast";
     } else {
-      return speed === "slow" ? "animate-scroll-slow" : speed === "medium" ? "animate-scroll-medium" : "animate-scroll-fast";
+      return speed === "slow"
+        ? "animate-scroll-slow"
+        : speed === "medium"
+        ? "animate-scroll-medium"
+        : "animate-scroll-fast";
     }
   };
 
@@ -111,7 +124,9 @@ const ReviewRow = ({ direction = "left", speed = "slow" }: { direction?: "left" 
 
 const Reviews: React.FC<ReviewsProps> = ({ className = "" }) => {
   return (
-    <section className={`py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)] relative ${className}`}>
+    <section
+      className={`py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)] relative ${className}`}
+    >
       <div className="max-w-content mx-auto px-4 w-full">
         <MainTitle
           title={
@@ -125,27 +140,13 @@ const Reviews: React.FC<ReviewsProps> = ({ className = "" }) => {
           content="True Color has built a global reputation for delivering exceptional, on-time results. Clients praise our detail, clear communication, and ability to turn ordinary images into stunning, market-ready visuals."
         />
       </div>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="mt-12"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-          className="mt-12"
-        >
-          {/* First row - scrolls left */}
-          <ReviewRow direction="left" speed="medium" />
+      <div className="mt-12">
+        {/* First row - scrolls left */}
+        <ReviewRow direction="left" speed="medium" />
 
-          {/* Second row - scrolls right */}
-          <ReviewRow direction="right" speed="slow" />
-        </motion.div>
-      </motion.div>
+        {/* Second row - scrolls right */}
+        <ReviewRow direction="right" speed="slow" />
+      </div>
     </section>
   );
 };

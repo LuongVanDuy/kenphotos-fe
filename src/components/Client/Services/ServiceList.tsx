@@ -8,7 +8,6 @@ import ServiceCard from "@/components/Client/Service/ServiceCard";
 import ServiceFilterBar from "@/components/Client/Services/ServiceFilterBar";
 import ServiceCardLoading from "@/components/Client/Services/ServiceCardLoading";
 import { Empty } from "antd";
-import { motion } from "framer-motion";
 
 const ServiceList = ({
   fetchPublicServices,
@@ -19,9 +18,9 @@ const ServiceList = ({
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(6);
+  const [pageSize, setPageSize] = useState(18);
 
-  function handleQuery(search = "", category = 0, page = 1, itemsPerPage = 6) {
+  function handleQuery(search = "", category = 0, page = 1, itemsPerPage = 18) {
     fetchPublicServices(
       {
         search,
@@ -73,27 +72,15 @@ const ServiceList = ({
             />
           </div>
 
-          <ServiceFilterBar
+          {/* <ServiceFilterBar
             keyword={search}
             onKeywordChange={setSearch}
             onSearch={() => handleQuery(search, category, 1, 6)}
             category={category}
             onCategoryChange={onCategoryChange}
-          />
+          /> */}
 
-          <motion.div
-            variants={{
-              hidden: { opacity: 0 },
-              show: {
-                opacity: 1,
-                transition: { staggerChildren: 0.12, delayChildren: 0.05 },
-              },
-            }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mt-12"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mt-12">
             {serviceLoading
               ? Array.from({ length: 6 }).map((_, index) => (
                   <ServiceCardLoading key={index} />
@@ -115,7 +102,7 @@ const ServiceList = ({
                   />
                 ))
               : null}
-          </motion.div>
+          </div>
 
           {!serviceLoading && totalPages === 0 && (
             <div className="w-full flex justify-center py-16">

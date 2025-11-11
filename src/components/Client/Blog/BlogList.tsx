@@ -9,7 +9,6 @@ import BlogCard from "@/components/Client/Blog/BlogCard";
 import BlogCardLoading from "@/components/Client/Blog/BlogCardLoading";
 import BlogFilterBar from "@/components/Client/Blog/BlogFilterBar";
 import { Empty } from "antd";
-import { motion } from "framer-motion";
 
 const BlogList = ({
   fetchPublicPosts,
@@ -77,12 +76,7 @@ const BlogList = ({
             onSearch={() => handleQuery(search, 1, pageSize, true)}
           />
 
-          <motion.div
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.15 }}
-            className="space-y-10 mt-12"
-          >
+          <div className="space-y-10 mt-12">
             {postLoading && grids.length === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10 styles_postList">
                 {Array.from({ length: 5 }).map((_, index) => (
@@ -92,17 +86,7 @@ const BlogList = ({
             )}
 
             {grids.map((grid, gridIndex) => (
-              <motion.div
-                variants={{
-                  hidden: { opacity: 0 },
-                  show: {
-                    opacity: 1,
-                    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
-                  },
-                }}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.2 }}
+              <div
                 key={gridIndex}
                 className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10 styles_postList ${
                   (gridIndex + 1) % 2 === 0 ? "styles_postList_old" : ""
@@ -111,9 +95,9 @@ const BlogList = ({
                 {grid.map((post: any, index: any) => (
                   <BlogCard key={index} blog={post} />
                 ))}
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
 
           {grids.flat().length < postTotal && (
             <div className="text-center mt-10">

@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
 import MainTitle from "./Title/MainTitle";
 import { MailOutlined, PhoneOutlined } from "@ant-design/icons";
 import { connect, useSelector, useDispatch } from "react-redux";
@@ -23,7 +22,6 @@ const FormService = ({
   const slug = params?.slug;
 
   const [verified, setVerified] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [captchaChecked, setCaptchaChecked] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -37,6 +35,9 @@ const FormService = ({
 
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+
+  const [loading, setLoading] = useState(false);
+  const captchaRef = useRef<HTMLDivElement | null>(null);
 
   function handleQuery(page = 1, itemsPerPage = 20) {
     fetchPublicServices(
@@ -87,44 +88,6 @@ const FormService = ({
       ...prev,
       selectedServiceId: parseInt(e.target.value),
     }));
-  };
-
-  const handleCheckboxChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setCaptchaChecked(e.target.checked);
-
-    if (!e.target.checked) {
-      setVerified(false);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const token = await window.grecaptcha.execute(
-        "6LfvyqYrAAAAACOms6yP9H3TowHoG082voRRc9sx",
-        {
-          action: "submit",
-        }
-      );
-
-      const res = await postNoToken("captcha/verify", { token });
-      if (res.verified) {
-        setVerified(true);
-        alert("Captcha verified successfully");
-      } else {
-        setVerified(false);
-        setCaptchaChecked(false);
-        alert("Captcha verification failed");
-      }
-    } catch (err: any) {
-      console.error(err);
-      alert(`Captcha verification failed: ${err.message}`);
-      setVerified(false);
-      setCaptchaChecked(false);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const onSuccess = (response?: any) => {
@@ -221,6 +184,58 @@ const FormService = ({
     dispatch(createPublicOrder(orderPayload, onSuccess, onFailure) as any);
   };
 
+  const handleCheckboxChange = async (
+    e?: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const checked = e ? e.target.checked : true; // ✅ an toàn hơn
+    setCaptchaChecked(checked);
+
+    if (!checked) {
+      setVerified(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = await window.grecaptcha.execute(
+        "6LfvyqYrAAAAACOms6yP9H3TowHoG082voRRc9sx",
+        { action: "submit" }
+      );
+
+      const res = await postNoToken("captcha/verify", { token });
+      if (res.verified) {
+        setVerified(true);
+        setCaptchaChecked(true);
+        console.log("Captcha verified successfully");
+      } else {
+        setVerified(false);
+        setCaptchaChecked(false);
+        console.warn("Captcha verification failed");
+      }
+    } catch (err: any) {
+      console.error("Captcha verification failed:", err);
+      setVerified(false);
+      setCaptchaChecked(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && !verified && !loading) {
+          handleCheckboxChange();
+        }
+      },
+      { threshold: 0.5 } // khi Captcha hiển thị ≥50% trong màn hình
+    );
+
+    if (captchaRef.current) observer.observe(captchaRef.current);
+    return () => observer.disconnect();
+  }, [verified, loading]);
+
   return (
     <section
       className="py-10 md:py-[120px] bg-[rgba(220,237,248,0.6)]"
@@ -228,13 +243,7 @@ const FormService = ({
     >
       <div className="max-w-content mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-start">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="space-y-10 md:pr-12 md:sticky md:top-24"
-          >
+          <div className="space-y-10 md:pr-12 md:sticky md:top-24">
             <MainTitle
               title={
                 <>
@@ -291,44 +300,22 @@ const FormService = ({
                 ></iframe>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="md:pl-16"
-          >
+          <div className="md:pl-16">
             <form
               onSubmit={handleSubmit}
               className="space-y-10 text-black"
               aria-label="Projektanfrage Formular"
             >
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-                className="space-y-6"
-              >
+              <div className="space-y-6">
                 <h2 className="text-2xl md:text-3xl font-bold">
                   Booking services
                 </h2>
 
                 <div className="space-y-4">
                   <div className="flex flex-wrap gap-4">
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      transition={{
-                        duration: 0.6,
-                        ease: "easeOut",
-                        delay: 0.5,
-                      }}
-                      className="w-full md:w-[48%]"
-                    >
+                    <div className="w-full md:w-[48%]">
                       <label htmlFor="name" className="block mb-1">
                         Full Name
                       </label>
@@ -342,19 +329,9 @@ const FormService = ({
                         placeholder="Enter your full name"
                         className="w-full p-4 border border-[#B1B1B1] rounded-md focus:outline-none focus:ring-2 focus:#2D6DFF"
                       />
-                    </motion.div>
+                    </div>
 
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      transition={{
-                        duration: 0.6,
-                        ease: "easeOut",
-                        delay: 0.6,
-                      }}
-                      className="w-full md:w-[48%]"
-                    >
+                    <div className="w-full md:w-[48%]">
                       <label htmlFor="email" className="block mb-1">
                         Email Address
                       </label>
@@ -368,21 +345,11 @@ const FormService = ({
                         placeholder="Enter your email for order updates"
                         className="w-full p-4 border border-[#B1B1B1] rounded-md focus:outline-none focus:ring-2 focus:#2D6DFF"
                       />
-                    </motion.div>
+                    </div>
                   </div>
 
                   <div className="flex flex-wrap gap-4">
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      transition={{
-                        duration: 0.6,
-                        ease: "easeOut",
-                        delay: 0.7,
-                      }}
-                      className="w-full md:w-[48%]"
-                    >
+                    <div className="w-full md:w-[48%]">
                       <label htmlFor="phone" className="block mb-1">
                         Phone Number
                       </label>
@@ -395,19 +362,9 @@ const FormService = ({
                         placeholder="Enter your contact number"
                         className="w-full p-4 border border-[#B1B1B1] rounded-md focus:outline-none focus:ring-2 focus:#2D6DFF"
                       />
-                    </motion.div>
+                    </div>
 
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      transition={{
-                        duration: 0.6,
-                        ease: "easeOut",
-                        delay: 0.8,
-                      }}
-                      className="w-full md:w-[48%]"
-                    >
+                    <div className="w-full md:w-[48%]">
                       <label htmlFor="address" className="block mb-1">
                         Property Address
                       </label>
@@ -420,16 +377,10 @@ const FormService = ({
                         placeholder="Enter the property location "
                         className="w-full p-4 border border-[#B1B1B1] rounded-md focus:outline-none focus:ring-2 focus:#2D6DFF"
                       />
-                    </motion.div>
+                    </div>
                   </div>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6, ease: "easeOut", delay: 0.8 }}
-                    className="w-full"
-                  >
+                  <div className="w-full">
                     <label htmlFor="inputFileUrl" className="block mb-1">
                       Link to Your Photos
                     </label>
@@ -442,14 +393,9 @@ const FormService = ({
                       placeholder="Paste the link to your photo files (Google Drive, Dropbox, etc.)"
                       className="w-full p-4 border border-[#B1B1B1] rounded-md focus:outline-none focus:ring-2 focus:#2D6DFF"
                     />
-                  </motion.div>
+                  </div>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6, ease: "easeOut", delay: 0.9 }}
-                  >
+                  <div>
                     <label htmlFor="note" className="block mb-1">
                       Note
                     </label>
@@ -463,14 +409,9 @@ const FormService = ({
                       className="w-full p-4 border border-[#B1B1B1] rounded-md focus:outline-none focus:ring-2 focus:#2D6DFF"
                       placeholder='Request or what you want. (We will send you the tested image within 24 hours, if you don&apos;t see our email in your main mailbox, you able check at "update" or "spam".)'
                     />
-                  </motion.div>
+                  </div>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6, ease: "easeOut", delay: 1.0 }}
-                  >
+                  <div>
                     <span className="block mb-2">Services</span>
                     <div
                       className={`${
@@ -495,28 +436,9 @@ const FormService = ({
                         </label>
                       ))}
                     </div>
-                  </motion.div>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6, ease: "easeOut", delay: 1.4 }}
-                    className="text-gray-700 text-[15px] leading-relaxed"
-                  >
-                    To plan your project in the best possible way, we ask about
-                    your estimated budget in advance. With years of experience,
-                    our team knows which ideas are feasible within different
-                    budget ranges. This allows us to quickly assess whether your
-                    vision is realistic and suggest suitable alternatives or
-                    optimizations during the very first consultation.
-                  </motion.p>
+                  </div>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6, ease: "easeOut", delay: 1.5 }}
-                  >
+                  <div ref={captchaRef}>
                     <label className="block text-sm mb-2">
                       Captcha <span className="font-bold">(Required)</span>
                     </label>
@@ -536,24 +458,19 @@ const FormService = ({
                           : "Not verified"}
                       </span>
                     </label>
-                  </motion.div>
+                  </div>
 
-                  <motion.button
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6, ease: "easeOut", delay: 1.6 }}
-                    whileHover={{ scale: 1.05 }}
+                  <button
                     type="submit"
                     disabled={loading}
                     className="inline-flex items-center justify-center bg-[#2D6DFF] min-w-[180px] text-white rounded-full px-8 py-3 text-[18px] font-semibold hover:bg-gray-900 transition-all mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? "Sending..." : "Send →"}
-                  </motion.button>
+                  </button>
                 </div>
-              </motion.div>
+              </div>
             </form>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

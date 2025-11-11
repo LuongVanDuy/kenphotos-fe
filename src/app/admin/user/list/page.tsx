@@ -199,12 +199,12 @@ const UserListPage: React.FC = () => {
         <Dropdown
           menu={{
             items: [
-              {
-                key: "view",
-                label: "View",
-                icon: <EyeOutlined />,
-                onClick: () => handleView(record),
-              },
+              // {
+              //   key: "view",
+              //   label: "View",
+              //   icon: <EyeOutlined />,
+              //   onClick: () => handleView(record),
+              // },
               {
                 key: "edit",
                 label: "Edit",

@@ -7,7 +7,6 @@ import {
   TeamOutlined,
   TrophyOutlined,
 } from "@ant-design/icons";
-import { motion } from "framer-motion";
 
 const data = [
   {
@@ -62,19 +61,12 @@ const OurMission: React.FC = () => {
           content="True Color has built a global reputation for delivering exceptional, on-time results. Clients praise our detail, clear communication, and ability to turn ordinary images into stunning, market-ready visuals."
         />
 
-        <motion.ul
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          className="md:flex mt-16"
-        >
+        <ul className="md:flex mt-16">
           {data.map((itemData, index) => {
             const Icon = itemData.icon;
             return (
-              <motion.li
+              <li
                 key={index}
-                variants={item}
                 className="md:flex-col flex-1 justify-between flex gap-10"
               >
                 <div className="md:flex-row flex flex-col items-center gap-[12px] md:gap-[10px]">
@@ -118,10 +110,10 @@ const OurMission: React.FC = () => {
                   </h3>
                   <p className="text-black text-[16px]">{itemData.content}</p>
                 </div>
-              </motion.li>
+              </li>
             );
           })}
-        </motion.ul>
+        </ul>
       </div>
     </section>
   );

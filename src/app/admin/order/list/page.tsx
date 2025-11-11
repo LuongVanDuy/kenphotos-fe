@@ -1,13 +1,35 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button, Tag, message, Select, Table, Dropdown, Modal, Input } from "antd";
-import { PlusOutlined, MoreOutlined, EditOutlined, DeleteOutlined, EyeOutlined, RestOutlined, DeleteFilled } from "@ant-design/icons";
+import {
+  Button,
+  Tag,
+  message,
+  Select,
+  Table,
+  Dropdown,
+  Modal,
+  Input,
+} from "antd";
+import {
+  PlusOutlined,
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  RestOutlined,
+  DeleteFilled,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { useSession } from "next-auth/react";
 import { AppDispatch, RootState } from "@/store/store";
-import { deleteOrder, fetchOrders, permanentDeleteOrder, restoreOrder } from "@/store/actions/orders";
+import {
+  deleteOrder,
+  fetchOrders,
+  permanentDeleteOrder,
+  restoreOrder,
+} from "@/store/actions/orders";
 
 const { Option } = Select;
 
@@ -80,7 +102,14 @@ const OrderListPage: React.FC = () => {
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        dispatch(deleteOrder({ ids: [order.id] }, session?.accessToken || "", onSuccess, onFailure) as any);
+        dispatch(
+          deleteOrder(
+            { ids: [order.id] },
+            session?.accessToken || "",
+            onSuccess,
+            onFailure
+          ) as any
+        );
       },
     });
   };
@@ -93,7 +122,14 @@ const OrderListPage: React.FC = () => {
       okType: "primary",
       cancelText: "Cancel",
       onOk() {
-        dispatch(restoreOrder({ ids: [order.id] }, session?.accessToken || "", onSuccess, onFailure) as any);
+        dispatch(
+          restoreOrder(
+            { ids: [order.id] },
+            session?.accessToken || "",
+            onSuccess,
+            onFailure
+          ) as any
+        );
       },
     });
   };
@@ -106,7 +142,14 @@ const OrderListPage: React.FC = () => {
       okType: "danger",
       cancelText: "Cancel",
       onOk() {
-        dispatch(permanentDeleteOrder({ ids: [order.id] }, session?.accessToken || "", onSuccess, onFailure) as any);
+        dispatch(
+          permanentDeleteOrder(
+            { ids: [order.id] },
+            session?.accessToken || "",
+            onSuccess,
+            onFailure
+          ) as any
+        );
       },
     });
   };
@@ -125,7 +168,14 @@ const OrderListPage: React.FC = () => {
       cancelText: "Cancel",
       onOk() {
         const ids = selectedOrders.map((order) => order.id);
-        dispatch(deleteOrder({ ids }, session?.accessToken || "", onSuccess, onFailure) as any);
+        dispatch(
+          deleteOrder(
+            { ids },
+            session?.accessToken || "",
+            onSuccess,
+            onFailure
+          ) as any
+        );
       },
     });
   };
@@ -144,7 +194,14 @@ const OrderListPage: React.FC = () => {
       cancelText: "Cancel",
       onOk() {
         const ids = selectedOrders.map((order) => order.id);
-        dispatch(restoreOrder({ ids }, session?.accessToken || "", onSuccess, onFailure) as any);
+        dispatch(
+          restoreOrder(
+            { ids },
+            session?.accessToken || "",
+            onSuccess,
+            onFailure
+          ) as any
+        );
       },
     });
   };
@@ -163,7 +220,14 @@ const OrderListPage: React.FC = () => {
       cancelText: "Cancel",
       onOk() {
         const ids = selectedOrders.map((order) => order.id);
-        dispatch(permanentDeleteOrder({ ids }, session?.accessToken || "", onSuccess, onFailure) as any);
+        dispatch(
+          permanentDeleteOrder(
+            { ids },
+            session?.accessToken || "",
+            onSuccess,
+            onFailure
+          ) as any
+        );
       },
     });
   };
@@ -211,7 +275,11 @@ const OrderListPage: React.FC = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: number) => <Tag color={statusMap[status]?.color || "default"}>{statusMap[status]?.label || status}</Tag>,
+      render: (status: number) => (
+        <Tag color={statusMap[status]?.color || "default"}>
+          {statusMap[status]?.label || status}
+        </Tag>
+      ),
     },
     {
       title: "Created",
@@ -220,7 +288,9 @@ const OrderListPage: React.FC = () => {
       render: (date: string) => (
         <div>
           <div className="text-sm">{new Date(date).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">{new Date(date).toLocaleTimeString()}</div>
+          <div className="text-xs text-gray-500">
+            {new Date(date).toLocaleTimeString()}
+          </div>
         </div>
       ),
     },
@@ -248,12 +318,12 @@ const OrderListPage: React.FC = () => {
               },
             ]
           : [
-              {
-                key: "view",
-                label: "View",
-                icon: <EyeOutlined />,
-                onClick: () => handleView(record),
-              },
+              // {
+              //   key: "view",
+              //   label: "View",
+              //   icon: <EyeOutlined />,
+              //   onClick: () => handleView(record),
+              // },
               {
                 key: "edit",
                 label: "Edit",
@@ -279,7 +349,9 @@ const OrderListPage: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-5">{deleteFlg === 1 ? "Trash" : "Orders"}</h1>
+      <h1 className="text-4xl font-bold mb-5">
+        {deleteFlg === 1 ? "Trash" : "Orders"}
+      </h1>
 
       <div className="flex flex-wrap gap-2 mb-6 items-center justify-between">
         <div className="flex flex-wrap gap-2 items-center">
@@ -295,7 +367,11 @@ const OrderListPage: React.FC = () => {
             }}
             style={{ width: 200 }}
           />
-          <Select value={status} onChange={setStatus} className="w-[120px] !h-[40px]">
+          <Select
+            value={status}
+            onChange={setStatus}
+            className="w-[120px] !h-[40px]"
+          >
             <Option value="all">All Status</Option>
             <Option value={0}>Pending</Option>
             <Option value={1}>Processing</Option>
@@ -316,7 +392,11 @@ const OrderListPage: React.FC = () => {
             <Option value={0}>Active</Option>
             <Option value={1}>Trash</Option>
           </Select>
-          <Select value={sortDesc} onChange={(v) => setSortDesc(v)} className="w-[120px] !h-[40px]">
+          <Select
+            value={sortDesc}
+            onChange={(v) => setSortDesc(v)}
+            className="w-[120px] !h-[40px]"
+          >
             <Option value={false}>Ascending</Option>
             <Option value={true}>Descending</Option>
           </Select>
@@ -324,19 +404,40 @@ const OrderListPage: React.FC = () => {
         <div className="flex gap-2">
           {deleteFlg === 1 ? (
             <>
-              <Button type="default" icon={<RestOutlined />} onClick={handleBulkRestore} disabled={selectedOrders.length === 0}>
+              <Button
+                type="default"
+                icon={<RestOutlined />}
+                onClick={handleBulkRestore}
+                disabled={selectedOrders.length === 0}
+              >
                 Restore Selected ({selectedOrders.length})
               </Button>
-              <Button type="primary" danger icon={<DeleteFilled />} onClick={handleBulkPermanentDelete} disabled={selectedOrders.length === 0}>
+              <Button
+                type="primary"
+                danger
+                icon={<DeleteFilled />}
+                onClick={handleBulkPermanentDelete}
+                disabled={selectedOrders.length === 0}
+              >
                 Delete Permanently ({selectedOrders.length})
               </Button>
             </>
           ) : (
             <>
-              <Button type="default" danger icon={<DeleteOutlined />} onClick={handleBulkDelete} disabled={selectedOrders.length === 0}>
+              <Button
+                type="default"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={handleBulkDelete}
+                disabled={selectedOrders.length === 0}
+              >
                 Move to Trash ({selectedOrders.length})
               </Button>
-              <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push("/admin/order/create")}>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => router.push("/admin/order/create")}
+              >
                 Add New Order
               </Button>
             </>
@@ -362,7 +463,8 @@ const OrderListPage: React.FC = () => {
           total: orderTotal,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
           onChange: (page, pageSize) => {
             handleQuery(keyword, page, pageSize);
           },

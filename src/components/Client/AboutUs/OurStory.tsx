@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import MainTitle from "../Common/Title/MainTitle";
-import { motion } from "framer-motion";
 
 import {
   RocketOutlined,
@@ -107,17 +106,11 @@ const OurStory: React.FC = () => {
           subTitle="Passionate About Perfecting Every Shot"
           content="From humble beginnings to a global clientele, True Color delivers vibrant, accurate, and market-ready images that make every property shine."
         />
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 md:gap-12 mt-12"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-12 mt-12">
           {data.map((itemData, index) => {
             const Icon = itemData.icon;
             return (
-              <motion.div key={index} variants={item}>
+              <div key={index}>
                 <div className="w-full h-[360px] xl:h-[440px] overflow-hidden rounded-xl border border-gray-50 mb-5">
                   <Image
                     src={`/images/${itemData.image}`}
@@ -131,10 +124,10 @@ const OurStory: React.FC = () => {
                   <Icon style={{ color: "#2D6DFF" }} /> {itemData.title}
                 </h3>
                 <p className="text-gray-600 mt-2">{itemData.description}</p>
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
