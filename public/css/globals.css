@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import url('./custom-antd.css');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import url("./custom-antd.css");
 
 @tailwind base;
 @tailwind components;
@@ -25,7 +25,7 @@ body {
   font-family: var(--font-poppins), sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -96,7 +96,7 @@ html {
   }
 
   /* Fix for potential motion div overflow */
-  [class*='motion'],
+  [class*="motion"],
   .motion-div {
     max-width: 100%;
     overflow-x: hidden;
@@ -400,10 +400,10 @@ html {
   width: 32px;
   height: 32px;
   background-color: transparent;
-  content: ' ';
+  content: " ";
   display: block;
   position: absolute;
-  background-image: url('https://www.djumla.de/templates/dj2025/assets/img/edge/edge-brand-light.svg');
+  background-image: url("https://www.djumla.de/templates/dj2025/assets/img/edge/edge-brand-light.svg");
   background-size: cover;
   background-position: center;
   transform: rotate(-90deg);
@@ -477,10 +477,10 @@ html {
   width: 32px;
   height: 32px;
   background-color: transparent;
-  content: ' ';
+  content: " ";
   display: block;
   position: absolute;
-  background-image: url('https://www.djumla.de/templates/dj2025/assets/img/edge/edge-white.svg');
+  background-image: url("https://www.djumla.de/templates/dj2025/assets/img/edge/edge-white.svg");
   background-size: cover;
   background-position: center;
   bottom: 0;
@@ -503,10 +503,10 @@ html {
   width: 32px;
   height: 32px;
   background-color: transparent;
-  content: ' ';
+  content: " ";
   display: block;
   position: absolute;
-  background-image: url('https://www.djumla.de/templates/dj2025/assets/img/edge/edge-brand-light.svg');
+  background-image: url("https://www.djumla.de/templates/dj2025/assets/img/edge/edge-brand-light.svg");
   background-size: cover;
   background-position: center;
   bottom: -1px;

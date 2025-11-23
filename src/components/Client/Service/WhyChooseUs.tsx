@@ -7,14 +7,10 @@ import CheckIcon from "@/components/Icons/CheckIcon";
 import { getImageUrl } from "@/utils/imageUrl";
 
 const WhyChooseUs: React.FC<{ steps: any }> = ({ steps }) => {
-  const [activeStepIndex, setActiveStepIndex] = useState<number[]>([0, 0, 0]); // Track active step for each feature
-
-  // Parse steps if it's a JSON string
   const parsedSteps = React.useMemo(() => {
     if (!steps) return [];
 
     try {
-      // If steps is a string, parse it
       if (typeof steps === "string") {
         const parsed = JSON.parse(steps);
         return parsed;
@@ -28,22 +24,9 @@ const WhyChooseUs: React.FC<{ steps: any }> = ({ steps }) => {
     }
   }, [steps]);
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.2, delayChildren: 0.1 },
-    },
-  };
-
-  const item: any = {
-    hidden: { opacity: 0, y: 40 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-    },
-  };
+  const [activeStepIndex, setActiveStepIndex] = useState<number[]>(
+    Array(parsedSteps?.length || 0).fill(0)
+  );
 
   const handleStepClick = (featureIndex: number, stepIndex: number) => {
     const newActiveSteps = [...activeStepIndex];
@@ -52,7 +35,7 @@ const WhyChooseUs: React.FC<{ steps: any }> = ({ steps }) => {
   };
 
   if (!parsedSteps || parsedSteps.length === 0) {
-    return null; // Don't render the section if there are no steps
+    return null;
   }
 
   return (

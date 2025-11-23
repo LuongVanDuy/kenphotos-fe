@@ -36,6 +36,7 @@ export const CompareSlider: React.FC<CompareSliderProps> = ({
             setPosition(rounded);
           }
         }}
+        onlyHandleDraggable={true} // **Cái này rất quan trọng**
         itemOne={
           <div className="relative w-full h-full">
             <ReactCompareSliderImage

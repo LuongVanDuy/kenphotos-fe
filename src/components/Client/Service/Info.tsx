@@ -12,44 +12,6 @@ import { CompareSlider } from "@/components/Client/Common/CompareSlider";
 import { useScrollToForm } from "@/utils/scrollToForm";
 import { getImageUrl } from "@/utils/imageUrl";
 
-const accordionData = [
-  {
-    title: "Ideal for",
-    content: (
-      <ul className="list-disc list-inside space-y-1">
-        <li>Exterior or Drone images</li>
-        <li>Pre-blended images</li>
-        <li>Smart phone photos</li>
-        <li>Fast, budget–friendly image improvements</li>
-      </ul>
-    ),
-  },
-  {
-    title: "Includes",
-    content: (
-      <ul className="list-disc list-inside space-y-1">
-        <li>Image sharpening</li>
-        <li>Vertical and horizontal straightening</li>
-        <li>Color correction | White balance</li>
-        <li>Brightness and contrast adjustment</li>
-        <li>Lens distortion correction</li>
-        <li>Lens spot removal</li>
-      </ul>
-    ),
-  },
-  {
-    title: "Add-ons (4)",
-    content: (
-      <ul className="list-disc list-inside space-y-1">
-        <li>Sky Replacement</li>
-        <li>Object Removal</li>
-        <li>Virtual Staging</li>
-        <li>Twilight Conversion</li>
-      </ul>
-    ),
-  },
-];
-
 interface InfoProps {
   serviceDetail: any;
 }
@@ -58,6 +20,43 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
   const swiperRef = useRef<SwiperCore | null>();
   const [activeTab, setActiveTab] = useState<number>(0);
   const scrollToForm = useScrollToForm();
+
+  console.log(serviceDetail);
+
+  const accordionData = [
+    {
+      title: "Ideal For",
+      content: (
+        <ul className="list-disc ml-5">
+          {serviceDetail.idealFors?.map((item: any) => (
+            <li key={item.id}>{item.label}</li>
+          )) || <li>...</li>}
+        </ul>
+      ),
+    },
+    {
+      title: "Includes",
+      content: (
+        <ul className="list-disc ml-5">
+          {serviceDetail.includes?.map((item: any) => (
+            <li key={item.id}>{item.label}</li>
+          )) || <li>...</li>}
+        </ul>
+      ),
+    },
+    {
+      title: "Add-Ons",
+      content: (
+        <ul className="list-disc ml-5">
+          {serviceDetail.addOns?.map((item: any) => (
+            <li key={item.id}>
+              <strong>{item.title}:</strong> {item.description}
+            </li>
+          )) || <li>...</li>}
+        </ul>
+      ),
+    },
+  ];
 
   return (
     <section className="w-full bg-section pt-[100px] md:pt-[180px]">
@@ -103,7 +102,6 @@ const Info: React.FC<InfoProps> = ({ serviceDetail }) => {
                     <span className="text-gray-400 font-bold">$0.00</span>
                   )}
                 </div>
-                {/* Rating */}
                 <div className="flex items-center gap-2">
                   {serviceDetail?.rating !== undefined && (
                     <div className="flex items-center">

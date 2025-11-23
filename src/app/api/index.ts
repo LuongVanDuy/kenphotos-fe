@@ -15,7 +15,7 @@ export async function fetchApi(
     method,
     headers,
     body: body ? JSON.stringify(body) : null,
-    cache: "no-store",
+    next: { revalidate: 1 },
   };
 
   try {

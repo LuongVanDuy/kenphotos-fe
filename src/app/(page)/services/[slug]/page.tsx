@@ -42,7 +42,6 @@ export default async function ServiceDetails({
     : params.slug;
   const service = await fetchServiceMeta(slugPath);
 
-  console.log("DEBUG - service data for slug:", slugPath, service);
   if (!service) {
     notFound();
   }
